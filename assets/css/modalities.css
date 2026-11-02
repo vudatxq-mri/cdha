@@ -154,3 +154,365 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0,0,0,.08);
 }
+
+
+/* ============================================================================
+   BẢNG MÀU PHỐI NỀN RIÊNG CHO TỪNG PHÂN HỆ & QUY TRÌNH
+   YÊU CẦU: MỖI DANH MỤC, QUY TRÌNH TẠO VÀ PHỐI NỀN MÀU RIÊNG
+   ============================================================================ */
+
+/* 1. X-QUANG: Xanh Băng Tuyết / Cyan */
+.modality-page-wrap.theme-xq {
+  --mod-bg: #f0f9ff;
+  --mod-card-bg: #ffffff;
+  --mod-border: #bae6fd;
+  --mod-header-grad: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  --mod-glow: rgba(2, 132, 199, 0.15);
+}
+.theme-xq .col-sidebar-left { background: #f8fcff; border-color: #bae6fd; }
+.theme-xq .detail-header {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.10) 0%, rgba(224, 242, 254, 0.45) 100%);
+  border-left: 5px solid var(--c-xq);
+  border-bottom: 2px solid #bae6fd;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-xq .lesson-item-btn.active {
+  background: #e0f2fe !important;
+  border-left: 4px solid var(--c-xq) !important;
+  color: #0369a1 !important;
+  font-weight: 700;
+}
+.theme-xq .region-pill.active {
+  background: var(--c-xq) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+
+/* 2. CT-SCANNER: Xanh Sapphire / Cobalt */
+.modality-page-wrap.theme-ct {
+  --mod-bg: #eff6ff;
+  --mod-card-bg: #ffffff;
+  --mod-border: #bfdbfe;
+  --mod-header-grad: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  --mod-glow: rgba(37, 99, 235, 0.15);
+}
+.theme-ct .col-sidebar-left { background: #f8faff; border-color: #bfdbfe; }
+.theme-ct .detail-header {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(219, 234, 254, 0.45) 100%);
+  border-left: 5px solid var(--c-ct);
+  border-bottom: 2px solid #bfdbfe;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-ct .lesson-item-btn.active {
+  background: #dbeafe !important;
+  border-left: 4px solid var(--c-ct) !important;
+  color: #1d4ed8 !important;
+  font-weight: 700;
+}
+.theme-ct .region-pill.active {
+  background: var(--c-ct) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+/* 3. MRI MASTER: Tím Hoàng Gia / Indigo */
+.modality-page-wrap.theme-mri {
+  --mod-bg: #f5f3ff;
+  --mod-card-bg: #ffffff;
+  --mod-border: #ddd6fe;
+  --mod-header-grad: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%);
+  --mod-glow: rgba(79, 70, 229, 0.15);
+}
+.theme-mri .col-sidebar-left { background: #faf8ff; border-color: #ddd6fe; }
+.theme-mri .detail-header {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(237, 233, 254, 0.45) 100%);
+  border-left: 5px solid var(--c-mri);
+  border-bottom: 2px solid #ddd6fe;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-mri .lesson-item-btn.active {
+  background: #ede9fe !important;
+  border-left: 4px solid var(--c-mri) !important;
+  color: #4338ca !important;
+  font-weight: 700;
+}
+.theme-mri .region-pill.active {
+  background: var(--c-mri) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+}
+
+/* 4. SIÊU ÂM: Xanh Ngọc Lục Bảo / Mint Emerald */
+.modality-page-wrap.theme-us {
+  --mod-bg: #ecfdf5;
+  --mod-card-bg: #ffffff;
+  --mod-border: #a7f3d0;
+  --mod-header-grad: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+  --mod-glow: rgba(5, 150, 105, 0.15);
+}
+.theme-us .col-sidebar-left { background: #f6fef9; border-color: #a7f3d0; }
+.theme-us .detail-header {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12) 0%, rgba(209, 250, 229, 0.45) 100%);
+  border-left: 5px solid var(--c-us);
+  border-bottom: 2px solid #a7f3d0;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-us .lesson-item-btn.active {
+  background: #d1fae5 !important;
+  border-left: 4px solid var(--c-us) !important;
+  color: #047857 !important;
+  font-weight: 700;
+}
+.theme-us .region-pill.active {
+  background: var(--c-us) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+}
+
+/* 5. SIÊU ÂM CAN THIỆP: Cam San Hô / Tangerine */
+.modality-page-wrap.theme-canthiep {
+  --mod-bg: #fff7ed;
+  --mod-card-bg: #ffffff;
+  --mod-border: #fed7aa;
+  --mod-header-grad: linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%);
+  --mod-glow: rgba(234, 88, 12, 0.15);
+}
+.theme-canthiep .col-sidebar-left { background: #fffbf7; border-color: #fed7aa; }
+.theme-canthiep .detail-header {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.12) 0%, rgba(255, 237, 213, 0.45) 100%);
+  border-left: 5px solid var(--c-canthiep);
+  border-bottom: 2px solid #fed7aa;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-canthiep .lesson-item-btn.active {
+  background: #ffedd5 !important;
+  border-left: 4px solid var(--c-canthiep) !important;
+  color: #c2410c !important;
+  font-weight: 700;
+}
+.theme-canthiep .region-pill.active {
+  background: var(--c-canthiep) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.4);
+}
+
+/* 6. ĐO LOÃNG XƯƠNG DEXA: Tím Thạch Anh / Violet */
+.modality-page-wrap.theme-dlx {
+  --mod-bg: #faf5ff;
+  --mod-card-bg: #ffffff;
+  --mod-border: #e9d5ff;
+  --mod-header-grad: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
+  --mod-glow: rgba(124, 58, 237, 0.15);
+}
+.theme-dlx .col-sidebar-left { background: #fdfaff; border-color: #e9d5ff; }
+.theme-dlx .detail-header {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(243, 232, 255, 0.45) 100%);
+  border-left: 5px solid var(--c-dlx);
+  border-bottom: 2px solid #e9d5ff;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-dlx .lesson-item-btn.active {
+  background: #f3e8ff !important;
+  border-left: 4px solid var(--c-dlx) !important;
+  color: #6d28d9 !important;
+  font-weight: 700;
+}
+.theme-dlx .region-pill.active {
+  background: var(--c-dlx) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+}
+
+/* 7. THUỐC CẢN QUANG: Hồng Cánh Sen / Magenta Rose */
+.modality-page-wrap.theme-cq {
+  --mod-bg: #fdf2f8;
+  --mod-card-bg: #ffffff;
+  --mod-border: #fbcfe8;
+  --mod-header-grad: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+  --mod-glow: rgba(219, 39, 119, 0.15);
+}
+.theme-cq .col-sidebar-left { background: #fef9fc; border-color: #fbcfe8; }
+.theme-cq .detail-header {
+  background: linear-gradient(135deg, rgba(219, 39, 119, 0.12) 0%, rgba(252, 231, 243, 0.45) 100%);
+  border-left: 5px solid var(--c-cq);
+  border-bottom: 2px solid #fbcfe8;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-cq .lesson-item-btn.active {
+  background: #fce7f3 !important;
+  border-left: 4px solid var(--c-cq) !important;
+  color: #be185d !important;
+  font-weight: 700;
+}
+.theme-cq .region-pill.active {
+  background: var(--c-cq) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(219, 39, 119, 0.4);
+}
+
+/* 8. TAI BIẾN & CẤP CỨU: Đỏ Báo Động / Crimson Alert */
+.modality-page-wrap.theme-emg {
+  --mod-bg: #fef2f2;
+  --mod-card-bg: #ffffff;
+  --mod-border: #fecaca;
+  --mod-header-grad: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+  --mod-glow: rgba(220, 38, 38, 0.15);
+}
+.theme-emg .col-sidebar-left { background: #fff8f8; border-color: #fecaca; }
+.theme-emg .detail-header {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.14) 0%, rgba(254, 226, 226, 0.5) 100%);
+  border-left: 5px solid var(--c-emg);
+  border-bottom: 2px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.theme-emg .lesson-item-btn.active {
+  background: #fee2e2 !important;
+  border-left: 4px solid var(--c-emg) !important;
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+.theme-emg .region-pill.active {
+  background: var(--c-emg) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+/* KHỐI CẢNH BÁO LÂM SÀNG NỔI BẬT ĐẶC BIỆT (CRITICAL MEDICAL ALERTS) */
+.clinical-alert-box {
+  margin: 14px 0 18px;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.clinical-alert-box.danger {
+  background: #fff5f5;
+  border: 2px solid #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+.clinical-alert-box.danger::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 6px;
+  background: #dc2626;
+}
+.clinical-alert-box.warning {
+  background: #fffbeb;
+  border: 2px solid #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+.clinical-alert-box.warning::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 6px;
+  background: #d97706;
+}
+
+.alert-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.alert-title-text {
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+}
+.clinical-alert-box.danger .alert-title-text { color: #b91c1c; }
+.clinical-alert-box.warning .alert-title-text { color: #b45309; }
+
+.alert-pulse-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 14px;
+  animation: alertPulseIcon 1.8s infinite;
+}
+@keyframes alertPulseIcon {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.18); filter: brightness(1.2); }
+}
+
+.alert-body-content {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #1e293b;
+}
+.alert-body-content ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+.alert-body-content li {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* THẺ CẢNH BÁO NHANH (TAGS / BADGES) */
+.alert-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.alert-tag.danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+}
+.alert-tag.warn {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+.alert-tag.info {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #7dd3fc;
+}
+
+/* GIAO DIỆN XÁC THỰC QUYỀN ADMIN */
+.admin-badge-banner {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #f8fafc;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #334155;
+  font-size: 13px;
+}
+.btn-lock-admin {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  border-radius: var(--pill);
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-lock-admin:hover {
+  background: #dc2626;
+  color: #fff;
+}

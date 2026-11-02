@@ -1,8 +1,9 @@
-# BỆNH VIỆN VĨNH PHÚC VPI — SỔ TAY ĐIỆN TỬ & ĐÀO TẠO THỰC HÀNH CĐHA
+# SỔ CĐHA — BỆNH VIỆN VĨNH PHÚC VPI
+**Tên ứng dụng:** SỔ CĐHA (chuẩn hóa đồng bộ cùng 5S VPI và CĐHA VPI)  
 **Đơn vị:** Bệnh viện Vĩnh Phúc VPI — Khoa Chẩn Đoán Hình Ảnh  
 **Địa chỉ Vercel Cloud:** `https://sotay-cdha-vudat.vercel.app/`  
 **Liên hệ:** Email: vudatxq@gmail.com | Hotline: +84916306115  
-**Phiên bản:** v2.6 PWA Mobile & External Access Edition
+**Phiên bản:** v2.7 Clinical Admin & Safety Edition (Phối màu phân hệ riêng • Quyền Admin Cài đặt • Cảnh báo an toàn nổi bật)
 
 ---
 

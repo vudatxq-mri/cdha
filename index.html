@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>BỆNH VIỆN VĨNH PHÚC VPI — Sổ Tay Điện Tử Chẩn Đoán Hình Ảnh</title>
-  <meta name="description" content="Sổ tay điện tử tra cứu kỹ thuật Chẩn đoán hình ảnh toàn diện — Bệnh viện Vĩnh Phúc VPI. X-quang, CT-Scanner, MRI Master, Siêu âm, Đo loãng xương, Thuốc cản quang, Cấp cứu.">
+  <title>SỔ CĐHA — Bệnh Viện Vĩnh Phúc VPI</title>
+  <meta name="description" content="Sổ CĐHA — Tra cứu kỹ thuật Chẩn đoán hình ảnh toàn diện Bệnh viện Vĩnh Phúc VPI. X-quang, CT-Scanner, MRI Master, Siêu âm, Đo loãng xương, Thuốc cản quang, Cấp cứu.">
   <meta name="theme-color" content="#0284c7">
 
   <!-- PWA & MOBILE APP CAPABILITIES (CÀI ĐẶT APP RA MÀN HÌNH CHÍNH & XEM NGOẠI VIỆN) -->
@@ -14,7 +14,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Sổ Tay CĐHA VPI">
+  <meta name="apple-mobile-web-app-title" content="SỔ CĐHA">
 
   <!-- STYLESHEETS -->
   <link rel="stylesheet" href="assets/css/style.css">
@@ -27,13 +27,13 @@
   <header class="appbar">
     <div class="appbar-inner">
       <!-- TIÊU ĐỀ SỔ TAY BÊN TRÁI -->
-      <button class="brand-btn" onclick="location.hash='home'" title="Về trang chủ Sổ tay CĐHA">
+      <button class="brand-btn" onclick="location.hash='home'" title="Về trang chủ SỔ CĐHA">
         <div class="brand-logo-wrap">
           <div class="brand-book-badge">📖</div>
         </div>
         <div class="brand-text">
-          <b>SỔ TAY ĐIỆN TỬ CĐHA</b>
-          <span>Kỹ Thuật Thực Hành Lâm Sàng</span>
+          <b>SỔ CĐHA</b>
+          <span>Bệnh Viện Vĩnh Phúc VPI</span>
         </div>
       </button>
 
@@ -173,18 +173,73 @@
     </button>
   </nav>
 
-  <!-- ===== MODAL CÀI ĐẶT & QUẢN TRỊ NỘI DUNG (YÊU CẦU #8) ===== -->
+  <!-- ===== MODAL XÁC THỰC QUYỀN ADMIN (QUẢN TRỊ VIÊN) ===== -->
+  <div class="modal-overlay" id="adminAuthModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideAdminAuthModal()">
+    <div class="modal-box" style="max-width:440px;" id="adminAuthBox">
+      <div class="modal-head" style="background:#0f172a;color:#fff;border-radius:14px 14px 0 0;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">🔐</span>
+          <b style="font-size:15px;">YÊU CẦU QUYỀN ADMIN QUẢN TRỊ</b>
+        </div>
+        <button class="modal-close-btn" style="color:#fff;" onclick="window.VUDAT_APP.hideAdminAuthModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <div style="text-align:center;margin-bottom:16px;">
+          <div style="width:56px;height:56px;margin:0 auto 10px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;">
+            👑
+          </div>
+          <b style="font-size:15px;color:var(--text);display:block;margin-bottom:4px;">Xác Thực Quyền Quản Trị Viên (Admin)</b>
+          <p style="font-size:12.5px;color:var(--text-soft);margin:0;line-height:1.45;">
+            Phần Cài đặt hệ thống, Cấu hình an toàn và Quản trị dữ liệu chỉ dành cho Admin Khoa CĐHA Bệnh viện Vĩnh Phúc VPI.
+          </p>
+        </div>
+
+        <div class="form-field" style="margin-bottom:14px;">
+          <label style="font-weight:700;font-size:13px;display:block;margin-bottom:6px;">Mật khẩu Admin hoặc Mã PIN Quản trị</label>
+          <input type="password" id="adminPassInput" placeholder="Nhập PIN hoặc Mật khẩu Admin..." style="width:100%;height:44px;padding:8px 12px;font-size:15px;border-radius:8px;border:1px solid var(--line);text-align:center;letter-spacing:2px;font-weight:700;" onkeydown="if(event.key==='Enter')window.VUDAT_APP.verifyAdminAccess()">
+        </div>
+
+        <div id="adminAuthErrorMsg" style="color:var(--danger);font-size:12.5px;font-weight:700;margin-bottom:12px;text-align:center;min-height:18px;"></div>
+
+        <div style="display:flex;gap:10px;">
+          <button class="btn-action-pill" onclick="window.VUDAT_APP.hideAdminAuthModal()" style="flex:1;height:42px;justify-content:center;">
+            Hủy bỏ
+          </button>
+          <button class="btn-action-pill" onclick="window.VUDAT_APP.verifyAdminAccess()" style="flex:1;height:42px;justify-content:center;background:var(--brand);color:#fff;font-weight:700;">
+            👑 Xác nhận Admin
+          </button>
+        </div>
+
+        <div style="font-size:11.5px;color:var(--text-muted);margin-top:14px;text-align:center;border-top:1px dashed var(--line);padding-top:10px;">
+          * Mật khẩu mặc định Admin ban đầu: <b>123</b> hoặc mã PIN <b>1234</b>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL CÀI ĐẶT & QUẢN TRỊ NỘI DUNG (CHỈ DÀNH CHO ADMIN) ===== -->
   <div class="modal-overlay" id="settingsModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideSettingsModal()">
     <div class="modal-box" style="max-width:620px;">
       <div class="modal-head">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:20px;">⚙️</span>
-          <b style="font-size:16px;">Cài Đặt & Quản Trị Nội Dung Sổ Tay</b>
+          <b style="font-size:16px;">Cài Đặt & Quản Trị Nội Dung (Admin)</b>
         </div>
         <button class="modal-close-btn" onclick="window.VUDAT_APP.hideSettingsModal()">&times;</button>
       </div>
 
       <div class="modal-body">
+        <!-- BANNER QUYỀN ADMIN (YÊU CẦU QUYỀN ADMIN) -->
+        <div class="admin-badge-banner">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;">👑</span>
+            <b>QUYỀN QUẢN TRỊ VIÊN (ADMIN) — KHOA CĐHA BV VPI</b>
+          </div>
+          <button class="btn-lock-admin" onclick="window.VUDAT_APP.lockAdminSession()" title="Khóa để bảo vệ quyền Admin">
+            🔒 Khóa Admin
+          </button>
+        </div>
+
         <!-- TAB QUẢN TRỊ -->
         <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:10px;overflow-x:auto;">
           <button id="setTab_view" class="navpill active" onclick="window.VUDAT_APP.switchSettingsTab('view')">🎨 Giao diện</button>
@@ -357,8 +412,8 @@
     <div class="pin-card" id="pinCardBox">
       <img src="assets/images/logo-vpi.jpg" alt="Logo VPI" class="pin-hosp-logo">
       <h3>BỆNH VIỆN VĨNH PHÚC VPI</h3>
-      <div class="pin-subtitle">KHOA CHẨN ĐOÁN HÌNH ẢNH — BẢO MẬT NỘI BỘ</div>
-      <div class="pin-prompt" id="pinPromptText">Nhập mã PIN để mở khóa sổ tay</div>
+      <div class="pin-subtitle">SỔ CĐHA — BẢO MẬT NỘI BỘ</div>
+      <div class="pin-prompt" id="pinPromptText">Nhập mã PIN để mở khóa Sổ CĐHA</div>
       
       <!-- 4 PIN DOTS -->
       <div class="pin-dots-container" id="pinDotsRow">
@@ -402,16 +457,16 @@
       <div class="modal-head">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:22px;">📲</span>
-          <b style="font-size:16px;">Cài Đặt Sổ Tay CĐHA Ra Màn Hình</b>
+          <b style="font-size:16px;">Cài Đặt SỔ CĐHA Ra Màn Hình</b>
         </div>
         <button class="modal-close-btn" onclick="window.VUDAT_APP.hideInstallModal()">&times;</button>
       </div>
       <div class="modal-body">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 12px;background:var(--brand-wash);border-radius:10px;">
-          <img src="assets/icons/icon-192.png" alt="Icon Sổ Tay CĐHA" style="width:48px;height:48px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.15);object-fit:cover;">
+          <img src="assets/icons/icon-192.png" alt="Icon SỔ CĐHA" style="width:48px;height:48px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.15);object-fit:cover;">
           <div>
-            <b style="font-size:14px;color:var(--brand-dark);display:block;">SỔ TAY CĐHA — BV VĨNH PHÚC VPI</b>
-            <span style="font-size:12px;color:var(--text-soft);">Mở nhanh như App, chạy ngoại tuyến 100% không cần mạng</span>
+            <b style="font-size:14px;color:var(--brand-dark);display:block;">SỔ CĐHA — BỆNH VIỆN VĨNH PHÚC VPI</b>
+            <span style="font-size:12px;color:var(--text-soft);">Mở nhanh như App 5S & CĐHA VPI, xem ngoại viện 100% không cần mạng</span>
           </div>
         </div>
 
@@ -531,9 +586,9 @@
 
   <!-- ===== BANNER NHẮC CÀI ĐẶT APP NỔI GÓC MÀN HÌNH ===== -->
   <div class="pwa-floating-banner" id="pwaFloatingBanner" style="display:none;">
-    <img src="assets/icons/icon-192.png" alt="Icon Sổ tay" class="pwa-banner-icon">
+    <img src="assets/icons/icon-192.png" alt="Icon SỔ CĐHA" class="pwa-banner-icon">
     <div class="pwa-banner-content">
-      <div class="pwa-banner-title">Cài Sổ Tay CĐHA ra màn hình</div>
+      <div class="pwa-banner-title">Cài SỔ CĐHA ra màn hình</div>
       <div class="pwa-banner-sub">Xem ngoại viện mượt mà, mở nhanh trong 0.2s không cần mạng.</div>
       <div class="pwa-banner-actions">
         <button class="pwa-btn-sm-install" onclick="window.VUDAT_APP.promptInstallApp()">Cài đặt App</button>

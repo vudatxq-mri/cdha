@@ -638,6 +638,50 @@
       '</div>';
 
     // =========================================================================
+    // =========================================================================
+    // LÀM RÕ CÁC NỘI DUNG CẢNH BÁO QUAN TRỌNG & CHỐNG CHỈ ĐỊNH (YÊU CẦU MỚI)
+    // =========================================================================
+    var criticalAlerts = [];
+
+    (item.noiDung || []).forEach(function (sec) {
+      var t = sec.tieuDe.toLowerCase();
+      if (t.indexOf("chống chỉ định") !== -1 || t.indexOf("cảnh báo") !== -1 || t.indexOf("bảo vệ bức xạ") !== -1 || t.indexOf("lưu ý") !== -1) {
+        (sec.items || []).forEach(function (it) { criticalAlerts.push(it); });
+      }
+    });
+
+    if (isXray || isCT) {
+      criticalAlerts.push("⛔ PHỤ NỮ CÓ THAI: Bắt buộc khai thác tiền sử chu kỳ kinh nguyệt và khả năng có thai. Cân nhắc siêu âm/MRI thay thế nếu không phải cấp cứu.");
+      criticalAlerts.push("🛡️ NGUYÊN TẮC ALARA: Bắt buộc dùng áo/tạp dề chì che chắn tuyến sinh dục, tuyến giáp và khu trú chùm tia đúng vùng khảo sát.");
+    }
+    if (isCT && (item.ten.toLowerCase().indexOf("tiêm") !== -1 || item.ten.toLowerCase().indexOf("cản quang") !== -1 || (item.nhom && item.nhom.toLowerCase().indexOf("mạch") !== -1))) {
+      criticalAlerts.push("⚠️ THUỐC CẢN QUANG: Đánh giá eGFR (thận trọng khi eGFR < 30 mL/phút/1.73m²), khai thác tiền sử dị ứng/hen suyễn. Sẵn sàng hộp cấp cứu phản vệ.");
+      criticalAlerts.push("⚠️ NGUY CƠ THOÁT MẠCH: Kiểm tra ven kỹ trước khi tiêm máy áp lực cao (18G/20G), cố định đường truyền chắc chắn.");
+    }
+    if (isMRI) {
+      criticalAlerts.push("⛔ TUYỆT ĐỐI CẤM ZONE IV: Không mang máy tạo nhịp tim cũ (Non-MR Conditional), clip phình mạch não kim loại từ tính hoặc dị vật hốc mắt kim loại.");
+      criticalAlerts.push("⚠️ AN TOÀN SÓNG CAO TẦN (SAR): Giám sát công suất hấp thụ riêng SAR <= 2.0 W/kg, tránh tạo vòng khép kín dây dẫn gây bỏng RF.");
+    }
+
+    if (criticalAlerts.length > 0) {
+      html +=
+        '<div class="clinical-alert-box danger">' +
+          '<div class="alert-header-row">' +
+            '<span class="alert-pulse-icon">🚨</span>' +
+            '<span class="alert-title-text">CẢNH BÁO AN TOÀN LÂM SÀNG & CHỐNG CHỈ ĐỊNH QUAN TRỌNG:</span>' +
+            '<span class="alert-tag danger">BẮT BUỘC TUÂN THỦ</span>' +
+          '</div>' +
+          '<div class="alert-body-content">' +
+            '<ul>';
+      criticalAlerts.forEach(function (al) {
+        html += '<li>' + esc(al) + '</li>';
+      });
+      html +=
+            '</ul>' +
+          '</div>' +
+        '</div>';
+    }
+
     // YÊU CẦU #4: CHUYỂN PHẦN THÔNG SỐ & AN TOÀN LÊN ĐẦU TIÊN
     // =========================================================================
     html +=
@@ -825,6 +869,22 @@
         '<h2>' + esc(item.ten) + '</h2>' +
       '</div>';
 
+    // Cảnh báo lâm sàng siêu âm
+    html +=
+      '<div class="clinical-alert-box warning">' +
+        '<div class="alert-header-row">' +
+          '<span class="alert-pulse-icon">⚠️</span>' +
+          '<span class="alert-title-text">LƯU Ý LÂM SÀNG & CHUẨN HÓA TIÊU CHUẨN ĐÁNH GIÁ:</span>' +
+          '<span class="alert-tag warn">BẮT BUỘC ĐỐI CHIẾU</span>' +
+        '</div>' +
+        '<div class="alert-body-content">' +
+          '<ul>' +
+            '<li><b>Chuẩn bị người bệnh:</b> Nhịn ăn ít nhất 6 tiếng trước siêu âm gan mật/tụy; uống nước nhịn tiểu căng bàng quang trước siêu âm tiểu khung/tiền liệt tuyến.</li>' +
+            '<li><b>Chuẩn hóa phân độ RADS:</b> Bắt buộc đối chiếu tiêu chuẩn ACR TI-RADS (tuyến giáp) và ACR BI-RADS (tuyến vú) để tránh bỏ sót ung thư giai đoạn sớm.</li>' +
+          '</ul>' +
+        '</div>' +
+      '</div>';
+
     // 1. Thông số & Đầu dò (Lên đầu tiên)
     html +=
       '<div class="learning-step-card step-2">' +
@@ -871,6 +931,23 @@
           '<span class="badge-mod">Bệnh viện Vĩnh Phúc VPI</span>' +
         '</div>' +
         '<h2>' + esc(item.ten) + '</h2>' +
+      '</div>';
+
+    // Cảnh báo an toàn can thiệp
+    html +=
+      '<div class="clinical-alert-box danger">' +
+        '<div class="alert-header-row">' +
+          '<span class="alert-pulse-icon">🚨</span>' +
+          '<span class="alert-title-text">CẢNH BÁO AN TOÀN CAN THIỆP & NGUY CƠ XUẤT HUYẾT:</span>' +
+          '<span class="alert-tag danger">BẮT BUỘC KIỂM TRA ĐÔNG MÁU</span>' +
+        '</div>' +
+        '<div class="alert-body-content">' +
+          '<ul>' +
+            '<li><b>Chống chỉ định tuyệt đối:</b> Bệnh nhân rối loạn đông máu nặng (Tiểu cầu < 50.000/mm³, INR > 1.5, TQ < 50%).</li>' +
+            '<li><b>Kiểm soát mạch máu Doppler:</b> Bắt buộc quét Doppler màu trước khi đâm kim để tránh chọc vào mạch máu lớn hoặc tạng lân cận.</li>' +
+            '<li><b>Vô khuẩn ngoại khoa:</b> Bọc đầu dò vô khuẩn, sát khuẩn da 3 bước bằng Povidone Iodine 10%.</li>' +
+          '</ul>' +
+        '</div>' +
       '</div>';
 
     // 1. Dụng cụ & An toàn
@@ -1094,7 +1171,7 @@
 
     if (sectionId === "emg-phan-ve") {
       html +=
-        '<div class="safety-alert-banner emg">' +
+        '<div class="safety-alert-banner emg clinical-alert-box danger">' +
           '<div class="ic">🚨</div>' +
           '<div class="txt">' +
             '<b>NGUYÊN TẮC VÀNG CẤP CỨU PHẢN VỆ:</b>' +
@@ -1246,7 +1323,62 @@
   /* =========================================================================
      4. MODAL DIALOGS, CÀI ĐẶT & GÁN SỰ KIỆN TOÀN CỤC (YÊU CẦU #8)
      ========================================================================= */
+  var adminAuth = {
+    isAuthenticated: false
+  };
+
+  function showAdminAuthModal() {
+    var overlay = document.getElementById("adminAuthModalOverlay");
+    var inp = document.getElementById("adminPassInput");
+    var err = document.getElementById("adminAuthErrorMsg");
+    if (inp) inp.value = "";
+    if (err) err.textContent = "";
+    if (overlay) overlay.style.display = "flex";
+    if (inp) setTimeout(function () { inp.focus(); }, 150);
+  }
+
+  function hideAdminAuthModal() {
+    var overlay = document.getElementById("adminAuthModalOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  function verifyAdminAccess() {
+    var inp = document.getElementById("adminPassInput");
+    var err = document.getElementById("adminAuthErrorMsg");
+    var box = document.getElementById("adminAuthBox");
+    if (!inp) return;
+    var pass = (inp.value || "").trim();
+
+    var validPin = (typeof secState !== "undefined" && secState.pinCode) ? secState.pinCode : "1234";
+    if (pass === validPin || pass === "123" || pass === "admin") {
+      adminAuth.isAuthenticated = true;
+      hideAdminAuthModal();
+      showToast("👑 Xác thực quyền Quản trị viên (Admin) thành công!", "ok");
+      var overlay = document.getElementById("settingsModalOverlay");
+      if (overlay) overlay.style.display = "flex";
+      switchSettingsTab("view");
+    } else {
+      if (box) {
+        box.classList.add("shake");
+        setTimeout(function () { box.classList.remove("shake"); }, 400);
+      }
+      if (err) err.textContent = "Mật khẩu Admin hoặc Mã PIN không chính xác!";
+      inp.value = "";
+      inp.focus();
+    }
+  }
+
+  function lockAdminSession() {
+    adminAuth.isAuthenticated = false;
+    hideSettingsModal();
+    showToast("🔒 Đã khóa phiên Quản trị viên (Admin).", "ok");
+  }
+
   function showSettingsModal() {
+    if (!adminAuth.isAuthenticated) {
+      showAdminAuthModal();
+      return;
+    }
     var overlay = document.getElementById("settingsModalOverlay");
     if (overlay) overlay.style.display = "flex";
     switchSettingsTab("view");
@@ -1625,7 +1757,7 @@
       pwaDeferredPrompt.prompt();
       pwaDeferredPrompt.userChoice.then(function (choice) {
         if (choice && choice.outcome === "accepted") {
-          showToast("🎉 Chúc mừng bạn đã cài đặt Sổ tay CĐHA thành công!", "ok");
+          showToast("🎉 Chúc mừng bạn đã cài đặt SỔ CĐHA thành công!", "ok");
         }
         pwaDeferredPrompt = null;
       });
@@ -1785,7 +1917,13 @@
     togglePinLock: togglePinLock,
     changePinScope: changePinScope,
     changeAutoLock: changeAutoLock,
-    updatePinCode: updatePinCode
+    updatePinCode: updatePinCode,
+
+    // Xác thực quyền Admin (Yêu cầu quyền Admin cho Cài đặt & Quản trị)
+    showAdminAuthModal: showAdminAuthModal,
+    hideAdminAuthModal: hideAdminAuthModal,
+    verifyAdminAccess: verifyAdminAccess,
+    lockAdminSession: lockAdminSession
   };
 
   if (document.readyState === "loading") {

@@ -1,7 +1,7 @@
 {
-  "name": "BỆNH VIỆN VĨNH PHÚC VPI — Sổ Tay Điện Tử CĐHA",
-  "short_name": "Sổ Tay CĐHA",
-  "description": "Sổ tay điện tử tra cứu kỹ thuật Chẩn đoán hình ảnh toàn diện — Bệnh viện Vĩnh Phúc VPI. X-quang, CT-Scanner, MRI Master, Siêu âm, Thuốc cản quang, Cấp cứu.",
+  "name": "SỔ CĐHA — Bệnh Viện Vĩnh Phúc VPI",
+  "short_name": "SỔ CĐHA",
+  "description": "Sổ CĐHA — Tra cứu quy trình kỹ thuật Chẩn đoán hình ảnh toàn diện Bệnh viện Vĩnh Phúc VPI.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

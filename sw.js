@@ -3,7 +3,7 @@
    Hỗ trợ cài đặt PWA App trên Điện thoại / Máy tính & Chế độ Xem Ngoại Viện Offline
    ============================================================================ */
 
-var CACHE_NAME = 'vpi-cdha-cache-v2.6';
+var CACHE_NAME = 'vpi-cdha-cache-v2.7';
 
 var PRECACHE_ASSETS = [
   './',
