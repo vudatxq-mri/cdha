@@ -1,7 +1,8 @@
 /* ============================================================================
    TỐI ƯU HÓA ĐÁP ỨNG ĐA THIẾT BỊ (RESPONSIVE & MOBILE ADAPTATION)
-   SỔ TAY ĐIỆN TỬ CĐHA — VŨ ĐẠT CĐHA
-   Thiết kế cân đối hoàn hảo trên máy tính (Desktop/Laptop), Tablet và Điện thoại di động
+   SỔ CĐHA — BỆNH VIỆN VĨNH PHÚC VPI
+   Đồng bộ nhận diện với 5S VPI & CĐHA VPI.
+   Căn chỉnh cân đối hoàn hảo trên Máy tính, Máy tính bảng (Tablet) & Điện thoại di động
    ============================================================================ */
 
 /* THANH ĐIỀU HƯỚNG DƯỚI ĐÁY CHO DI ĐỘNG (MOBILE BOTTOM NAVIGATION) */
@@ -11,14 +12,16 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 56px;
   background: var(--surface);
   border-top: 1px solid var(--line);
-  z-index: 60;
-  padding: 4px 8px env(safe-area-inset-bottom, 4px);
+  z-index: 100;
+  padding: 2px 6px env(safe-area-inset-bottom, 2px);
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0 -2px 10px rgba(0,0,0,.06);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .mob-nav-item {
@@ -26,16 +29,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   background: none;
   border: none;
   color: var(--text-soft);
   font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 4px 6px;
   border-radius: var(--radius);
-  transition: all .15s;
+  transition: all .15s ease;
   flex: 1;
 }
 
@@ -54,131 +57,518 @@
   color: var(--danger);
 }
 
-/* THIẾT BỊ MÀN HÌNH NHỎ VÀ DI ĐỘNG (<= 768px) */
+/* THANH CHUYỂN ĐỔI CHẾ ĐỘ XEM TRÊN MOBILE (DANH MỤC <-> CHI TIẾT) */
+.mobile-view-tabs {
+  display: none;
+}
+
+.mobile-protocol-top-bar {
+  display: none;
+}
+
+.mobile-protocol-bottom-bar {
+  display: none;
+}
+
+/* ============================================================================
+   THIẾT BỊ MÀN HÌNH NHỎ VÀ DI ĐỘNG (<= 768px)
+   ============================================================================ */
 @media (max-width: 768px) {
   body {
-    padding-bottom: 70px; /* Chừa khoảng trống cho thanh bottom nav */
+    padding-bottom: 76px !important; /* Chừa khoảng trống an toàn cho Bottom Navigation */
   }
 
   .mobile-bottom-nav {
     display: flex;
   }
 
+  /* 1. THANH APPBAR TRÊN MOBILE: 2 DÒNG CÂN ĐỐI GỌN GÀNG */
   .appbar-inner {
-    padding: 8px 12px;
+    padding: 6px 10px;
     gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand-btn {
+    padding: 2px 4px;
+    gap: 7px;
+  }
+
+  .brand-book-badge {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+
+  .brand-text b {
+    font-size: 14.5px;
+    letter-spacing: -0.2px;
   }
 
   .brand-text span {
-    display: none; /* Ẩn dòng phụ trên điện thoại */
+    display: none !important; /* Ẩn dòng phụ để tên SỔ CĐHA nổi bật */
   }
 
+  /* Rút gọn nút và huy hiệu bên phải Header */
+  .header-actions {
+    gap: 5px;
+    margin-left: auto;
+  }
+
+  /* Huy hiệu ngoại viện: Chỉ giữ chấm tròn xanh/cam và icon nhỏ */
+  .network-badge {
+    padding: 4px 7px;
+    font-size: 11px;
+    height: 30px;
+  }
+  #networkStatusText {
+    display: none !important; /* Ẩn chữ dài trên mobile */
+  }
+
+  /* Nút Cài App */
+  .btn-pwa-install {
+    height: 30px;
+    padding: 0 9px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+  .btn-pwa-install svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* Nút Cài đặt & Quản trị */
+  .btn-action-pill {
+    height: 30px;
+    padding: 0 8px;
+    font-size: 11.5px;
+  }
+  #settingsHeaderBtn span {
+    display: none !important; /* Chỉ hiện icon bánh răng */
+  }
+
+  /* Nút Khóa an toàn & Đổi theme */
+  #quickLockBtn {
+    height: 30px;
+    padding: 0 7px;
+  }
+  .btn-theme {
+    height: 30px;
+    width: 30px;
+    padding: 0;
+  }
+
+  /* Nút Cấp cứu khẩn cấp */
+  .btn-emg {
+    height: 30px;
+    padding: 0 8px;
+    font-size: 11.5px;
+  }
+  .btn-emg span {
+    display: none !important; /* Chỉ hiện icon chuông cấp cứu */
+  }
+
+  /* Logo bệnh viện bên phải: Chỉ giữ logo vuông bo tròn nhỏ gọn */
+  .hospital-branding-right {
+    margin-left: 2px;
+    padding-left: 4px;
+    border-left: none;
+  }
+  .vpi-text-block {
+    display: none !important;
+  }
+  .vpi-logo-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  /* Thanh tìm kiếm trên mobile: Đẩy xuống hàng 2 chiếm 100% */
   .bar-search {
     order: 3;
     flex: 1 1 100%;
     max-width: 100%;
+    margin-top: 2px;
+  }
+  .bar-search input {
+    height: 34px;
+    font-size: 12.5px;
+    padding-left: 32px;
+  }
+  .bar-search svg {
+    left: 10px;
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Thanh phân hệ Navpills */
+  .navpills-bar {
+    padding: 4px 6px;
+  }
+  .navpills-inner {
+    gap: 6px;
+    padding-bottom: 2px;
+  }
+  .navpill {
+    padding: 5px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* Khung nội dung chính */
+  .app-container {
+    padding: 0 10px;
+    margin: 8px auto 40px;
+  }
+
+  /* 2. TRANG CHỦ DASHBOARD TRÊN MOBILE */
+  .home-hero {
+    padding: 14px 12px;
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+  }
+  .home-hero-text h1 {
+    font-size: 17.5px;
+    line-height: 1.35;
+  }
+  .home-hero-text p {
+    font-size: 12px;
+    line-height: 1.45;
     margin-top: 4px;
   }
-
-  .header-actions {
-    gap: 6px;
-  }
-
-  .btn-emg span {
-    display: none; /* Chỉ hiện icon trên mobile */
-  }
-
-  .btn-auth-user span.uname {
-    display: none;
-  }
-
-  .app-container {
-    padding: 0 12px;
-    margin: 12px auto 60px;
-  }
-
-  .home-hero {
-    padding: 16px;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .home-hero-text h1 {
-    font-size: 21px;
-  }
-
   .home-hero-stats {
     width: 100%;
-    justify-content: flex-start;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    font-size: 11px;
+    padding: 4px 8px;
   }
 
-  .main-detail-content {
-    padding: 16px;
+  /* Lưới phân hệ 2 cột cân đối trên màn hình điện thoại */
+  .mod-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .mod-card {
+    padding: 12px 10px;
+    border-radius: var(--radius);
+  }
+  .mod-card-head {
+    margin-bottom: 8px;
+  }
+  .mod-card-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+  .mod-card-count {
+    font-size: 22px;
+  }
+  .mod-card-title {
+    font-size: 14.5px;
+    margin-bottom: 3px;
+  }
+  .mod-card-desc {
+    font-size: 11.5px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .mod-card-footer {
+    margin-top: 8px;
+    padding-top: 6px;
+    font-size: 11px;
   }
 
-  .detail-header h2 {
-    font-size: 19px;
+  /* 3. THANH CHUYỂN ĐỔI CHẾ ĐỘ XEM TRÊN MOBILE CHO PHÂN HỆ */
+  .mobile-view-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 12px;
+    padding: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--pill);
   }
 
-  .quick-chips-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .mob-tab-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 12.5px;
+    font-weight: 700;
+    border-radius: var(--pill);
+    cursor: pointer;
+    transition: all .2s ease;
   }
 
-  .checklist-step {
+  .mob-tab-btn.active {
+    background: var(--surface);
+    color: var(--theme-color, var(--brand-dark));
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Điều khiển hiển thị Split-view trên Mobile */
+  .split-view {
+    display: block !important;
+  }
+
+  /* Mặc định hiển thị chi tiết (hoặc chuyển đổi qua class) */
+  .split-view.mobile-show-list .col-sidebar-left {
+    display: block !important;
+    width: 100% !important;
+    max-height: none !important;
+  }
+  .split-view.mobile-show-list .main-detail-content,
+  .split-view.mobile-show-list .col-sidebar-right {
+    display: none !important;
+  }
+
+  .split-view.mobile-show-detail .col-sidebar-left {
+    display: none !important;
+  }
+  .split-view.mobile-show-detail .main-detail-content {
+    display: block !important;
+    width: 100% !important;
+    padding: 14px 12px;
+  }
+  .split-view.mobile-show-detail .col-sidebar-right {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 14px;
+  }
+
+  /* Thanh điều hướng bài học trên đầu trang chi tiết Mobile */
+  .mobile-protocol-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 7px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+  }
+
+  .btn-mob-back-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: var(--pill);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--theme-color, var(--brand));
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .mob-step-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .btn-mob-step {
+    padding: 5px 9px;
+    border-radius: var(--pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Chân bài học trên mobile: Nút chuyển bài tiện lợi */
+  .mobile-protocol-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 18px;
     padding: 10px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
   }
 
+  /* 4. TỐI ƯU CÁC KHỐI NỘI DUNG CHI TIẾT TRÊN MOBILE */
+  .detail-header h2 {
+    font-size: 17.5px;
+    line-height: 1.35;
+  }
+  .detail-header p {
+    font-size: 12px;
+  }
+
+  /* Thẻ cảnh báo quan trọng */
+  .clinical-alert-box {
+    padding: 12px 10px;
+    margin-bottom: 14px;
+    border-radius: var(--radius);
+  }
+  .alert-header-row {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .alert-title-text {
+    font-size: 12.5px;
+  }
+  .alert-body-content ul {
+    padding-left: 18px;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  /* Lưới thông số chụp: 2 cột cân đối */
+  .quick-chips-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px;
+  }
+  .param-chip {
+    padding: 7px 8px;
+  }
+  .param-chip .label {
+    font-size: 10.5px;
+  }
+  .param-chip .val {
+    font-size: 12.5px;
+  }
+
+  /* Bảng đối chiếu 3 hãng MRI (Siemens, Philips, GE): Cuộn ngang mượt mà */
+  .ref-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin: 10px 0;
+  }
+  .ref-table {
+    min-width: 500px !important; /* Đảm bảo không bị ép méo các cột trên mobile */
+    font-size: 12px;
+  }
+  .ref-table th, .ref-table td {
+    padding: 7px 9px;
+  }
+
+  /* Bảng kiểm an toàn 7 bước */
+  .checklist-step {
+    padding: 9px 10px;
+    gap: 8px;
+  }
   .checklist-step input[type="checkbox"] {
     width: 22px;
-    height: 22px; /* Dễ chạm ngón tay trên màn cảm ứng */
+    height: 22px;
+    flex: none;
+  }
+  .checklist-step .t {
+    font-size: 13px;
+  }
+  .checklist-step .desc {
+    font-size: 12px;
   }
 
+  /* Khung ghi nhận LMS */
   .lms-unlock-action-box {
     flex-direction: column;
     align-items: stretch;
+    padding: 14px;
+    gap: 10px;
     text-align: center;
   }
-
   .btn-unlock-next {
     width: 100%;
     justify-content: center;
-    padding: 12px;
+    padding: 10px;
+    font-size: 13px;
   }
 
-  .calc-result-box {
-    flex-direction: column;
-    gap: 10px;
+  /* Chân trang Footer */
+  .site-footer {
+    padding: 24px 12px 16px;
   }
-
-  .modal-box {
-    max-width: 95vw;
-    margin: 10px;
-  }
-}
-
-/* THIẾT BỊ MÀN HÌNH RẤT NHỎ (<= 420px) */
-@media (max-width: 420px) {
-  .brand-logo-badge {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-  .brand-text b {
-    font-size: 14px;
-  }
-  .quick-chips-grid {
+  .footer-inner {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .footer-logo-row {
+    align-items: center;
+  }
+  .footer-vpi-logo {
+    width: 44px;
+    height: 44px;
+  }
+  .footer-hosp-name {
+    font-size: 14.5px;
+  }
+  .footer-dept-name {
+    font-size: 12px;
+  }
+  .footer-desc {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  /* Hộp thoại Modal trên điện thoại */
+  .modal-box {
+    max-width: 94vw !important;
+    margin: 8px auto !important;
+    border-radius: var(--radius-lg);
+  }
+  .modal-head {
+    padding: 12px 14px;
+  }
+  .modal-body {
+    padding: 14px 12px;
+    max-height: 75vh;
   }
 }
 
-/* CHẾ ĐỘ IN ẤN TÀI LIỆU Y TẾ (PRINT MEDIA) */
+/* ============================================================================
+   MÀN HÌNH RẤT NHỎ (<= 380px)
+   ============================================================================ */
+@media (max-width: 380px) {
+  .brand-text b {
+    font-size: 13.5px;
+  }
+  .btn-pwa-install span {
+    display: none; /* Chỉ hiện icon 📲 */
+  }
+  .btn-pwa-install {
+    padding: 0 6px;
+  }
+  .mod-grid {
+    grid-template-columns: 1fr !important; /* Màn hình quá hẹp < 380px thì 1 cột */
+  }
+}
+
+/* CHẾ ĐỘ IN ẤN TÀI LIỆU Y TẾ */
 @media print {
-  .appbar, .navpills-bar, .header-actions, .mobile-bottom-nav, .list-filter-bar, .lms-unlock-action-box, .btn-unlock-next {
+  .appbar, .navpills-bar, .header-actions, .mobile-bottom-nav, .list-filter-bar,
+  .lms-unlock-action-box, .btn-unlock-next, .mobile-view-tabs, .mobile-protocol-top-bar, .mobile-protocol-bottom-bar {
     display: none !important;
   }
   body {
     background: #fff !important;
     color: #000 !important;
+    padding: 0 !important;
   }
   .split-view {
     display: block !important;

@@ -230,6 +230,14 @@
     pills.forEach(function (p) {
       p.classList.toggle("active", p.getAttribute("data-mod") === (modId || "home"));
     });
+
+    // Cập nhật trạng thái active trên thanh Bottom Nav trên Điện thoại di động
+    var mobItems = document.querySelectorAll(".mob-nav-item");
+    mobItems.forEach(function (m) {
+      var oc = m.getAttribute("onclick") || "";
+      var target = (modId === "home" || !modId) ? "home" : ("mod-" + modId);
+      m.classList.toggle("active", oc.indexOf(target) !== -1);
+    });
   }
 
   /* Đếm số bài trong từng phân hệ (Không tính bảng kiểm rời!) */
@@ -303,7 +311,7 @@
     var html =
       '<div class="home-hero">' +
         '<div class="home-hero-text">' +
-          '<h1>BỆNH VIỆN VĨNH PHÚC VPI — SỔ TAY ĐIỆN TỬ CĐHA</h1>' +
+          '<h1>BỆNH VIỆN VĨNH PHÚC VPI — SỔ CĐHA</h1>' +
           '<p>Cẩm nang chuẩn hóa kỹ thuật thực hành lâm sàng, bảng kiểm an toàn y tế và dược thư cản quang toàn diện</p>' +
         '</div>' +
         '<div class="home-hero-stats">' +
@@ -401,9 +409,20 @@
         '</div>' +
       '</div>';
 
-    // KHUNG CHIA CỘT: Cột trái (Danh mục kỹ thuật) GIỮ NGUYÊN theo yêu cầu!
+    // THANH CHUYỂN ĐỔI CHẾ ĐỘ XEM TRÊN ĐIỆN THOẠI DI ĐỘNG (MOBILE VIEW TABS)
     html +=
-      '<div class="split-view">' +
+      '<div class="mobile-view-tabs" id="mobileViewTabs">' +
+        '<button class="mob-tab-btn active" id="mobTabListBtn" onclick="window.VUDAT_APP.switchMobileView(\'list\')">' +
+          '📋 Danh mục (' + items.length + ' kỹ thuật)' +
+        '</button>' +
+        '<button class="mob-tab-btn" id="mobTabDetailBtn" onclick="window.VUDAT_APP.switchMobileView(\'detail\')">' +
+          '📖 Chi tiết bài học' +
+        '</button>' +
+      '</div>';
+
+    // KHUNG CHIA CỘT: Cột trái (Danh mục kỹ thuật) GIỮ NGUYÊN trên Desktop, tự co giãn trên Mobile
+    html +=
+      '<div class="split-view mobile-show-list" id="splitViewContainer">' +
         // CỘT TRÁI: DANH MỤC KỸ THUẬT (GIỮ NGUYÊN!)
         '<div class="col-panel col-sidebar-left">' +
           '<div class="list-filter-bar">' +
@@ -547,6 +566,57 @@
         3. KỸ THUẬT CHỤP & HƯỚNG ĐẶT CẮT (SLICE PLANNING)
         4. BẢNG KIỂM THỰC HÀNH LÂM SÀNG (Ở CUỐI CÙNG)
      ========================================================================= */
+
+  /* Chuyển đổi giữa Chế độ Danh mục và Chi tiết trên Điện thoại di động */
+  function switchMobileView(mode) {
+    var split = document.getElementById("splitViewContainer") || document.querySelector(".split-view");
+    var btnList = document.getElementById("mobTabListBtn");
+    var btnDetail = document.getElementById("mobTabDetailBtn");
+    if (!split) return;
+
+    if (mode === "list") {
+      split.classList.remove("mobile-show-detail");
+      split.classList.add("mobile-show-list");
+      if (btnList) btnList.classList.add("active");
+      if (btnDetail) btnDetail.classList.remove("active");
+      var listScroll = document.getElementById("lessonListContainer") || split;
+      if (listScroll) {
+        listScroll.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      split.classList.remove("mobile-show-list");
+      split.classList.add("mobile-show-detail");
+      if (btnList) btnList.classList.remove("active");
+      if (btnDetail) btnDetail.classList.add("active");
+      var mainPanel = document.getElementById("detailMainPanel");
+      if (mainPanel) {
+        mainPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }
+
+  /* Tạo thanh điều hướng bài học nhanh trên Điện thoại di động */
+  function getMobileNavBarsHtml(itemId) {
+    return {
+      top:
+        '<div class="mobile-protocol-top-bar">' +
+          '<button class="btn-mob-back-list" onclick="window.VUDAT_APP.switchMobileView(\'list\')">' +
+            '☰ Đổi kỹ thuật khác' +
+          '</button>' +
+          '<div class="mob-step-nav-group">' +
+            '<button class="btn-mob-step" onclick="window.VUDAT_APP.prevLesson(\'' + itemId + '\')" title="Kỹ thuật trước">◀ Trước</button>' +
+            '<button class="btn-mob-step" onclick="window.VUDAT_APP.nextLesson(\'' + itemId + '\')" title="Kỹ thuật kế tiếp">Tiếp ▶</button>' +
+          '</div>' +
+        '</div>',
+      bottom:
+        '<div class="mobile-protocol-bottom-bar">' +
+          '<button class="btn-mob-step" onclick="window.VUDAT_APP.prevLesson(\'' + itemId + '\')">◀ Trước</button>' +
+          '<button class="btn-mob-back-list" onclick="window.VUDAT_APP.switchMobileView(\'list\')">📋 Danh mục</button>' +
+          '<button class="btn-mob-step" onclick="window.VUDAT_APP.nextLesson(\'' + itemId + '\')">Tiếp ▶</button>' +
+        '</div>'
+    };
+  }
+
   function showItemDetail(itemId, updateHash) {
     if (updateHash !== false) {
       location.hash = "item:" + itemId;
@@ -583,6 +653,11 @@
       renderEmergencyDetail(item.id, mainPanel, rightPanel);
     } else {
       renderStructuredProtocolDetail(item, mainPanel, rightPanel);
+    }
+
+    // Tự động chuyển tab chi tiết và cuộn mượt trên Mobile khi người dùng chọn bài
+    if (window.innerWidth <= 768 && updateHash !== false) {
+      switchMobileView("detail");
     }
 
     mainPanel.scrollTop = 0;
@@ -626,7 +701,10 @@
       })[0];
     }
 
+    var mobBars = getMobileNavBarsHtml(item.id);
+
     var html =
+      mobBars.top +
       '<div class="detail-header">' +
         '<div class="badges">' +
           '<span class="badge-mod">' + esc(item.modality) + '</span>' +
@@ -848,6 +926,7 @@
 
     // Khung đánh dấu hoàn thành bài học (không khóa!)
     html += renderLMSUnlockBox(item.id, item.ten);
+    html += mobBars.bottom;
 
     mainPanel.innerHTML = html;
 
@@ -859,7 +938,10 @@
 
   /* Render Siêu âm */
   function renderUltrasoundDetail(item, mainPanel, rightPanel) {
+    var mobBars = getMobileNavBarsHtml(item.id);
+
     var html =
+      mobBars.top +
       '<div class="detail-header">' +
         '<div class="badges">' +
           '<span class="badge-mod" style="background:var(--c-us-wash);color:var(--c-us-dark);border-color:var(--c-us-border);">Siêu âm</span>' +
@@ -910,6 +992,7 @@
     html += '</div></div>';
 
     html += renderLMSUnlockBox(item.id, item.ten);
+    html += mobBars.bottom;
     mainPanel.innerHTML = html;
 
     if (rightPanel) {
@@ -924,7 +1007,10 @@
 
   /* Render Siêu âm can thiệp */
   function renderInterventionalDetail(item, mainPanel, rightPanel) {
+    var mobBars = getMobileNavBarsHtml(item.id);
+
     var html =
+      mobBars.top +
       '<div class="detail-header">' +
         '<div class="badges">' +
           '<span class="badge-mod" style="background:var(--c-canthiep-wash);color:var(--c-canthiep-dark);border-color:var(--c-canthiep-border);">Can thiệp</span>' +
@@ -969,6 +1055,7 @@
       '</div>';
 
     html += renderLMSUnlockBox(item.id, item.ten);
+    html += mobBars.bottom;
     mainPanel.innerHTML = html;
 
     if (rightPanel) {
@@ -985,7 +1072,10 @@
   /* Render Đo loãng xương (DEXA) */
   function renderDEXADetail(sectionId, mainPanel, rightPanel) {
     var d = window.SOTAY_DOLOANGXUONG;
+    var mobBars = getMobileNavBarsHtml(sectionId);
+
     var html =
+      mobBars.top +
       '<div class="detail-header">' +
         '<div class="badges">' +
           '<span class="badge-mod" style="background:var(--c-dlx-wash);color:var(--c-dlx-dark);border-color:var(--c-dlx-border);">TDCN: Đo Loãng Xương</span>' +
@@ -1025,6 +1115,7 @@
     }
 
     html += renderLMSUnlockBox(sectionId, "Đo Loãng Xương DEXA");
+    html += mobBars.bottom;
     mainPanel.innerHTML = html;
 
     if (rightPanel) {
@@ -1041,7 +1132,10 @@
   /* Render Thuốc cản quang — YÊU CẦU #9: BỔ SUNG HÌNH ẢNH MINH HỌA BAO BÌ CHAI/LỌ */
   function renderContrastDetail(sectionId, mainPanel, rightPanel) {
     var cq = window.SOTAY_THUOCCANQUANG;
+    var mobBars = getMobileNavBarsHtml(sectionId);
+
     var html =
+      mobBars.top +
       '<div class="detail-header">' +
         '<div class="badges">' +
           '<span class="badge-mod" style="background:var(--c-cq-wash);color:var(--c-cq-dark);border-color:var(--c-cq-border);">Dược thư CĐHA</span>' +
@@ -1094,6 +1188,7 @@
     }
 
     html += renderLMSUnlockBox(sectionId, "Thuốc Cản Quang & ĐQT");
+    html += mobBars.bottom;
     mainPanel.innerHTML = html;
 
     if (rightPanel) {
@@ -1160,7 +1255,10 @@
   /* Render Tai biến & Cấp cứu CĐHA */
   function renderEmergencyDetail(sectionId, mainPanel, rightPanel) {
     var tb = window.SOTAY_TAIBIEN;
+    var mobBars = getMobileNavBarsHtml(sectionId);
+
     var html =
+      mobBars.top +
       '<div class="detail-header">' +
         '<div class="badges">' +
           '<span class="badge-mod" style="background:var(--c-emg-wash);color:var(--c-emg-dark);border-color:var(--c-emg-border);">Khẩn cấp</span>' +
@@ -1231,6 +1329,7 @@
     }
 
     html += renderLMSUnlockBox(sectionId, "Tai Biến & Cấp Cứu CĐHA");
+    html += mobBars.bottom;
     mainPanel.innerHTML = html;
 
     if (rightPanel) {
@@ -1877,9 +1976,10 @@
     goToNextLesson: function (currentLessonId) {
       var curMod = appState.currentModId;
       var items = getItemsForModality(curMod);
+      var curId = currentLessonId || appState.currentProtocolId;
       var curIdx = -1;
       for (var i = 0; i < items.length; i++) {
-        if (items[i].id === currentLessonId) { curIdx = i; break; }
+        if (items[i].id === curId) { curIdx = i; break; }
       }
       if (curIdx !== -1 && curIdx < items.length - 1) {
         showItemDetail(items[curIdx + 1].id);
@@ -1887,6 +1987,27 @@
         showToast("Bạn đã xem đến bài cuối cùng trong chuyên mục này!", "ok");
       }
     },
+    goToPrevLesson: function (currentLessonId) {
+      var curMod = appState.currentModId;
+      var items = getItemsForModality(curMod);
+      var curId = currentLessonId || appState.currentProtocolId;
+      var curIdx = -1;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].id === curId) { curIdx = i; break; }
+      }
+      if (curIdx > 0) {
+        showItemDetail(items[curIdx - 1].id);
+      } else {
+        showToast("Bạn đang ở bài đầu tiên trong chuyên mục này!", "ok");
+      }
+    },
+    nextLesson: function (currentLessonId) {
+      window.VUDAT_APP.goToNextLesson(currentLessonId);
+    },
+    prevLesson: function (currentLessonId) {
+      window.VUDAT_APP.goToPrevLesson(currentLessonId);
+    },
+    switchMobileView: switchMobileView,
     showSettingsModal: showSettingsModal,
     hideSettingsModal: hideSettingsModal,
     switchSettingsTab: switchSettingsTab,
