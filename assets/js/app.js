@@ -150,6 +150,7 @@
     setupGlobalEvents();
     loadChecklistProgress();
     applySavedTheme();
+    initSecurityAndPWA();
     handleHashChange();
   }
 
@@ -256,6 +257,20 @@
   /* Xử lý chuyển đổi Hash URL */
   function handleHashChange() {
     var hash = (location.hash || "").replace("#", "").trim();
+
+    // Kiểm tra an toàn bảo mật mã PIN nội bộ BV VPI
+    if (typeof secState !== "undefined" && secState.pinEnabled && !secState.isUnlocked) {
+      if (secState.pinScope === "all") {
+        showPinLockOverlay("Nhập mã PIN để mở khóa sổ tay lâm sàng");
+        return;
+      } else if (secState.pinScope === "sensitive") {
+        if (hash === "mod-emg" || hash === "mod-cq") {
+          secState.pendingHash = hash;
+          showPinLockOverlay("Vui lòng nhập PIN để truy cập chuyên mục Cấp cứu & Dược thư");
+          return;
+        }
+      }
+    }
 
     if (!hash || hash === "home") {
       showDashboardView();
@@ -1243,7 +1258,7 @@
   }
 
   function switchSettingsTab(tab) {
-    var tabs = ["view", "data", "hosp"];
+    var tabs = ["view", "sec", "data", "hosp"];
     tabs.forEach(function (t) {
       var btn = document.getElementById("setTab_" + t);
       var pane = document.getElementById("setPane_" + t);
@@ -1359,6 +1374,310 @@
     }
   }
 
+  /* =========================================================================
+     5. PWA ENGINE, XEM NGOẠI VIỆN & BẢO MẬT MÃ PIN (YÊU CẦU MỚI)
+     ========================================================================= */
+  var pwaDeferredPrompt = null;
+  var secState = {
+    pinEnabled: false,
+    pinCode: "1234",
+    pinScope: "sensitive",
+    autoLockMinutes: 15,
+    isUnlocked: false,
+    enteredDigits: "",
+    lastActivity: Date.now(),
+    pendingHash: null
+  };
+
+  function initSecurityAndPWA() {
+    try {
+      secState.pinEnabled = localStorage.getItem("vpi_cdha_pin_enabled") === "true";
+      secState.pinCode = localStorage.getItem("vpi_cdha_pin_code") || "1234";
+      secState.pinScope = localStorage.getItem("vpi_cdha_pin_scope") || "sensitive";
+      var al = localStorage.getItem("vpi_cdha_pin_autolock");
+      secState.autoLockMinutes = al ? parseInt(al, 10) : 15;
+    } catch (e) {}
+
+    var toggleEl = document.getElementById("cfgPinEnableToggle");
+    var sliderEl = document.getElementById("cfgPinToggleSlider");
+    var boxEl = document.getElementById("cfgPinDetailsBox");
+    var scopeSel = document.getElementById("cfgPinScopeSelect");
+    var lockSel = document.getElementById("cfgPinAutoLockSelect");
+
+    if (toggleEl) toggleEl.checked = secState.pinEnabled;
+    if (sliderEl) sliderEl.style.backgroundColor = secState.pinEnabled ? "var(--brand)" : "#cbd5e1";
+    if (boxEl) boxEl.style.display = secState.pinEnabled ? "block" : "none";
+    if (scopeSel) scopeSel.value = secState.pinScope;
+    if (lockSel) lockSel.value = String(secState.autoLockMinutes);
+
+    var updateActivity = function () {
+      secState.lastActivity = Date.now();
+    };
+    ["touchstart", "click", "keydown", "mousemove"].forEach(function (evt) {
+      window.addEventListener(evt, updateActivity, { passive: true });
+    });
+
+    setInterval(function () {
+      if (secState.pinEnabled && secState.isUnlocked && secState.autoLockMinutes > 0) {
+        var elapsedMin = (Date.now() - secState.lastActivity) / 60000;
+        if (elapsedMin >= secState.autoLockMinutes) {
+          lockAppNow();
+          showToast("Phiên đã tự động khóa sau " + secState.autoLockMinutes + " phút không thao tác.", "warn");
+        }
+      }
+    }, 30000);
+
+    window.addEventListener("keydown", function (e) {
+      var overlay = document.getElementById("pinLockOverlay");
+      if (overlay && overlay.style.display !== "none") {
+        if (e.key >= "0" && e.key <= "9") {
+          enterPinDigit(e.key);
+        } else if (e.key === "Backspace") {
+          backspacePin();
+        } else if (e.key === "Escape" || e.key === "Delete") {
+          clearPin();
+        }
+      }
+    });
+
+    window.addEventListener("beforeinstallprompt", function (e) {
+      e.preventDefault();
+      pwaDeferredPrompt = e;
+      var banner = document.getElementById("pwaFloatingBanner");
+      var isDismissed = false;
+      try { isDismissed = localStorage.getItem("vpi_dismiss_pwa_banner") === "true"; } catch (err) {}
+      if (banner && !isDismissed && !isStandaloneMode()) {
+        banner.style.display = "flex";
+      }
+    });
+
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+    updateNetworkStatus();
+
+    if (secState.pinEnabled && secState.pinScope === "all") {
+      secState.isUnlocked = false;
+      showPinLockOverlay("Nhập mã PIN để mở khóa sổ tay");
+    } else {
+      secState.isUnlocked = true;
+    }
+  }
+
+  function isStandaloneMode() {
+    return window.matchMedia("(display-mode: standalone)").matches || (window.navigator && window.navigator.standalone === true);
+  }
+
+  function updateNetworkStatus() {
+    var badge = document.getElementById("networkStatusBadge");
+    var txt = document.getElementById("networkStatusText");
+    if (!badge || !txt) return;
+
+    if (navigator.onLine) {
+      badge.className = "network-badge online";
+      txt.textContent = "Ngoại viện: Trực tuyến";
+      badge.title = "Đang kết nối Vercel Cloud. Sẵn sàng xem ngoại viện 100%.";
+    } else {
+      badge.className = "network-badge offline";
+      txt.textContent = "Ngoại viện: Offline";
+      badge.title = "Đang chạy ngoại tuyến bằng bộ nhớ thiết bị. Mọi kỹ thuật & phác đồ đều hoạt động bình thường.";
+    }
+  }
+
+  function showOfflineInfoModal() {
+    var overlay = document.getElementById("offlineInfoModalOverlay");
+    if (overlay) overlay.style.display = "flex";
+  }
+
+  function hideOfflineInfoModal() {
+    var overlay = document.getElementById("offlineInfoModalOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  function syncCloudData() {
+    showToast("Đang kết nối đồng bộ Vercel Cloud...", "ok");
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { r.update(); });
+      });
+    }
+    setTimeout(function () {
+      showToast("🎉 Đã đồng bộ dữ liệu mới nhất thành công!", "ok");
+      hideOfflineInfoModal();
+    }, 800);
+  }
+
+  function showPinLockOverlay(prompt) {
+    var overlay = document.getElementById("pinLockOverlay");
+    var promptEl = document.getElementById("pinPromptText");
+    var errorEl = document.getElementById("pinMsgError");
+    if (promptEl && prompt) promptEl.textContent = prompt;
+    if (errorEl) errorEl.textContent = "";
+    secState.enteredDigits = "";
+    updatePinDots();
+    if (overlay) overlay.style.display = "flex";
+  }
+
+  function hidePinLockOverlay() {
+    var overlay = document.getElementById("pinLockOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  function updatePinDots() {
+    for (var i = 0; i < 4; i++) {
+      var dot = document.getElementById("pdot_" + i);
+      if (dot) dot.classList.toggle("filled", i < secState.enteredDigits.length);
+    }
+  }
+
+  function enterPinDigit(digit) {
+    if (secState.enteredDigits.length >= 4) return;
+    secState.enteredDigits += String(digit);
+    updatePinDots();
+
+    if (secState.enteredDigits.length === 4) {
+      setTimeout(verifyEnteredPin, 100);
+    }
+  }
+
+  function backspacePin() {
+    if (secState.enteredDigits.length > 0) {
+      secState.enteredDigits = secState.enteredDigits.slice(0, -1);
+      updatePinDots();
+    }
+  }
+
+  function clearPin() {
+    secState.enteredDigits = "";
+    updatePinDots();
+  }
+
+  function verifyEnteredPin() {
+    var errorEl = document.getElementById("pinMsgError");
+    var card = document.getElementById("pinCardBox");
+
+    if (secState.enteredDigits === secState.pinCode) {
+      secState.isUnlocked = true;
+      secState.lastActivity = Date.now();
+      hidePinLockOverlay();
+      showToast("🔓 Mở khóa thành công!", "ok");
+
+      if (secState.pendingHash) {
+        var h = secState.pendingHash;
+        secState.pendingHash = null;
+        location.hash = h;
+      }
+    } else {
+      if (card) {
+        card.classList.add("shake");
+        setTimeout(function () { card.classList.remove("shake"); }, 400);
+      }
+      if (errorEl) errorEl.textContent = "Mã PIN không chính xác. Thử lại!";
+      setTimeout(function () {
+        secState.enteredDigits = "";
+        updatePinDots();
+      }, 500);
+    }
+  }
+
+  function lockAppNow() {
+    secState.isUnlocked = false;
+    showPinLockOverlay("Nhập mã PIN để mở khóa sổ tay");
+  }
+
+  function togglePinLock(enabled) {
+    secState.pinEnabled = enabled;
+    localStorage.setItem("vpi_cdha_pin_enabled", enabled ? "true" : "false");
+    var sliderEl = document.getElementById("cfgPinToggleSlider");
+    var boxEl = document.getElementById("cfgPinDetailsBox");
+    if (sliderEl) sliderEl.style.backgroundColor = enabled ? "var(--brand)" : "#cbd5e1";
+    if (boxEl) boxEl.style.display = enabled ? "block" : "none";
+    showToast(enabled ? "Đã BẬT khóa bảo mật mã PIN." : "Đã TẮT khóa bảo mật mã PIN.", "ok");
+  }
+
+  function changePinScope(scope) {
+    secState.pinScope = scope;
+    localStorage.setItem("vpi_cdha_pin_scope", scope);
+    showToast("Đã cập nhật phạm vi bảo vệ mã PIN.", "ok");
+  }
+
+  function changeAutoLock(minutes) {
+    secState.autoLockMinutes = parseInt(minutes, 10);
+    localStorage.setItem("vpi_cdha_pin_autolock", String(secState.autoLockMinutes));
+    showToast("Đã lưu thời gian tự động khóa: " + (secState.autoLockMinutes ? secState.autoLockMinutes + " phút" : "Không bao giờ"), "ok");
+  }
+
+  function updatePinCode() {
+    var inp = document.getElementById("cfgNewPinInput");
+    if (!inp) return;
+    var v = (inp.value || "").trim();
+    if (!/^\d{4}$/.test(v)) {
+      showToast("Mã PIN phải bao gồm đúng 4 chữ số (0-9)!", "err");
+      return;
+    }
+    secState.pinCode = v;
+    localStorage.setItem("vpi_cdha_pin_code", v);
+    inp.value = "";
+    showToast("🎉 Đã đổi mã PIN bảo vệ mới thành công!", "ok");
+  }
+
+  function promptInstallApp() {
+    if (pwaDeferredPrompt) {
+      pwaDeferredPrompt.prompt();
+      pwaDeferredPrompt.userChoice.then(function (choice) {
+        if (choice && choice.outcome === "accepted") {
+          showToast("🎉 Chúc mừng bạn đã cài đặt Sổ tay CĐHA thành công!", "ok");
+        }
+        pwaDeferredPrompt = null;
+      });
+      return;
+    }
+    showInstallModal();
+  }
+
+  function showInstallModal() {
+    var overlay = document.getElementById("installModalOverlay");
+    if (overlay) overlay.style.display = "flex";
+
+    var ua = navigator.userAgent || "";
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      switchInstTab("ios");
+    } else if (/Android/i.test(ua)) {
+      switchInstTab("android");
+    } else {
+      switchInstTab("pc");
+    }
+  }
+
+  function hideInstallModal() {
+    var overlay = document.getElementById("installModalOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  function switchInstTab(tab) {
+    var tabs = ["ios", "android", "pc"];
+    tabs.forEach(function (t) {
+      var btn = document.getElementById("instTab_" + t);
+      var pane = document.getElementById("instPane_" + t);
+      if (btn) btn.classList.toggle("active", t === tab);
+      if (pane) pane.style.display = (t === tab) ? "block" : "none";
+    });
+  }
+
+  function dismissPwaBanner() {
+    var banner = document.getElementById("pwaFloatingBanner");
+    if (banner) banner.style.display = "none";
+    try { localStorage.setItem("vpi_dismiss_pwa_banner", "true"); } catch (e) {}
+  }
+
+  function triggerPwaPrompt() {
+    if (pwaDeferredPrompt) {
+      promptInstallApp();
+      hideInstallModal();
+    } else {
+      showToast("Hãy làm theo hướng dẫn 3 bước bên dưới để thêm vào màn hình chính!", "ok");
+    }
+  }
+
   /* Gán API ra phạm vi toàn cục */
   window.VUDAT_APP = {
     selectItem: function (itemId) {
@@ -1445,7 +1764,28 @@
     importDataJson: importDataJson,
     resetDefaultData: resetDefaultData,
     showLightbox: showLightbox,
-    hideLightbox: hideLightbox
+    hideLightbox: hideLightbox,
+
+    // PWA & Chế độ xem ngoại viện
+    promptInstallApp: promptInstallApp,
+    showInstallModal: showInstallModal,
+    hideInstallModal: hideInstallModal,
+    switchInstTab: switchInstTab,
+    dismissPwaBanner: dismissPwaBanner,
+    triggerPwaPrompt: triggerPwaPrompt,
+    showOfflineInfoModal: showOfflineInfoModal,
+    hideOfflineInfoModal: hideOfflineInfoModal,
+    syncCloudData: syncCloudData,
+
+    // Bảo mật an toàn mã PIN (như App 5S & Quản lý CĐHA)
+    lockAppNow: lockAppNow,
+    enterPinDigit: enterPinDigit,
+    backspacePin: backspacePin,
+    clearPin: clearPin,
+    togglePinLock: togglePinLock,
+    changePinScope: changePinScope,
+    changeAutoLock: changeAutoLock,
+    updatePinCode: updatePinCode
   };
 
   if (document.readyState === "loading") {

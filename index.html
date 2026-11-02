@@ -7,6 +7,15 @@
   <meta name="description" content="Sổ tay điện tử tra cứu kỹ thuật Chẩn đoán hình ảnh toàn diện — Bệnh viện Vĩnh Phúc VPI. X-quang, CT-Scanner, MRI Master, Siêu âm, Đo loãng xương, Thuốc cản quang, Cấp cứu.">
   <meta name="theme-color" content="#0284c7">
 
+  <!-- PWA & MOBILE APP CAPABILITIES (CÀI ĐẶT APP RA MÀN HÌNH CHÍNH & XEM NGOẠI VIỆN) -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Sổ Tay CĐHA VPI">
+
   <!-- STYLESHEETS -->
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/modalities.css">
@@ -36,10 +45,27 @@
 
       <!-- NÚT THAO TÁC & LOGO BỆNH VIỆN Ở GÓC BÊN PHẢI -->
       <div class="header-actions">
+        <!-- Huy hiệu trạng thái kết nối & Chế độ xem ngoại viện -->
+        <div class="network-badge online" id="networkStatusBadge" onclick="window.VUDAT_APP.showOfflineInfoModal()" title="Chế độ ngoại viện: Đã lưu ngoại tuyến toàn bộ 210+ kỹ thuật lâm sàng">
+          <span class="network-dot"></span>
+          <span id="networkStatusText">Ngoại viện: Trực tuyến</span>
+        </div>
+
+        <!-- Nút Cài đặt App ra màn hình điện thoại / máy tính -->
+        <button class="btn-pwa-install" id="installAppHeaderBtn" onclick="window.VUDAT_APP.promptInstallApp()" title="Cài đặt Sổ Tay CĐHA ra ngoài màn hình điện thoại hoặc máy tính">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/><path d="m9 11 3 3 3-3"/><path d="M12 7v7"/></svg>
+          <span>Cài App</span>
+        </button>
+
         <!-- Nút Cài đặt & Quản trị -->
-        <button class="btn-action-pill" id="settingsHeaderBtn" onclick="window.VUDAT_APP.showSettingsModal()" title="Cài đặt & Quản trị nội dung">
+        <button class="btn-action-pill" id="settingsHeaderBtn" onclick="window.VUDAT_APP.showSettingsModal()" title="Cài đặt, Bảo mật & Quản trị nội dung">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Cài đặt</span>
+        </button>
+
+        <!-- Nút Khóa bảo mật nhanh (Lock Screen) -->
+        <button class="btn-action-pill" id="quickLockBtn" onclick="window.VUDAT_APP.lockAppNow()" title="Khóa màn hình an toàn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </button>
 
         <!-- Nút Cấp cứu -->
@@ -160,10 +186,11 @@
 
       <div class="modal-body">
         <!-- TAB QUẢN TRỊ -->
-        <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:10px;">
-          <button id="setTab_view" class="navpill active" onclick="window.VUDAT_APP.switchSettingsTab('view')">🎨 Hiển thị & Giao diện</button>
-          <button id="setTab_data" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('data')">💾 Quản trị dữ liệu & Sao lưu</button>
-          <button id="setTab_hosp" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('hosp')">🏥 Thông tin Bệnh viện</button>
+        <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:10px;overflow-x:auto;">
+          <button id="setTab_view" class="navpill active" onclick="window.VUDAT_APP.switchSettingsTab('view')">🎨 Giao diện</button>
+          <button id="setTab_sec" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('sec')">🛡️ Bảo mật & Ngoại viện</button>
+          <button id="setTab_data" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('data')">💾 Dữ liệu & Sao lưu</button>
+          <button id="setTab_hosp" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('hosp')">🏥 Bệnh viện</button>
         </div>
 
         <!-- PANE HIỂN THỊ -->
@@ -187,6 +214,80 @@
 
           <div style="padding:10px 12px;background:var(--surface-2);border-radius:8px;font-size:13px;color:var(--text-soft);line-height:1.5;">
             💡 <b>Mẹo tra cứu nhanh:</b> Toàn bộ bài học đều đã được mở khóa tự do theo yêu cầu để bác sĩ và kỹ thuật viên tra cứu ngay lập tức khi vận hành máy.
+          </div>
+        </div>
+
+        <!-- PANE BẢO MẬT & XEM NGOẠI VIỆN (YÊU CẦU BẢO MẬT AN TOÀN NHƯ APP 5S & QUẢN LÝ CĐHA) -->
+        <div id="setPane_sec" style="display:none;">
+          <!-- 1. KHÓA BẢO MẬT MÃ PIN -->
+          <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div>
+                <b style="font-size:14px;display:block;">🔐 Khóa bảo mật bằng Mã PIN</b>
+                <span style="font-size:12px;color:var(--text-soft);">Bảo vệ dữ liệu lâm sàng nội bộ viện VPI</span>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+                <input type="checkbox" id="cfgPinEnableToggle" onchange="window.VUDAT_APP.togglePinLock(this.checked)" style="opacity:0;width:0;height:0;">
+                <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#cbd5e1;transition:.3s;border-radius:24px;" id="cfgPinToggleSlider"></span>
+              </label>
+            </div>
+
+            <div id="cfgPinDetailsBox" style="display:none;margin-top:12px;padding:12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line);">
+              <div class="form-field" style="margin-bottom:10px;">
+                <label>Phạm vi áp dụng bảo vệ</label>
+                <select id="cfgPinScopeSelect" onchange="window.VUDAT_APP.changePinScope(this.value)">
+                  <option value="all">Khóa toàn bộ Sổ tay khi khởi động ứng dụng</option>
+                  <option value="sensitive">Chỉ khóa vùng Nhạy cảm (Cấp cứu, Thuốc cản quang, Cài đặt)</option>
+                </select>
+              </div>
+
+              <div class="form-field" style="margin-bottom:10px;">
+                <label>Tự động khóa phiên khi không thao tác (Auto-lock)</label>
+                <select id="cfgPinAutoLockSelect" onchange="window.VUDAT_APP.changeAutoLock(this.value)">
+                  <option value="0">Không bao giờ tự khóa</option>
+                  <option value="5">Sau 5 phút không thao tác</option>
+                  <option value="15" selected>Sau 15 phút không thao tác (Khuyến nghị y tế)</option>
+                  <option value="30">Sau 30 phút không thao tác</option>
+                </select>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:flex-end;">
+                <div class="form-field" style="flex:1;margin-bottom:0;">
+                  <label>Đổi mã PIN mới (4 chữ số)</label>
+                  <input type="password" id="cfgNewPinInput" maxlength="4" placeholder="Nhập 4 số mới (VD: 1234)" style="font-weight:700;letter-spacing:4px;text-align:center;">
+                </div>
+                <button class="btn-action-pill" onclick="window.VUDAT_APP.updatePinCode()" style="background:var(--brand);color:#fff;height:38px;">
+                  Lưu PIN
+                </button>
+              </div>
+              <div style="font-size:11.5px;color:var(--text-soft);margin-top:6px;">
+                * Mã PIN mặc định ban đầu: <b>1234</b>.
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. TÍNH NĂNG XEM NGOẠI VIỆN & CẬP NHẬT CLOUD -->
+          <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);">
+            <b style="font-size:14px;display:block;margin-bottom:4px;">🌐 Chế độ Xem Ngoại Viện & Bộ Nhớ Offline</b>
+            <p style="font-size:12px;color:var(--text-soft);margin:0 0 10px;">
+              Toàn bộ hơn 210 kỹ thuật, bảng kiểm, phác đồ cấp cứu và bảng đối chiếu 3 hãng MRI đã được nạp sẵn vào bộ nhớ thiết bị. Bạn có thể xem mượt mà khi ra khỏi bệnh viện, đi công tác hoặc nơi mất mạng.
+            </p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-action-pill" onclick="window.VUDAT_APP.syncCloudData()" style="border-color:var(--brand);color:var(--brand);background:var(--brand-wash);">
+                🔄 Làm mới & Cập nhật từ Cloud Vercel
+              </button>
+              <button class="btn-action-pill" onclick="window.VUDAT_APP.promptInstallApp()" style="background:var(--brand);color:#fff;">
+                📱 Cài App ra màn hình chính
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. BẢO MẬT AN TOÀN Y TẾ THEO BỘ 83 TIÊU CHÍ BYT -->
+          <div style="padding:10px 12px;background:var(--brand-wash);border-radius:10px;border-left:4px solid var(--brand);">
+            <b style="font-size:13px;color:var(--brand-dark);display:block;margin-bottom:3px;">📋 Cam kết An toàn Thông tin & Tiêu chuẩn Y tế</b>
+            <p style="font-size:12px;color:var(--text-soft);margin:0;line-height:1.45;">
+              Tài liệu chuyên môn lưu hành nội bộ phục vụ nhân viên y tế Bệnh viện Vĩnh Phúc VPI. Tuân thủ Bộ 83 Tiêu chí Chất lượng Bệnh viện (Quyết định 6858/QĐ-BYT) và Thông tư 51/2017/TT-BYT. Mọi dữ liệu thao tác cá nhân được lưu bảo mật cục bộ tại thiết bị.
+            </p>
           </div>
         </div>
 
@@ -251,6 +352,196 @@
     </div>
   </div>
 
+  <!-- ===== MÀN HÌNH KHÓA BẢO MẬT MÃ PIN (PASSCODE LOCK SCREEN) ===== -->
+  <div class="pin-lock-overlay" id="pinLockOverlay" style="display:none;">
+    <div class="pin-card" id="pinCardBox">
+      <img src="assets/images/logo-vpi.jpg" alt="Logo VPI" class="pin-hosp-logo">
+      <h3>BỆNH VIỆN VĨNH PHÚC VPI</h3>
+      <div class="pin-subtitle">KHOA CHẨN ĐOÁN HÌNH ẢNH — BẢO MẬT NỘI BỘ</div>
+      <div class="pin-prompt" id="pinPromptText">Nhập mã PIN để mở khóa sổ tay</div>
+      
+      <!-- 4 PIN DOTS -->
+      <div class="pin-dots-container" id="pinDotsRow">
+        <span class="pin-dot" id="pdot_0"></span>
+        <span class="pin-dot" id="pdot_1"></span>
+        <span class="pin-dot" id="pdot_2"></span>
+        <span class="pin-dot" id="pdot_3"></span>
+      </div>
+
+      <!-- Ẩn input hỗ trợ gõ phím máy tính trực tiếp -->
+      <input type="password" id="pinKeyboardHiddenInput" maxlength="4" style="position:absolute;opacity:0;pointer-events:none;" autocomplete="off">
+
+      <div class="pin-msg-error" id="pinMsgError"></div>
+
+      <!-- BÀN PHÍM SỐ CẢM ỨNG (NUMERIC KEYPAD) -->
+      <div class="pin-keypad">
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('1')">1</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('2')">2</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('3')">3</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('4')">4</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('5')">5</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('6')">6</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('7')">7</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('8')">8</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('9')">9</button>
+        <button class="pin-btn action-btn" onclick="window.VUDAT_APP.clearPin()">Xóa</button>
+        <button class="pin-btn" onclick="window.VUDAT_APP.enterPinDigit('0')">0</button>
+        <button class="pin-btn action-btn" onclick="window.VUDAT_APP.backspacePin()">⌫</button>
+      </div>
+
+      <div class="pin-footer-hint">
+        🔒 Bảo mật theo chuẩn Bộ 83 Tiêu chí BYT.<br>
+        <i>Mã PIN ban đầu: <b>1234</b>. (Quản lý trong mục Cài đặt)</i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL HƯỚNG DẪN CÀI ĐẶT APP RA MÀN HÌNH CHÍNH (PWA) ===== -->
+  <div class="modal-overlay" id="installModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideInstallModal()">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">📲</span>
+          <b style="font-size:16px;">Cài Đặt Sổ Tay CĐHA Ra Màn Hình</b>
+        </div>
+        <button class="modal-close-btn" onclick="window.VUDAT_APP.hideInstallModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 12px;background:var(--brand-wash);border-radius:10px;">
+          <img src="assets/icons/icon-192.png" alt="Icon Sổ Tay CĐHA" style="width:48px;height:48px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.15);object-fit:cover;">
+          <div>
+            <b style="font-size:14px;color:var(--brand-dark);display:block;">SỔ TAY CĐHA — BV VĨNH PHÚC VPI</b>
+            <span style="font-size:12px;color:var(--text-soft);">Mở nhanh như App, chạy ngoại tuyến 100% không cần mạng</span>
+          </div>
+        </div>
+
+        <!-- TABS THIẾT BỊ -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:8px;overflow-x:auto;">
+          <button id="instTab_ios" class="navpill active" onclick="window.VUDAT_APP.switchInstTab('ios')">🍏 iPhone / iPad</button>
+          <button id="instTab_android" class="navpill" onclick="window.VUDAT_APP.switchInstTab('android')">🤖 Android</button>
+          <button id="instTab_pc" class="navpill" onclick="window.VUDAT_APP.switchInstTab('pc')">💻 Máy tính (PC / Mac)</button>
+        </div>
+
+        <!-- PANE IPHONE -->
+        <div id="instPane_ios">
+          <div class="install-step-card">
+            <span class="install-step-num">1</span>
+            <div class="install-step-body">
+              Mở bằng trình duyệt <b>Safari</b> trên iPhone / iPad. Bấm vào biểu tượng <b>Chia sẻ</b> (hình vuông có mũi tên hướng lên <b>⎋</b>) ở thanh công cụ dưới đáy màn hình.
+            </div>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">2</span>
+            <div class="install-step-body">
+              Cuộn menu xuống dưới và chọn dòng <b>"Thêm vào MH chính"</b> (Add to Home Screen ➕).
+            </div>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">3</span>
+            <div class="install-step-body">
+              Bấm nút <b>"Thêm"</b> (Add) ở góc trên bên phải. Biểu tượng Sổ tay sẽ xuất hiện trên màn hình chính như một App chuyên nghiệp!
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE ANDROID -->
+        <div id="instPane_android" style="display:none;">
+          <div id="androidDirectInstallBox" style="margin-bottom:12px;text-align:center;">
+            <button class="btn-action-pill" onclick="window.VUDAT_APP.triggerPwaPrompt()" style="background:var(--brand);color:#fff;padding:10px 18px;font-size:14px;font-weight:700;">
+              ⚡ Bấm vào đây để Cài đặt ngay lên điện thoại
+            </button>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">1</span>
+            <div class="install-step-body">
+              Nếu dùng Chrome hoặc Cốc Cốc: Chạm vào dấu <b>3 chấm dọc (⋮)</b> ở góc trên bên phải trình duyệt.
+            </div>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">2</span>
+            <div class="install-step-body">
+              Chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào màn hình chính"</b>.
+            </div>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">3</span>
+            <div class="install-step-body">
+              Xác nhận <b>"Cài đặt"</b>. Ứng dụng sẽ được tạo ra ngoài màn hình chờ của điện thoại.
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE PC -->
+        <div id="instPane_pc" style="display:none;">
+          <div class="install-step-card">
+            <span class="install-step-num">1</span>
+            <div class="install-step-body">
+              Trên trình duyệt <b>Google Chrome</b> hoặc <b>Microsoft Edge</b> máy tính: Nhìn lên góc phải của thanh địa chỉ URL.
+            </div>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">2</span>
+            <div class="install-step-body">
+              Bấm vào biểu tượng <b>Cài đặt ứng dụng</b> (hình máy tính 🖥️ hoặc dấu cộng ⊕ trên thanh địa chỉ).
+            </div>
+          </div>
+          <div class="install-step-card">
+            <span class="install-step-num">3</span>
+            <div class="install-step-body">
+              Bấm <b>"Cài đặt"</b>. Sổ tay sẽ mở ra trong một cửa sổ riêng biệt giống như phần mềm chuyên dụng và có icon trên Desktop Windows.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL THÔNG TIN CHẾ ĐỘ XEM NGOẠI VIỆN (EXTERNAL ACCESS MODAL) ===== -->
+  <div class="modal-overlay" id="offlineInfoModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideOfflineInfoModal()">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">🌐</span>
+          <b style="font-size:16px;">Chế Độ Xem Ngoại Viện & Offline</b>
+        </div>
+        <button class="modal-close-btn" onclick="window.VUDAT_APP.hideOfflineInfoModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align:center;padding:12px;background:var(--ok-wash);border-radius:12px;margin-bottom:14px;border:1px solid rgba(22,163,74,0.2);">
+          <span style="font-size:26px;">🟢</span>
+          <b style="display:block;font-size:15px;color:var(--ok);margin-top:4px;" id="offlineModalTitle">Đã Sẵn Sàng Xem Ngoại Viện 100%</b>
+          <span style="font-size:12.5px;color:var(--text-soft);">Toàn bộ 210+ quy trình và phác đồ đã được nạp vào bộ nhớ đệm máy bạn.</span>
+        </div>
+        <ul style="font-size:13px;line-height:1.6;color:var(--text);padding-left:18px;margin:0 0 16px;">
+          <li><b>Khi ở ngoài viện:</b> Bạn có thể mở sổ tay tra cứu bình thường ngay cả khi không có WiFi, không có sóng 4G/5G hoặc trong thang máy/phòng chì.</li>
+          <li><b>Tốc độ siêu nhanh:</b> Ứng dụng khởi động ngay trong 0.2 giây.</li>
+          <li><b>Cập nhật tự động:</b> Khi có mạng trở lại, hệ thống sẽ tự động đối chiếu với Vercel Cloud để cập nhật những phác đồ mới nhất.</li>
+        </ul>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn-action-pill" onclick="window.VUDAT_APP.syncCloudData()" style="background:var(--brand);color:#fff;">
+            🔄 Kiểm tra cập nhật Cloud ngay
+          </button>
+          <button class="btn-action-pill" onclick="window.VUDAT_APP.hideOfflineInfoModal()">
+            Đã hiểu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BANNER NHẮC CÀI ĐẶT APP NỔI GÓC MÀN HÌNH ===== -->
+  <div class="pwa-floating-banner" id="pwaFloatingBanner" style="display:none;">
+    <img src="assets/icons/icon-192.png" alt="Icon Sổ tay" class="pwa-banner-icon">
+    <div class="pwa-banner-content">
+      <div class="pwa-banner-title">Cài Sổ Tay CĐHA ra màn hình</div>
+      <div class="pwa-banner-sub">Xem ngoại viện mượt mà, mở nhanh trong 0.2s không cần mạng.</div>
+      <div class="pwa-banner-actions">
+        <button class="pwa-btn-sm-install" onclick="window.VUDAT_APP.promptInstallApp()">Cài đặt App</button>
+        <button class="pwa-btn-sm-close" onclick="window.VUDAT_APP.dismissPwaBanner()" title="Đóng">&times;</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATIONS -->
   <div class="toast-container" id="toastContainer"></div>
 
@@ -266,6 +557,19 @@
   <script src="assets/js/data-congcu.js"></script>
   <script src="assets/js/auth-lms.js"></script>
   <script src="assets/js/app.js"></script>
+
+  <!-- ĐĂNG KÝ SERVICE WORKER (PWA & OFFLINE ENGINE) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./sw.js').then(function (reg) {
+          console.log('VPI ServiceWorker registered with scope:', reg.scope);
+        }).catch(function (err) {
+          console.warn('VPI ServiceWorker failed:', err);
+        });
+      });
+    }
+  </script>
 
 </body>
 </html>

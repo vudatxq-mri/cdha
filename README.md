@@ -1,8 +1,8 @@
 # BỆNH VIỆN VĨNH PHÚC VPI — SỔ TAY ĐIỆN TỬ & ĐÀO TẠO THỰC HÀNH CĐHA
 **Đơn vị:** Bệnh viện Vĩnh Phúc VPI — Khoa Chẩn Đoán Hình Ảnh  
-**Chủ biên / Quản trị:** Admin Vũ Đạt  
-**Tên địa chỉ nhận diện:** `vudat.cdha...`  
-**Phiên bản:** v2.5 Clinical & LMS Edition
+**Địa chỉ Vercel Cloud:** `https://sotay-cdha-vudat.vercel.app/`  
+**Liên hệ:** Email: vudatxq@gmail.com | Hotline: +84916306115  
+**Phiên bản:** v2.6 PWA Mobile & External Access Edition
 
 ---
 
@@ -13,22 +13,22 @@ Nền tảng sổ tay điện tử và đào tạo thực hành Chẩn đoán H�
    - **Phần 1: Nguyên lý & Chỉ định lâm sàng**: Cơ chế tạo ảnh, chỉ định, chống chỉ định, chuẩn bị người bệnh.
    - **Phần 2: Các thông số kỹ thuật**: kVp, mAs, FOV, Matrix, Lát cắt, Pitch, Kernel, TR/TE, thông số 3 hãng Siemens/Philips/GE, liều thuốc cản quang.
    - **Phần 3: Kỹ thuật chụp & Quy trình các bước**: Chiếu thế, hướng tia, trường quét, khẩu lệnh nín thở, các thì chụp đa pha, tái tạo MPR/MIP/VRT, tiêu chuẩn đánh giá phim.
-   - **Phần 4: Bảng kiểm thực hành (Checklist)**: Bảng kiểm tương tác từng bước được **sắp xếp ở phần cuối cùng** của kỹ thuật đó, hỗ trợ tích chọn trực quan.
+   - **Phần 4: Bảng kiểm an toàn (Checklist)**: Bảng kiểm 7 bước an toàn được tích hợp ở cuối mỗi kỹ thuật.
 
-2. **Phân loại danh mục theo Nhóm Vùng Cơ Thể**:
-   - 🧠 **Sọ não & Đầu mặt cổ**: Sọ thẳng/nghiêng, xoang, hàm mặt, xương đá, CTA mạch não, MRI sọ não...
-   - 🦴 **Cột sống**: Cổ, Ngực, Thắt lưng, Cùng cụt, Mạch máu tủy...
-   - 🫁 **Lồng ngực & Tim mạch**: Ngực thẳng/nghiêng, HRCT phổi kẽ, CTPA động mạch phổi, CCTA động mạch vành...
-   - 🩺 **Ổ bụng & Tiểu khung**: Bụng KUB, CT gan đa pha, CT tụy, CTU hệ tiết niệu, MRCP 3D đường mật...
-   - 💪 **Chi trên & Các khớp**: Vai, Cánh tay, Khuỷu, Cẳng tay, Cổ tay, Xương thuyền, Bàn tay...
-   - 🦵 **Chi dưới & Các khớp**: Khung chậu, Háng, Đùi, Gối, Cẳng chân, Cổ chân, Bàn chân...
-   - 🌐 **Toàn thân & Kỹ thuật đặc biệt**: Đa chấn thương (Polytrauma Pan-scan), tầm soát toàn thân...
-   - ⚙️ **Thông số & An toàn**: kVp, mAs, ALARA, An toàn bức xạ, Vật lý MRI, Dự phòng CIN...
+2. **Cài đặt App ra màn hình chính (Progressive Web App - PWA)**:
+   - Cài đặt trực tiếp lên điện thoại iPhone, Android và máy tính Windows, Mac.
+   - Khởi động siêu tốc trong 0.2 giây như một phần mềm độc lập, không thanh địa chỉ trình duyệt.
 
-3. **Hệ thống Kiểm soát Học Tuần Tự (LMS Engine)**:
-   - Học viên đăng ký tài khoản và học theo lộ trình tuần tự.
-   - Hoàn thành bài trước mới mở khóa bài tiếp theo (khóa 🔒 ➔ mở khóa 🔓 ➔ hoàn thành ✅).
-   - Nút bật **Chế độ Giảng viên (Admin Vũ Đạt)** cho phép mở khóa toàn bộ tức thì khi cần tra cứu khẩn cấp trong ca trực.
+3. **Chế độ Xem Ngoại Viện & Offline (Service Worker)**:
+   - Lưu trữ toàn bộ 210+ kỹ thuật, phác đồ cấp cứu phản vệ, bảng liều cản quang trực tiếp vào bộ nhớ thiết bị.
+   - Hoạt động 100% khi ra ngoài bệnh viện, đi công tác, trên xe cấp cứu hoặc trong phòng chụp chắn sóng không có mạng.
+
+4. **Bảo Mật An Toàn Nội Bộ (Mã PIN & Auto-lock)**:
+   - Tương tự như hệ thống **App 5S** và **Quản trị CĐHA**:
+     - Khóa bằng mã PIN 4 số (Mặc định: `1234`, có thể đổi trong Cài đặt).
+     - Tùy chọn phạm vi bảo vệ: Khóa toàn bộ App hoặc chỉ khóa vùng Nhạy cảm (Cấp cứu, Cản quang, Cài đặt).
+     - Tự động khóa phiên làm việc (Auto-lock) sau 5 - 15 - 30 phút không thao tác.
+     - Tuân thủ Bộ 83 Tiêu chí Chất lượng Bệnh viện (Quyết định 6858/QĐ-BYT).
 
 ---
 
@@ -44,11 +44,19 @@ Nền tảng sổ tay điện tử và đào tạo thực hành Chẩn đoán H�
 
 ---
 
-## 🚀 HƯỚNG DẪN SỬ DỤNG
-* **Chạy ứng dụng**: Nhấp đúp chuột vào file `index.html` để mở trong trình duyệt (Chrome, Edge, Safari...).
-* **Đăng nhập nhanh**:
-  - 👑 **Admin Vũ Đạt**: `vudat` • Mật khẩu `123` (Toàn quyền xem mọi bài).
-  - 🎓 **Học viên mới**: `hocvien` • Mật khẩu `123` (Học tuần tự).
+## 🚀 HƯỚNG DẪN CÀI ĐẶT APP RA MÀN HÌNH CHÍNH
+1. **Trên iPhone / iPad (Safari)**:
+   - Mở link: `https://sotay-cdha-vudat.vercel.app/`
+   - Bấm nút **Chia sẻ** (biểu tượng ⎋ ở dưới cùng).
+   - Chọn **"Thêm vào MH chính"** (Add to Home Screen ➕).
+   - Nhấn **"Thêm"** (Add).
+
+2. **Trên Android (Chrome / Cốc Cốc)**:
+   - Mở link: `https://sotay-cdha-vudat.vercel.app/`
+   - Bấm nút **"📲 Cài App"** trên thanh đầu trang hoặc bấm menu 3 chấm (⋮) ➔ Chọn **"Cài đặt ứng dụng"**.
+
+3. **Trên Máy tính (Windows / Mac)**:
+   - Mở link trên Chrome hoặc Edge ➔ Bấm biểu tượng Cài đặt 🖥️ trên thanh địa chỉ URL.
 
 ---
-*Bản quyền nội dung thuộc Bệnh viện Vĩnh Phúc VPI — Khoa Chẩn Đoán Hình Ảnh — Admin Vũ Đạt.*
+*Bản quyền nội dung thuộc Bệnh viện Vĩnh Phúc VPI — Khoa Chẩn Đoán Hình Ảnh.*

@@ -1,0 +1,73 @@
+{
+  "name": "BỆNH VIỆN VĨNH PHÚC VPI — Sổ Tay Điện Tử CĐHA",
+  "short_name": "Sổ Tay CĐHA",
+  "description": "Sổ tay điện tử tra cứu kỹ thuật Chẩn đoán hình ảnh toàn diện — Bệnh viện Vĩnh Phúc VPI. X-quang, CT-Scanner, MRI Master, Siêu âm, Thuốc cản quang, Cấp cứu.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
+  "theme_color": "#0284c7",
+  "lang": "vi",
+  "dir": "ltr",
+  "categories": [
+    "medical",
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "🚨 Cấp Cứu Phản Vệ",
+      "short_name": "Cấp cứu",
+      "description": "Phác đồ phản vệ TT 51/2017 & xử trí thoát mạch",
+      "url": "./index.html#mod-emg",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "🧪 Thuốc Cản Quang",
+      "short_name": "Cản quang",
+      "description": "Tra cứu thuốc CT/MRI & tính liều an toàn",
+      "url": "./index.html#mod-cq",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "⭕ CT Scanner",
+      "short_name": "CT Scanner",
+      "description": "Kỹ thuật CT & bảng kiểm 7 bước",
+      "url": "./index.html#mod-ct",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "🧲 MRI Master",
+      "short_name": "MRI Master",
+      "description": "Định hướng cắt & thông số 3 hãng máy",
+      "url": "./index.html#mod-mri",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

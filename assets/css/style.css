@@ -1430,3 +1430,311 @@ body {
   max-width: 100%;
   height: auto;
 }
+
+
+/* ============================================================================
+   PWA INSTALLATION, EXTERNAL ACCESS & MEDICAL SECURITY STYLES
+   BỆNH VIỆN VĨNH PHÚC VPI — KHOA CHẨN ĐOÁN HÌNH ẢNH
+   ============================================================================ */
+
+/* Nút Cài đặt App trên AppBar */
+.btn-pwa-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--pill);
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+.btn-pwa-install:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.45);
+  filter: brightness(1.08);
+}
+.btn-pwa-install svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Huy hiệu trạng thái kết nối & Ngoại viện */
+.network-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--pill);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s ease;
+  border: 1px solid transparent;
+  user-select: none;
+}
+.network-badge.online {
+  background: var(--ok-wash);
+  color: var(--ok);
+  border-color: rgba(22, 163, 74, 0.2);
+}
+.network-badge.offline {
+  background: var(--warn-wash);
+  color: var(--warn);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+.network-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.network-badge.online .network-dot {
+  background: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25);
+}
+.network-badge.offline .network-dot {
+  background: #d97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
+}
+
+/* Banner nhắc cài đặt App nổi góc màn hình */
+.pwa-floating-banner {
+  position: fixed;
+  bottom: 74px;
+  right: 18px;
+  z-index: 55;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 380px;
+  animation: slideUpFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.pwa-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+}
+.pwa-banner-content {
+  flex: 1;
+  min-width: 0;
+}
+.pwa-banner-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.pwa-banner-sub {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  line-height: 1.35;
+}
+.pwa-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.pwa-btn-sm-install {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--pill);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pwa-btn-sm-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+/* MÀN HÌNH KHÓA BẢO MẬT MÃ PIN (HOSPITAL MEDICAL PASSCODE LOCK) */
+.pin-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  user-select: none;
+}
+.pin-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  padding: 26px 22px 20px;
+  text-align: center;
+}
+.pin-hosp-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  margin: 0 auto 10px;
+  display: block;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+.pin-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brand-dark);
+  margin: 0 0 2px;
+  letter-spacing: -0.2px;
+}
+.pin-card .pin-subtitle {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.pin-prompt {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.pin-dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  background: transparent;
+  transition: all .18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pin-dot.filled {
+  background: var(--brand);
+  border-color: var(--brand);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px var(--brand-wash);
+}
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.pin-btn {
+  height: 54px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .12s ease;
+  outline: none;
+}
+.pin-btn:hover {
+  background: var(--surface-3);
+  transform: translateY(-1px);
+}
+.pin-btn:active {
+  transform: scale(0.95);
+  background: var(--brand-wash);
+  color: var(--brand);
+}
+.pin-btn.action-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+.pin-msg-error {
+  min-height: 20px;
+  font-size: 12.5px;
+  color: var(--danger);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.pin-footer-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 8px;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+/* Rung lắc khi sai mã PIN */
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.pin-card.shake {
+  animation: pinShake 0.35s ease-in-out;
+}
+
+/* MODAL HƯỚNG DẪN CÀI ĐẶT PWA */
+.install-step-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+}
+.install-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  flex: none;
+}
+.install-step-body {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.install-step-body b {
+  color: var(--brand-dark);
+}

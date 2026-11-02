@@ -1,6 +1,6 @@
 /* ============================================================================
    HỆ THỐNG QUẢN LÝ TÀI KHOẢN & KIỂM SOÁT HỌC TUẦN TỰ (AUTH & LMS ENGINE)
-   BỆNH VIỆN VĨNH PHÚC VPI — ADMIN VŨ ĐẠT
+   BỆNH VIỆN VĨNH PHÚC VPI — KHOA CHẨN ĐOÁN HÌNH ẢNH
    ============================================================================ */
 
 (function () {
@@ -11,15 +11,15 @@
   var STORAGE_KEY_PROGRESS = "vudat_cdha_progress_";
   var STORAGE_KEY_MENTOR_MODE = "vudat_cdha_mentor_mode";
 
-  // Danh sách tài khoản mẫu ban đầu: Admin Vũ Đạt & Học viên
+  // Danh sách tài khoản mẫu ban đầu: Quản trị viên & Học viên
   var DEFAULT_USERS = [
     {
-      id: "user_vudat",
-      username: "vudat",
-      email: "vudat.cdha@vpihospital.vn",
-      name: "Admin Vũ Đạt",
+      id: "user_vpi_admin",
+      username: "admin",
+      email: "vudatxq@gmail.com",
+      name: "Quản trị viên CĐHA VPI",
       hospital: "Bệnh viện Vĩnh Phúc VPI",
-      role: "Admin Vũ Đạt (Giảng viên / Quản trị)",
+      role: "Quản trị viên Khoa CĐHA",
       password: "123",
       createdAt: "2026-01-01"
     },

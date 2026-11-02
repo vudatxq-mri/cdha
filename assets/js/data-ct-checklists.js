@@ -1,6 +1,6 @@
 /* ============================================================================
    BẢNG KIỂM KỸ THUẬT CẮT LỚP VI TÍNH (CT-SCANNER CHECKLISTS REGISTRY)
-   BỆNH VIỆN VĨNH PHÚC VPI — KHOA CHẨN ĐOÁN HÌNH ẢNH — ADMIN VŨ ĐẠT
+   BỆNH VIỆN VĨNH PHÚC VPI — KHOA CHẨN ĐOÁN HÌNH ẢNH
    Chuẩn hóa theo khuyến cáo Hội Điện quang & Y học Hạt nhân VN, ACR & ESUR
    Bảng kiểm được liên kết và hiển thị ở PHẦN CUỐI CÙNG của từng kỹ thuật chụp
    ============================================================================ */
