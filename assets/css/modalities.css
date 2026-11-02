@@ -1,0 +1,156 @@
+/* ============================================================================
+   HỆ THỐNG MÀU SẮC ĐẶC TRƯNG TỪNG PHÂN HỆ (MODALITY COLOR SYSTEM)
+   SỔ TAY ĐIỆN TỬ CĐHA — VŨ ĐẠT CĐHA
+   ============================================================================ */
+
+:root {
+  /* 1. X-QUANG: XANH DƯƠNG NGỌC / CYAN */
+  --c-xq:        #0284c7;
+  --c-xq-dark:   #0369a1;
+  --c-xq-wash:   #e0f2fe;
+  --c-xq-border: #7dd3fc;
+  --c-xq-ink:    #0c4a6e;
+
+  /* 2. CT-SCANNER: XANH SAPPHIRE / COBALT */
+  --c-ct:        #2563eb;
+  --c-ct-dark:   #1d4ed8;
+  --c-ct-wash:   #eff6ff;
+  --c-ct-border: #93c5fd;
+  --c-ct-ink:    #1e3a8a;
+
+  /* 3. MRI: TÍM ĐẬM HOÀNG GIA / INDIGO */
+  --c-mri:        #4f46e5;
+  --c-mri-dark:   #4338ca;
+  --c-mri-wash:   #eef2ff;
+  --c-mri-border: #a5b4fc;
+  --c-mri-ink:    #312e81;
+
+  /* 4. SIÊU ÂM: XANH NGỌC LỤC BẢO / EMERALD */
+  --c-us:        #059669;
+  --c-us-dark:   #047857;
+  --c-us-wash:   #ecfdf5;
+  --c-us-border: #6ee7b7;
+  --c-us-ink:    #064e3b;
+
+  /* 5. SIÊU ÂM CAN THIỆP: CAM SAN HÔ / TANGERINE */
+  --c-canthiep:        #ea580c;
+  --c-canthiep-dark:   #c2410c;
+  --c-canthiep-wash:   #fff7ed;
+  --c-canthiep-border: #fdba74;
+  --c-canthiep-ink:    #7c2d12;
+
+  /* 6. THĂM DÒ CHỨC NĂNG (ĐO LOÃNG XƯƠNG): TÍM THẠCH ANH / VIOLET */
+  --c-dlx:        #7c3aed;
+  --c-dlx-dark:   #6d28d9;
+  --c-dlx-wash:   #f5f3ff;
+  --c-dlx-border: #c4b5fd;
+  --c-dlx-ink:    #4c1d95;
+
+  /* 7. THUỐC CẢN QUANG: HỒNG CÁNH SEN / MAGENTA ROSE */
+  --c-cq:        #db2777;
+  --c-cq-dark:   #be185d;
+  --c-cq-wash:   #fdf2f8;
+  --c-cq-border: #f472b6;
+  --c-cq-ink:    #831843;
+
+  /* 8. TAI BIẾN & CẤP CỨU: ĐỎ BÁO ĐỘNG / CRIMSON */
+  --c-emg:        #dc2626;
+  --c-emg-dark:   #b91c1c;
+  --c-emg-wash:   #fef2f2;
+  --c-emg-border: #fca5a5;
+  --c-emg-ink:    #7f1d1d;
+}
+
+/* PHIÊN BẢN CHẾ ĐỘ NỀN TỐI (DARK THEME) */
+:root[data-theme="dark"] {
+  --c-xq:        #38bdf8;
+  --c-xq-dark:   #0284c7;
+  --c-xq-wash:   #082f49;
+  --c-xq-border: #0369a1;
+  --c-xq-ink:    #bae6fd;
+
+  --c-ct:        #60a5fa;
+  --c-ct-dark:   #2563eb;
+  --c-ct-wash:   #172554;
+  --c-ct-border: #1d4ed8;
+  --c-ct-ink:    #dbeafe;
+
+  --c-mri:        #818cf8;
+  --c-mri-dark:   #4f46e5;
+  --c-mri-wash:   #1e1b4b;
+  --c-mri-border: #4338ca;
+  --c-mri-ink:    #e0e7ff;
+
+  --c-us:        #34d399;
+  --c-us-dark:   #059669;
+  --c-us-wash:   #022c22;
+  --c-us-border: #047857;
+  --c-us-ink:    #d1fae5;
+
+  --c-canthiep:        #fb923c;
+  --c-canthiep-dark:   #ea580c;
+  --c-canthiep-wash:   #431407;
+  --c-canthiep-border: #9a3412;
+  --c-canthiep-ink:    #ffedd5;
+
+  --c-dlx:        #a78bfa;
+  --c-dlx-dark:   #7c3aed;
+  --c-dlx-wash:   #2e1065;
+  --c-dlx-border: #6d28d9;
+  --c-dlx-ink:    #ede9fe;
+
+  --c-cq:        #f472b6;
+  --c-cq-dark:   #db2777;
+  --c-cq-wash:   #500724;
+  --c-cq-border: #be185d;
+  --c-cq-ink:    #fce7f3;
+
+  --c-emg:        #f87171;
+  --c-emg-dark:   #dc2626;
+  --c-emg-wash:   #450a0a;
+  --c-emg-border: #b91c1c;
+  --c-emg-ink:    #fee2e2;
+}
+
+/* ÁP DỤNG STYLING TỪNG PHÂN HỆ */
+.theme-xq { --theme-color: var(--c-xq); --theme-wash: var(--c-xq-wash); --theme-border: var(--c-xq-border); --theme-ink: var(--c-xq-ink); }
+.theme-ct { --theme-color: var(--c-ct); --theme-wash: var(--c-ct-wash); --theme-border: var(--c-ct-border); --theme-ink: var(--c-ct-ink); }
+.theme-mri { --theme-color: var(--c-mri); --theme-wash: var(--c-mri-wash); --theme-border: var(--c-mri-border); --theme-ink: var(--c-mri-ink); }
+.theme-us { --theme-color: var(--c-us); --theme-wash: var(--c-us-wash); --theme-border: var(--c-us-border); --theme-ink: var(--c-us-ink); }
+.theme-canthiep { --theme-color: var(--c-canthiep); --theme-wash: var(--c-canthiep-wash); --theme-border: var(--c-canthiep-border); --theme-ink: var(--c-canthiep-ink); }
+.theme-dlx { --theme-color: var(--c-dlx); --theme-wash: var(--c-dlx-wash); --theme-border: var(--c-dlx-border); --theme-ink: var(--c-dlx-ink); }
+.theme-cq { --theme-color: var(--c-cq); --theme-wash: var(--c-cq-wash); --theme-border: var(--c-cq-border); --theme-ink: var(--c-cq-ink); }
+.theme-emg { --theme-color: var(--c-emg); --theme-wash: var(--c-emg-wash); --theme-border: var(--c-emg-border); --theme-ink: var(--c-emg-ink); }
+
+/* BADGES & CHIPS THEO MÀU */
+.badge-mod {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background: var(--theme-wash);
+  color: var(--theme-ink);
+}
+
+.modcard-themed {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  transition: all .2s ease;
+}
+.modcard-themed::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--theme-color);
+}
+.modcard-themed:hover {
+  border-color: var(--theme-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
