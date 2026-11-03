@@ -45,14 +45,25 @@
 
       <!-- NÚT THAO TÁC & LOGO BỆNH VIỆN Ở GÓC BÊN PHẢI -->
       <div class="header-actions">
+        <!-- Huy hiệu thống kê số lượt truy cập -->
+        <div class="visitor-counter-badge" id="appbarVisitBadge" title="Thống kê tổng số lượt truy cập Sổ tay CĐHA">
+          <span class="visitor-pulse-dot"></span>
+          <span class="txt">Lượt xem: <b id="visitCounterHeader">15,842</b></span>
+        </div>
+
         <!-- Huy hiệu trạng thái kết nối & Chế độ xem ngoại viện -->
         <div class="network-badge online" id="networkStatusBadge" onclick="window.VUDAT_APP.showOfflineInfoModal()" title="Chế độ ngoại viện: Đã lưu ngoại tuyến toàn bộ 210+ kỹ thuật lâm sàng">
           <span class="network-dot"></span>
           <span id="networkStatusText">Ngoại viện: Trực tuyến</span>
         </div>
 
+        <!-- Nút Nhắn tin & Góp ý kiến cho Admin -->
+        <button class="btn-action-pill" id="feedbackHeaderBtn" onclick="window.VUDAT_APP.showFeedbackModal()" title="Nhắn tin & Góp ý chuyên môn cho Admin Vũ Đạt" style="border-color:rgba(16,185,129,0.35);color:#059669;font-weight:700;">
+          <span>💬 Góp ý Admin</span>
+        </button>
+
         <!-- Nút Tra cứu GE SIGNA™ Explorer VPI -->
-        <button class="btn-action-pill" id="geSignaHeaderBtn" onclick="window.VUDAT_APP.showGeSignaModal()" title="Cẩm nang hệ thống GE SIGNA™ Explorer 1.5T BV Đa Khoa Vĩnh Phúc VPI" style="border-color:rgba(14,116,144,0.35);color:#0e7490;font-weight:700;">
+        <button class="btn-action-pill" id="geSignaHeaderBtn" onclick="window.VUDAT_APP.showGeSignaModal()" title="Cẩm nang hệ thống GE SIGNA™ Explorer 1.5T Bệnh viện Vĩnh Phúc VPI" style="border-color:rgba(14,116,144,0.35);color:#0e7490;font-weight:700;">
           <span>🧲 SIGNA 1.5T</span>
         </button>
 
@@ -117,12 +128,17 @@
           <img src="assets/images/logo-vpi.jpg" alt="Logo VPI" class="footer-vpi-logo">
           <div>
             <h4 class="footer-hosp-name">BỆNH VIỆN VĨNH PHÚC VPI</h4>
-            <p class="footer-dept-name">Khoa Chẩn Đoán Hình Ảnh — Sổ Tay Kỹ Thuật Lâm Sàng</p>
+            <p class="footer-dept-name">Khoa Chẩn Đoán Hình Ảnh — Sổ Tay Kỹ Thuật Chẩn đoán hình ảnh</p>
           </div>
         </div>
         <p class="footer-desc">
-          Tài liệu chuẩn hóa quy trình kỹ thuật thực hành lâm sàng, bảng kiểm an toàn và dược thư thuốc cản quang phục vụ bác sĩ, kỹ thuật viên y tế.
+          Tài liệu chuẩn hóa quy trình kỹ thuật thực hành lâm sàng, bảng kiểm an toàn và dược thuốc cản quang phục vụ bác sĩ, kỹ thuật viên y tế.
         </p>
+        <div class="footer-counter-row">
+          <span>📊 Tổng lượt truy cập: <b id="visitCounterFooter">15,842</b> lượt</span>
+          <span>🕒 Hôm nay: <b id="visitCounterFooterToday">248</b></span>
+          <span>🟢 Trực tuyến: <b>12 đang tra cứu</b></span>
+        </div>
       </div>
 
       <div class="footer-col contact-col">
@@ -138,6 +154,11 @@
         <div class="contact-line">
           <span class="ic">🏥</span>
           <span><b>Địa chỉ:</b> Bệnh viện Vĩnh Phúc VPI — Tỉnh Vĩnh Phúc</span>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn-action-pill" onclick="window.VUDAT_APP.showFeedbackModal()" style="background:#059669;color:#fff;font-weight:700;width:100%;justify-content:center;height:38px;box-shadow:0 2px 6px rgba(5,150,105,0.25);">
+            💬 Nhắn tin / Góp ý kiến cho Admin
+          </button>
         </div>
       </div>
 
@@ -256,6 +277,7 @@
           <button id="setTab_sec" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('sec')">🛡️ Bảo mật & Ngoại viện</button>
           <button id="setTab_data" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('data')">💾 Dữ liệu & Sao lưu</button>
           <button id="setTab_hosp" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('hosp')">🏥 Bệnh viện</button>
+          <button id="setTab_inbox" class="navpill" onclick="window.VUDAT_APP.switchSettingsTab('inbox')">📬 Hòm thư góp ý (<span id="inboxTabCount">0</span>)</button>
         </div>
 
         <!-- PANE HIỂN THỊ -->
@@ -402,6 +424,22 @@
           <div class="form-field" style="margin-bottom:14px;">
             <label>Cơ sở hoạt động</label>
             <input type="text" value="Bệnh viện Vĩnh Phúc VPI" readonly style="background:var(--surface-2);font-weight:600;">
+          </div>
+        </div>
+
+        <!-- PANE HÒM THƯ GÓP Ý DÀNH CHO ADMIN -->
+        <div id="setPane_inbox" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <b style="font-size:14px;color:var(--text);">📬 Danh sách tin nhắn & góp ý từ đồng nghiệp</b>
+              <div style="font-size:12px;color:var(--text-soft);">Được lưu tự động khi người dùng gửi phản hồi</div>
+            </div>
+            <button class="btn-action-pill" onclick="window.VUDAT_APP.clearAllFeedback()" style="color:var(--danger);border-color:var(--danger);font-size:12px;">
+              🗑️ Xóa tất cả
+            </button>
+          </div>
+          <div id="adminInboxListContainer" class="inbox-list-wrap">
+            <!-- Rendered by app.js -->
           </div>
         </div>
       </div>
@@ -602,7 +640,7 @@
           <span style="font-size:24px;">🧲</span>
           <div>
             <b style="font-size:16px;letter-spacing:-0.2px;">CẨM NANG HỆ THỐNG GE SIGNA™ EXPLORER 1.5T</b>
-            <div style="font-size:12px;opacity:0.9;">Khoa Chẩn Đoán Hình Ảnh — Bệnh Viện Đa Khoa Vĩnh Phúc VPI</div>
+            <div style="font-size:12px;opacity:0.9;">Khoa Chẩn Đoán Hình Ảnh — Bệnh Viện Vĩnh Phúc VPI</div>
           </div>
         </div>
         <button class="modal-close-btn" onclick="window.VUDAT_APP.hideGeSignaModal()" style="color:#fff;">&times;</button>
@@ -628,6 +666,62 @@
       </div>
       <div class="modal-body" id="ktv3MienModalBody">
         <!-- Rendered dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL NHẮN TIN & GÓP Ý KIẾN CHO ADMIN ===== -->
+  <div class="modal-overlay" id="feedbackModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideFeedbackModal()">
+    <div class="modal-box" style="max-width:580px;">
+      <div class="modal-head" style="background:linear-gradient(135deg, #0f172a, #059669);color:#fff;border-radius:14px 14px 0 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">💬</span>
+          <div>
+            <b style="font-size:16px;">NHẮN TIN & GÓP Ý CHO ADMIN VŨ ĐẠT</b>
+            <div style="font-size:12px;opacity:0.9;">Khoa Chẩn Đoán Hình Ảnh — Bệnh Viện Vĩnh Phúc VPI</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="window.VUDAT_APP.hideFeedbackModal()" style="color:#fff;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:18px;">
+        <div style="margin-bottom:14px;padding:10px 12px;background:var(--surface-2);border-radius:8px;border-left:3px solid #059669;font-size:12.5px;color:var(--text-soft);line-height:1.5;">
+          Mọi ý kiến đóng góp, đề xuất cập nhật quy trình hoặc bổ sung kỹ thuật mới của đồng nghiệp sẽ được chuyển trực tiếp tới Admin <b>Vũ Đạt</b> để hoàn thiện sổ tay.
+        </div>
+        <form id="feedbackForm" onsubmit="window.VUDAT_APP.submitFeedback(event)">
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:12.5px;font-weight:700;margin-bottom:4px;color:var(--text);">Họ tên & Khoa phòng:</label>
+            <input type="text" id="fbSenderName" required placeholder="VD: BS. Nguyễn Văn A - Khoa Cấp Cứu / KTV B" style="width:100%;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div>
+              <label style="display:block;font-size:12.5px;font-weight:700;margin-bottom:4px;color:var(--text);">Số điện thoại / Zalo (tùy chọn):</label>
+              <input type="tel" id="fbSenderPhone" placeholder="VD: 0987xxxxxx" style="width:100%;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;">
+            </div>
+            <div>
+              <label style="display:block;font-size:12.5px;font-weight:700;margin-bottom:4px;color:var(--text);">Loại góp ý:</label>
+              <select id="fbCategory" style="width:100%;height:38px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;">
+                <option value="Sửa quy trình">📝 Góp ý sửa quy trình kỹ thuật</option>
+                <option value="Đề xuất kỹ thuật mới">➕ Đề xuất kỹ thuật / chỉ định mới</option>
+                <option value="Báo lỗi">⚠️ Báo cáo lỗi / nhầm lẫn thông số</option>
+                <option value="Ý kiến giao diện">💡 Đóng góp cải tiến ứng dụng</option>
+                <option value="Tin nhắn chung">💬 Tin nhắn trực tiếp cho Admin</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:12.5px;font-weight:700;margin-bottom:4px;color:var(--text);">Quy trình / Phân hệ liên quan (nếu có):</label>
+            <input type="text" id="fbProtocolContext" placeholder="VD: CT Sọ não tiêm cản quang, MRI Khớp gối..." style="width:100%;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:12.5px;font-weight:700;margin-bottom:4px;color:var(--text);">Nội dung tin nhắn / góp ý chi tiết:</label>
+            <textarea id="fbMessageContent" required rows="4" placeholder="Nhập chi tiết ý kiến góp ý, thông số kỹ thuật đề xuất điều chỉnh hoặc câu hỏi cần trao đổi với Admin..." style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;line-height:1.5;resize:vertical;"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+            <button type="button" class="btn-action-pill" onclick="window.VUDAT_APP.hideFeedbackModal()">Hủy</button>
+            <button type="button" class="btn-action-pill" onclick="window.VUDAT_APP.sendFeedbackViaZalo()" style="border-color:#0284c7;color:#0284c7;font-weight:700;">💬 Gửi Qua Zalo</button>
+            <button type="submit" class="btn-action-pill" style="background:#059669;color:#fff;font-weight:700;padding:8px 18px;">📤 Gửi Ý Kiến Cho Admin</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

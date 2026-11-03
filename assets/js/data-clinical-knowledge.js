@@ -1,9 +1,9 @@
 ﻿/* ============================================================================
    BỘ DỮ LIỆU TRI THỨC LÂM SÀNG, NGUYÊN LÝ & CẨM NANG VẬN HÀNH THIẾT BỊ
-   SỔ CĐHA — KHOA CHẨN ĐOÁN HÌNH ẢNH — BỆNH VIỆN ĐA KHOA VĨNH PHÚC (VPI)
+   SỔ CĐHA — KHOA CHẨN ĐOÁN HÌNH ẢNH — BỆNH VIỆN VĨNH PHÚC (VPI)
    
    NGUỒN THAM CHIẾU CHÍNH THỨC:
-   1. Bệnh Viện Đa Khoa Vĩnh Phúc VPI - GE SIGNA™ Explorer 1.5T:
+   1. Bệnh Viện Vĩnh Phúc VPI - GE SIGNA™ Explorer 1.5T:
       https://academy.siemens-healthineers.com/vi-vn
    2. Siemens Healthineers Academy:
       https://academy.siemens-healthineers.com/vi-vn
@@ -16,10 +16,10 @@
 window.SOTAY_CLINICAL_KNOWLEDGE = {
 
   /* =========================================================================
-     1. CẨM NANG VẬN HÀNH MÁY GE SIGNA™ EXPLORER 1.5T TẠI BV ĐA KHOA VĨNH PHÚC VPI
+     1. CẨM NANG VẬN HÀNH MÁY GE SIGNA™ EXPLORER 1.5T TẠI BỆNH VIỆN VĨNH PHÚC VPI
      ========================================================================= */
   geSignaExplorerVPI: {
-    tenThietBi: "GE SIGNA™ Explorer 1.5 Tesla (Bệnh viện Đa Khoa Vĩnh Phúc VPI)",
+    tenThietBi: "GE SIGNA™ Explorer 1.5 Tesla (Bệnh viện Vĩnh Phúc VPI)",
     // taiLieuVPI
     thongSoPhanCung: {
       tuTruong: "1.5 Tesla (Nam châm siêu dẫn đồng nhất cao)",

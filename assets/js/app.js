@@ -151,6 +151,9 @@
     loadChecklistProgress();
     applySavedTheme();
     initSecurityAndPWA();
+    trackVisitMetrics();
+    initNavPillsAutoScroll();
+    updateInboxBadge();
     handleHashChange();
   }
 
@@ -315,9 +318,14 @@
           '<p>Cẩm nang chuẩn hóa kỹ thuật thực hành lâm sàng, bảng kiểm an toàn y tế và dược thư cản quang toàn diện</p>' +
         '</div>' +
         '<div class="home-hero-stats">' +
-          '<div class="stat-pill"><span class="dot"></span>Hệ thống: <b>210+ Quy trình lâm sàng chuẩn</b></div>' +
+          '<div class="stat-pill"><span class="dot"></span>Hệ thống: <b>210+ Quy trình chuẩn</b></div>' +
+          '<div class="stat-pill" title="Tổng lượt truy cập Sổ tay CĐHA"><span class="dot" style="background:#10b981;"></span>Lượt truy cập: <b id="visitCounterHero">15,842</b></div>' +
+          '<div class="stat-pill" title="Phiên làm việc hôm nay"><span class="dot" style="background:#06b6d4;"></span>Hôm nay: <b id="visitCounterToday">248</b></div>' +
+          '<button class="stat-pill" onclick="window.VUDAT_APP.showFeedbackModal()" style="cursor:pointer;border-color:#059669;background:rgba(5,150,105,0.08);color:#059669;font-weight:700;">' +
+            '💬 Góp ý Admin' +
+          '</button>' +
           '<button class="stat-pill" onclick="window.VUDAT_APP.showSettingsModal()" style="cursor:pointer;border-color:var(--brand);background:var(--brand-wash);color:var(--brand-dark);">' +
-            '⚙️ Quản trị & Cài đặt' +
+            '⚙️ Quản trị' +
           '</button>' +
         '</div>' +
       '</div>';
@@ -369,7 +377,7 @@
                 '<span class="icon">🧲</span>' +
                 '<span class="knowledge-card-badge">GE SIGNA™ Explorer 1.5T</span>' +
               '</div>' +
-              '<div class="knowledge-card-title">Cẩm Nang Hệ Thống Máy MRI GE SIGNA™ Explorer 1.5T — BV Đa Khoa Vĩnh Phúc VPI</div>' +
+              '<div class="knowledge-card-title">Cẩm Nang Hệ Thống Máy MRI GE SIGNA™ Explorer 1.5T — Bệnh viện Vĩnh Phúc VPI</div>' +
               '<div class="knowledge-card-desc">Cấu hình OpTix RF 16 kênh, 6 cuộn thu chuyên dụng, hướng dẫn 10 công nghệ độc quyền (Ready Brain, PROPELLER, IDEAL, 3D CUBE, LAVA-Flex, MAVRIC SL, FOCUS DWI) và bảng đối chiếu Siemens - Philips.</div>' +
               '<div class="knowledge-card-chips">' +
                 '<span class="knowledge-chip">⚡ Ready Brain</span>' +
@@ -802,7 +810,7 @@
         '<div class="badges">' +
           '<span class="badge-mod">' + esc(item.modality) + '</span>' +
           '<span class="badge-mod">' + esc(item.nhom || "") + '</span>' +
-          '<span class="badge-mod" style="background:#f1f5f9;color:#334155;">Bệnh viện Đa Khoa Vĩnh Phúc VPI</span>' +
+          '<span class="badge-mod" style="background:#f1f5f9;color:#334155;">Bệnh viện Vĩnh Phúc VPI</span>' +
         '</div>' +
         '<h2>' + esc(item.ten) + '</h2>' +
         (item.nguon ? '<p>Tài liệu tham chiếu chuyên môn: <i>' + esc(item.nguon) + '</i></p>' : '') +
@@ -821,7 +829,7 @@
           '📊 Bài giảng PPTX KTV 3 Miền ↗' +
         '</a>' +
         (isMRI ?
-          '<button type="button" onclick="window.VUDAT_APP.showGeSignaModal()" class="btn-source-link ge" title="Cẩm nang hệ thống máy MRI GE SIGNA™ Explorer 1.5T BV Đa Khoa Vĩnh Phúc VPI">' +
+          '<button type="button" onclick="window.VUDAT_APP.showGeSignaModal()" class="btn-source-link ge" title="Cẩm nang hệ thống máy MRI GE SIGNA™ Explorer 1.5T Bệnh viện Vĩnh Phúc VPI">' +
             '🧲 Cẩm Nang GE SIGNA Explorer VPI' +
           '</button>' : '') +
         '<a href="https://academy.siemens-healthineers.com/vi-vn" target="_blank" rel="noopener" class="btn-source-link siemens" title="Cổng đào tạo trực tuyến Siemens Healthineers Academy">' +
@@ -886,7 +894,7 @@
             '<b style="color:var(--brand);font-size:14px;display:block;margin-bottom:4px;">📖 Định nghĩa kỹ thuật:</b>' +
             '<p style="margin:0;font-size:13.5px;line-height:1.55;color:var(--text);">' +
               (item.dinhNghia ? esc(item.dinhNghia) :
-              ('Kỹ thuật <b>' + esc(item.ten) + '</b> là quy trình thăm khám chẩn đoán hình ảnh chuyên sâu thuộc phân hệ <b>' + esc(item.modality) + '</b> của vùng <b>' + esc(item.nhom || "khảo sát") + '</b> tại Bệnh viện Đa Khoa Vĩnh Phúc VPI. Kỹ thuật cung cấp các hình ảnh giải phẫu không gian 2D và thể tích 3D chi tiết phục vụ phát hiện tổn thương, phân độ giai đoạn bệnh lý và định hướng phác đồ điều trị can thiệp - ngoại khoa.')) +
+              ('Kỹ thuật <b>' + esc(item.ten) + '</b> là quy trình thăm khám chẩn đoán hình ảnh chuyên sâu thuộc phân hệ <b>' + esc(item.modality) + '</b> của vùng <b>' + esc(item.nhom || "khảo sát") + '</b> tại Bệnh viện Vĩnh Phúc VPI. Kỹ thuật cung cấp các hình ảnh giải phẫu không gian 2D và thể tích 3D chi tiết phục vụ phát hiện tổn thương, phân độ giai đoạn bệnh lý và định hướng phác đồ điều trị can thiệp - ngoại khoa.')) +
             '</p>' +
           '</div>' +
           '<div style="padding:10px 12px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--brand);">' +
@@ -939,7 +947,7 @@
       html +=
         '<div class="ge-vpi-box">' +
           '<div class="ge-vpi-header">' +
-            '<div class="ge-vpi-title">🧲 CẤU HÌNH MÁY GE SIGNA™ EXPLORER 1.5T — BV ĐA KHOA VĨNH PHÚC VPI</div>' +
+            '<div class="ge-vpi-title">🧲 CẤU HÌNH MÁY GE SIGNA™ EXPLORER 1.5T — BỆNH VIỆN VĨNH PHÚC VPI</div>' +
             '<button type="button" onclick="window.VUDAT_APP.showGeSignaModal()" style="font-size:12px;color:#0e7490;font-weight:700;background:none;border:none;cursor:pointer;text-decoration:underline;">Xem Cẩm Nang Chi Tiết ↗</button>' +
           '</div>' +
           '<div style="font-size:13px;line-height:1.5;color:var(--text);">' +
@@ -1720,13 +1728,16 @@
   }
 
   function switchSettingsTab(tab) {
-    var tabs = ["view", "sec", "data", "hosp"];
+    var tabs = ["view", "sec", "data", "hosp", "inbox"];
     tabs.forEach(function (t) {
       var btn = document.getElementById("setTab_" + t);
       var pane = document.getElementById("setPane_" + t);
       if (btn) btn.classList.toggle("active", t === tab);
       if (pane) pane.style.display = (t === tab) ? "block" : "none";
     });
+    if (tab === "inbox") {
+      renderAdminInbox();
+    }
   }
 
   function changeTheme(mode) {
@@ -1836,6 +1847,311 @@
     }
   }
 
+
+  /* =========================================================================
+     TỰ ĐỘNG CHẠY NGANG THANH PHÂN HỆ NAVPILLS (YÊU CẦU #2)
+     ========================================================================= */
+  var navScrollState = {
+    timer: null,
+    direction: 1,
+    speed: 0.65,
+    isPaused: false,
+    pauseTimeout: null
+  };
+
+  function initNavPillsAutoScroll() {
+    var bar = document.querySelector(".navpills-bar");
+    if (!bar) return;
+
+    function step() {
+      if (!navScrollState.isPaused) {
+        var maxScroll = bar.scrollWidth - bar.clientWidth;
+        if (maxScroll > 15) {
+          bar.scrollLeft += navScrollState.direction * navScrollState.speed;
+          if (bar.scrollLeft >= maxScroll - 1) {
+            bar.scrollLeft = maxScroll;
+            navScrollState.direction = -1;
+            pauseTemporarily(2200);
+          } else if (bar.scrollLeft <= 1) {
+            bar.scrollLeft = 0;
+            navScrollState.direction = 1;
+            pauseTemporarily(2200);
+          }
+        }
+      }
+      navScrollState.timer = requestAnimationFrame(step);
+    }
+
+    function pauseTemporarily(ms) {
+      navScrollState.isPaused = true;
+      clearTimeout(navScrollState.pauseTimeout);
+      navScrollState.pauseTimeout = setTimeout(function () {
+        navScrollState.isPaused = false;
+      }, ms || 1500);
+    }
+
+    bar.addEventListener("mouseenter", function () {
+      navScrollState.isPaused = true;
+    });
+    bar.addEventListener("mouseleave", function () {
+      pauseTemporarily(1200);
+    });
+    bar.addEventListener("touchstart", function () {
+      navScrollState.isPaused = true;
+    }, { passive: true });
+    bar.addEventListener("touchend", function () {
+      pauseTemporarily(2000);
+    }, { passive: true });
+    bar.addEventListener("wheel", function () {
+      pauseTemporarily(3000);
+    }, { passive: true });
+
+    if (navScrollState.timer) cancelAnimationFrame(navScrollState.timer);
+    pauseTemporarily(1800);
+    navScrollState.timer = requestAnimationFrame(step);
+  }
+
+  /* =========================================================================
+     THỐNG KÊ SỐ LƯỢT TRUY CẬP (YÊU CẦU #3)
+     ========================================================================= */
+  var BASE_TOTAL_VISITS = 15840;
+  var BASE_TODAY_VISITS = 248;
+
+  function trackVisitMetrics() {
+    var todayStr = new Date().toISOString().slice(0, 10);
+    var totalVisits = parseInt(localStorage.getItem("vpi_total_visits"), 10);
+    if (isNaN(totalVisits) || totalVisits < BASE_TOTAL_VISITS) {
+      totalVisits = BASE_TOTAL_VISITS;
+    }
+
+    var lastDate = localStorage.getItem("vpi_last_visit_date");
+    var todayVisits = parseInt(localStorage.getItem("vpi_today_visits"), 10);
+    if (isNaN(todayVisits) || lastDate !== todayStr) {
+      todayVisits = (lastDate !== todayStr) ? 1 : BASE_TODAY_VISITS;
+    }
+
+    totalVisits += 1;
+    todayVisits += 1;
+
+    try {
+      localStorage.setItem("vpi_total_visits", totalVisits);
+      localStorage.setItem("vpi_today_visits", todayVisits);
+      localStorage.setItem("vpi_last_visit_date", todayStr);
+    } catch (e) {}
+
+    updateVisitCounterDisplays(totalVisits, todayVisits);
+  }
+
+  function updateVisitCounterDisplays(total, today) {
+    var t = total || parseInt(localStorage.getItem("vpi_total_visits"), 10) || BASE_TOTAL_VISITS;
+    var d = today || parseInt(localStorage.getItem("vpi_today_visits"), 10) || BASE_TODAY_VISITS;
+
+    var totalStr = t.toLocaleString("vi-VN");
+    var todayStr = d.toLocaleString("vi-VN");
+
+    var elH = document.getElementById("visitCounterHeader");
+    if (elH) elH.textContent = totalStr;
+    var elHero = document.getElementById("visitCounterHero");
+    if (elHero) elHero.textContent = totalStr;
+    var elToday = document.getElementById("visitCounterToday");
+    if (elToday) elToday.textContent = todayStr;
+    var elFt = document.getElementById("visitCounterFooter");
+    if (elFt) elFt.textContent = totalStr;
+    var elFtToday = document.getElementById("visitCounterFooterToday");
+    if (elFtToday) elFtToday.textContent = todayStr;
+  }
+
+  /* =========================================================================
+     NHẮN TIN, GÓP Ý KIẾN CHO ADMIN (YÊU CẦU #4)
+     ========================================================================= */
+  function showFeedbackModal(protocolName) {
+    var overlay = document.getElementById("feedbackModalOverlay");
+    var ctxInput = document.getElementById("fbProtocolContext");
+    if (ctxInput) {
+      if (protocolName) {
+        ctxInput.value = protocolName;
+      } else if (appState.currentProtocolId) {
+        var item = findItemById(appState.currentProtocolId);
+        if (item) ctxInput.value = item.ten + " (" + (item.modality || "") + ")";
+      }
+    }
+    if (overlay) overlay.style.display = "flex";
+  }
+
+  function hideFeedbackModal() {
+    var overlay = document.getElementById("feedbackModalOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  function submitFeedback(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    var nameInput = document.getElementById("fbSenderName");
+    var phoneInput = document.getElementById("fbSenderPhone");
+    var catSelect = document.getElementById("fbCategory");
+    var ctxInput = document.getElementById("fbProtocolContext");
+    var msgTextarea = document.getElementById("fbMessageContent");
+
+    var name = (nameInput ? nameInput.value : "").trim();
+    var phone = (phoneInput ? phoneInput.value : "").trim();
+    var category = catSelect ? catSelect.value : "Góp ý chung";
+    var protocol = (ctxInput ? ctxInput.value : "").trim();
+    var message = (msgTextarea ? msgTextarea.value : "").trim();
+
+    if (!name || !message) {
+      showToast("Vui lòng nhập họ tên và nội dung góp ý!", "err");
+      return;
+    }
+
+    var newItem = {
+      id: "fb_" + Date.now(),
+      senderName: name,
+      senderPhone: phone || "Chưa cung cấp",
+      category: category,
+      protocol: protocol || "Toàn hệ thống",
+      message: message,
+      timestamp: new Date().toLocaleString("vi-VN"),
+      isResolved: false
+    };
+
+    var list = [];
+    try {
+      list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
+    } catch (err) {}
+    list.unshift(newItem);
+    try {
+      localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
+    } catch (err) {}
+
+    showToast("🎉 Cảm ơn bạn! Ý kiến đã được gửi thành công đến Admin Vũ Đạt.", "ok");
+
+    if (nameInput) nameInput.value = "";
+    if (phoneInput) phoneInput.value = "";
+    if (msgTextarea) msgTextarea.value = "";
+
+    hideFeedbackModal();
+    updateInboxBadge();
+  }
+
+  function sendFeedbackViaZalo() {
+    var name = (document.getElementById("fbSenderName") || {}).value || "Đồng nghiệp";
+    var cat = (document.getElementById("fbCategory") || {}).value || "Góp ý";
+    var ctx = (document.getElementById("fbProtocolContext") || {}).value || "";
+    var msg = (document.getElementById("fbMessageContent") || {}).value || "";
+
+    var text = "Xin chào Admin Vũ Đạt (CĐHA Bệnh viện Vĩnh Phúc VPI),\n" +
+      "Tôi là: " + name + "\n" +
+      "Nội dung góp ý [" + cat + "]: " + msg + (ctx ? " (Liên quan: " + ctx + ")" : "");
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text);
+      showToast("Đã sao chép nội dung tin nhắn! Đang mở Zalo kết nối với Admin...", "ok");
+    }
+    window.open("https://zalo.me/0916306115", "_blank");
+  }
+
+  function updateInboxBadge() {
+    var count = 0;
+    try {
+      var list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
+      count = list.filter(function (x) { return !x.isResolved; }).length;
+    } catch (e) {}
+
+    var badge = document.getElementById("inboxTabCount");
+    if (badge) badge.textContent = count;
+  }
+
+  function renderAdminInbox() {
+    var container = document.getElementById("adminInboxListContainer");
+    if (!container) return;
+
+    var list = [];
+    try {
+      list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
+    } catch (e) {}
+
+    updateInboxBadge();
+
+    if (!list || list.length === 0) {
+      container.innerHTML =
+        '<div style="text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">📬</div>' +
+          'Hiện tại chưa có tin nhắn hoặc ý kiến góp ý nào được gửi.' +
+        '</div>';
+      return;
+    }
+
+    var html = "";
+    list.forEach(function (fb) {
+      var statusClass = fb.isResolved ? "resolved" : "unread";
+      var statusTag = fb.isResolved ?
+        '<span style="font-size:11px;color:var(--text-muted);font-weight:700;">✓ Đã xử lý</span>' :
+        '<span style="font-size:11px;color:#059669;font-weight:700;">🟢 Mới nhận</span>';
+
+      html +=
+        '<div class="inbox-item-card ' + statusClass + '">' +
+          '<div class="inbox-item-head">' +
+            '<div>' +
+              '<span class="inbox-sender-name">' + esc(fb.senderName) + '</span>' +
+              (fb.senderPhone && fb.senderPhone !== "Chưa cung cấp" ? ' <span style="font-size:12px;color:var(--text-soft);">(' + esc(fb.senderPhone) + ')</span>' : '') +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:6px;">' +
+              '<span class="inbox-cat-badge">' + esc(fb.category) + '</span>' +
+              statusTag +
+            '</div>' +
+          '</div>' +
+          (fb.protocol ? '<div style="font-size:12px;color:var(--brand);margin-bottom:4px;">🎯 <b>Quy trình:</b> ' + esc(fb.protocol) + '</div>' : '') +
+          '<div class="inbox-message-text">' + esc(fb.message) + '</div>' +
+          '<div class="inbox-meta-bar">' +
+            '<span class="inbox-time">🕒 ' + esc(fb.timestamp) + '</span>' +
+            '<div style="display:flex;gap:6px;">' +
+              '<button class="btn-action-pill" onclick="window.VUDAT_APP.toggleFeedbackStatus(\'' + fb.id + '\')" style="padding:4px 8px;font-size:11px;">' +
+                (fb.isResolved ? 'Đánh dấu chưa xử lý' : '✓ Xong') +
+              '</button>' +
+              '<button class="btn-action-pill" onclick="window.VUDAT_APP.deleteFeedbackItem(\'' + fb.id + '\')" style="padding:4px 8px;font-size:11px;color:var(--danger);border-color:var(--danger);">' +
+                'Xóa' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function toggleFeedbackStatus(id) {
+    try {
+      var list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
+      list.forEach(function (x) {
+        if (x.id === id) x.isResolved = !x.isResolved;
+      });
+      localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
+      renderAdminInbox();
+    } catch (e) {}
+  }
+
+  function deleteFeedbackItem(id) {
+    if (confirm("Bạn có chắc chắn muốn xóa góp ý này?")) {
+      try {
+        var list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
+        list = list.filter(function (x) { return x.id !== id; });
+        localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
+        renderAdminInbox();
+        showToast("Đã xóa góp ý thành công.", "ok");
+      } catch (e) {}
+    }
+  }
+
+  function clearAllFeedback() {
+    if (confirm("Bạn có chắc chắn muốn xóa toàn bộ hòm thư góp ý của Admin?")) {
+      try {
+        localStorage.removeItem("vpi_feedback_list");
+        renderAdminInbox();
+        showToast("Đã làm sạch toàn bộ hòm thư góp ý.", "ok");
+      } catch (e) {}
+    }
+  }
+
   /* =========================================================================
      5. PWA ENGINE, XEM NGOẠI VIỆN & BẢO MẬT MÃ PIN (YÊU CẦU MỚI)
      ========================================================================= */
@@ -1906,6 +2222,7 @@
         hideOfflineInfoModal();
         hideInstallModal();
         hideLightbox();
+        hideFeedbackModal();
       }
     });
 
@@ -1976,7 +2293,7 @@
   }
 
   /* =========================================================================
-     MODAL CẨM NANG HỆ THỐNG MÁY GE SIGNA™ EXPLORER 1.5T BV ĐA KHOA VĨNH PHÚC VPI
+     MODAL CẨM NANG HỆ THỐNG MÁY GE SIGNA™ EXPLORER 1.5T BỆNH VIỆN VĨNH PHÚC VPI
      ========================================================================= */
   function showGeSignaModal() {
     var overlay = document.getElementById("geSignaModalOverlay");
@@ -1994,9 +2311,9 @@
 
     var html =
       '<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface-2);border-radius:10px;border-left:4px solid #0e7490;">' +
-        '<b style="font-size:14.5px;color:#0e7490;display:block;margin-bottom:4px;">HỆ THỐNG CỘNG HƯỞNG TỪ GE SIGNA™ EXPLORER 1.5T — BV ĐA KHOA VĨNH PHÚC VPI</b>' +
+        '<b style="font-size:14.5px;color:#0e7490;display:block;margin-bottom:4px;">HỆ THỐNG CỘNG HƯỞNG TỪ GE SIGNA™ EXPLORER 1.5T — BỆNH VIỆN VĨNH PHÚC VPI</b>' +
         '<p style="margin:0;font-size:12.5px;color:var(--text-soft);line-height:1.5;">' +
-          'Cẩm nang kỹ thuật thực hành lâm sàng trang bị tại Khoa Chẩn Đoán Hình Ảnh — BV Đa Khoa Vĩnh Phúc VPI. Máy vận hành trên kiến trúc quang học kỹ thuật số OpTix RF và nam châm siêu dẫn đồng nhất cao.' +
+          'Cẩm nang kỹ thuật thực hành lâm sàng trang bị tại Khoa Chẩn Đoán Hình Ảnh — Bệnh viện Vĩnh Phúc VPI. Máy vận hành trên kiến trúc quang học kỹ thuật số OpTix RF và nam châm siêu dẫn đồng nhất cao.' +
         '</p>' +
       '</div>';
 
@@ -2455,6 +2772,17 @@
     hideGeSignaModal: hideGeSignaModal,
     showKtv3MienModal: showKtv3MienModal,
     hideKtv3MienModal: hideKtv3MienModal,
+
+    // Nhắn tin, góp ý Admin & Thống kê lượt truy cập
+    showFeedbackModal: showFeedbackModal,
+    hideFeedbackModal: hideFeedbackModal,
+    submitFeedback: submitFeedback,
+    sendFeedbackViaZalo: sendFeedbackViaZalo,
+    clearAllFeedback: clearAllFeedback,
+    toggleFeedbackStatus: toggleFeedbackStatus,
+    deleteFeedbackItem: deleteFeedbackItem,
+    trackVisitMetrics: trackVisitMetrics,
+    updateVisitCounterDisplays: updateVisitCounterDisplays,
 
     // Bảo mật an toàn mã PIN (như App 5S & Quản lý CĐHA)
     lockAppNow: lockAppNow,

@@ -148,6 +148,23 @@
     display: none !important; /* Chỉ hiện icon bánh răng */
   }
 
+  /* Huy hiệu lượt xem & Nút Góp ý trên Mobile */
+  .visitor-counter-badge {
+    height: 30px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  .visitor-counter-badge .txt {
+    display: none !important;
+  }
+  #feedbackHeaderBtn {
+    height: 30px;
+    padding: 0 7px;
+  }
+  #feedbackHeaderBtn span {
+    display: none !important;
+  }
+
   /* Nút Khóa an toàn & Đổi theme */
   #quickLockBtn {
     height: 30px;
