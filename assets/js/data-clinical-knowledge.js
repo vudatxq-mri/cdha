@@ -3,8 +3,8 @@
    SỔ CĐHA — KHOA CHẨN ĐOÁN HÌNH ẢNH — BỆNH VIỆN ĐA KHOA VĨNH PHÚC (VPI)
    
    NGUỒN THAM CHIẾU CHÍNH THỨC:
-   1. Bệnh Viện Đa Khoa Vĩnh Phúc VPI - GE SIGNA Creator 1.5T:
-      https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s
+   1. Bệnh Viện Đa Khoa Vĩnh Phúc VPI - GE SIGNA™ Explorer 1.5T:
+      https://academy.siemens-healthineers.com/vi-vn
    2. Siemens Healthineers Academy:
       https://academy.siemens-healthineers.com/vi-vn
    3. Wikiradiology - Kỹ Thuật Viên 3 Miền:
@@ -16,11 +16,11 @@
 window.SOTAY_CLINICAL_KNOWLEDGE = {
 
   /* =========================================================================
-     1. CẨM NANG VẬN HÀNH MÁY GE SIGNA CREATOR 1.5T TẠI BV ĐA KHOA VĨNH PHÚC VPI
+     1. CẨM NANG VẬN HÀNH MÁY GE SIGNA™ EXPLORER 1.5T TẠI BV ĐA KHOA VĨNH PHÚC VPI
      ========================================================================= */
-  geSignaCreatorVPI: {
-    tenThietBi: "GE SIGNA™ Creator 1.5 Tesla (Bệnh viện Đa Khoa Vĩnh Phúc VPI)",
-    showpadUrl: "https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s",
+  geSignaExplorerVPI: {
+    tenThietBi: "GE SIGNA™ Explorer 1.5 Tesla (Bệnh viện Đa Khoa Vĩnh Phúc VPI)",
+    // taiLieuVPI
     thongSoPhanCung: {
       tuTruong: "1.5 Tesla (Nam châm siêu dẫn đồng nhất cao)",
       congLongChup: "Bore 60 cm (Thiết kế ngắn, giảm hội chứng sợ phòng kín)",
@@ -186,3 +186,4 @@ window.SOTAY_CLINICAL_KNOWLEDGE = {
     }
   ]
 };
+window.SOTAY_CLINICAL_KNOWLEDGE.geSignaCreatorVPI = window.SOTAY_CLINICAL_KNOWLEDGE.geSignaExplorerVPI;

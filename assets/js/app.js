@@ -1,4 +1,4 @@
-/* ============================================================================
+﻿/* ============================================================================
    ĐIỀU KHIỂN CHÍNH — SỔ TAY ĐIỆN TỬ CĐHA
    BỆNH VIỆN VĨNH PHÚC VPI — KHOA CHẨN ĐOÁN HÌNH ẢNH
    Phiên bản chuẩn hóa cấu trúc 4 phần & phân loại theo Nhóm Vùng Cơ Thể Hàng Ngang
@@ -293,7 +293,7 @@
 
     if (hash.indexOf("item:") === 0) {
       var itemId = hash.replace("item:", "");
-      showItemDetail(itemId);
+      showItemDetail(itemId, false);
       return;
     }
 
@@ -359,17 +359,17 @@
       '<div class="dashboard-knowledge-section">' +
         '<div class="knowledge-section-title">' +
           '<h2>🔬 NGUỒN TRI THỨC LÂM SÀNG & CẨM NANG THIẾT BỊ BỆNH VIỆN VPI</h2>' +
-          '<span>Đào tạo chuẩn hóa — Wikiradiology, KTV 3 Miền, GE SIGNA Creator VPI & Siemens Academy</span>' +
+          '<span>Đào tạo chuẩn hóa — Wikiradiology, KTV 3 Miền, GE SIGNA™ Explorer VPI & Siemens Academy</span>' +
         '</div>' +
         '<div class="knowledge-card-grid">' +
-          // Thẻ 1: Cẩm nang GE SIGNA Creator 1.5T BV Vĩnh Phúc VPI
+          // Thẻ 1: Cẩm nang GE SIGNA Explorer 1.5T BV Vĩnh Phúc VPI
           '<div class="knowledge-showcase-card ge-card">' +
             '<div>' +
               '<div class="knowledge-card-head">' +
                 '<span class="icon">🧲</span>' +
-                '<span class="knowledge-card-badge">GE SIGNA™ Creator 1.5T</span>' +
+                '<span class="knowledge-card-badge">GE SIGNA™ Explorer 1.5T</span>' +
               '</div>' +
-              '<div class="knowledge-card-title">Cẩm Nang Hệ Thống Máy MRI GE SIGNA™ Creator 1.5T — BV Đa Khoa Vĩnh Phúc VPI</div>' +
+              '<div class="knowledge-card-title">Cẩm Nang Hệ Thống Máy MRI GE SIGNA™ Explorer 1.5T — BV Đa Khoa Vĩnh Phúc VPI</div>' +
               '<div class="knowledge-card-desc">Cấu hình OpTix RF 16 kênh, 6 cuộn thu chuyên dụng, hướng dẫn 10 công nghệ độc quyền (Ready Brain, PROPELLER, IDEAL, 3D CUBE, LAVA-Flex, MAVRIC SL, FOCUS DWI) và bảng đối chiếu Siemens - Philips.</div>' +
               '<div class="knowledge-card-chips">' +
                 '<span class="knowledge-chip">⚡ Ready Brain</span>' +
@@ -381,11 +381,8 @@
             '</div>' +
             '<div class="knowledge-card-actions">' +
               '<button class="btn-kc-primary" onclick="window.VUDAT_APP.showGeSignaModal()">' +
-                '🔍 Mở Cẩm Nang VPI' +
+                '🔍 Mở Cẩm Nang Máy GE SIGNA Explorer' +
               '</button>' +
-              '<a href="https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s" target="_blank" rel="noopener" class="btn-kc-link">' +
-                'GE Showpad ↗' +
-              '</a>' +
             '</div>' +
           '</div>' +
 
@@ -691,15 +688,30 @@
     }
     appState.currentProtocolId = itemId;
 
-    var mainPanel = document.getElementById("detailMainPanel");
-    var rightPanel = document.getElementById("detailRightPanel");
-    if (!mainPanel) return;
-
     var item = findItemById(itemId);
     if (!item) {
-      mainPanel.innerHTML = '<div style="padding:30px;color:var(--danger);">Không tìm thấy thông tin kỹ thuật này.</div>';
+      var mp = document.getElementById("detailMainPanel");
+      if (mp) mp.innerHTML = '<div style="padding:30px;color:var(--danger);">Không tìm thấy thông tin kỹ thuật này.</div>';
       return;
     }
+
+    var modId = "xq";
+    if (item.modality === "X-quang") modId = "xq";
+    else if (item.modality === "CT") modId = "ct";
+    else if (item.modality === "MRI") modId = "mri";
+    else if (item.modality === "Siêu âm") modId = "us";
+    else if (item.modality === "Siêu âm can thiệp") modId = "canthiep";
+    else if (item.type === "dlx-section") modId = "dlx";
+    else if (item.type === "cq-section") modId = "cq";
+    else if (item.type === "emg-section") modId = "emg";
+
+    var mainPanel = document.getElementById("detailMainPanel");
+    if (!mainPanel || appState.currentModId !== modId) {
+      showModalityView(modId);
+      mainPanel = document.getElementById("detailMainPanel");
+    }
+    var rightPanel = document.getElementById("detailRightPanel");
+    if (!mainPanel) return;
 
     // Cập nhật trạng thái active trên danh sách bài học bên trái
     var buttons = document.querySelectorAll(".lesson-item-btn");
@@ -749,7 +761,7 @@
   }
 
   /* RENDER QUY TRÌNH CHUẨN ĐÚNG THỨ TỰ: THÔNG SỐ LÊN ĐẦU TIÊN (YÊU CẦU #4) */
-  /* RENDER QUY TRÌNH CHUẨN ĐÚNG THỨ TỰ: NGUYÊN LÝ, ĐỊNH NGHĨA, CHI TIẾT, ỨNG DỤNG, THÔNG SỐ (WIKIRAD, GE SIGNA CREATOR VPI, SIEMENS) */
+  /* RENDER QUY TRÌNH CHUẨN ĐÚNG THỨ TỰ: NGUYÊN LÝ, ĐỊNH NGHĨA, CHI TIẾT, ỨNG DỤNG, THÔNG SỐ (WIKIRAD, GE SIGNA EXPLORER VPI, SIEMENS) */
   function renderStructuredProtocolDetail(item, mainPanel, rightPanel) {
     var isXray = (item.modality === "X-quang");
     var isCT = (item.modality === "CT");
@@ -761,7 +773,7 @@
     var kn = window.SOTAY_CLINICAL_KNOWLEDGE || {};
     var modKey = isXray ? "xray" : (isCT ? "ct" : (isMRI ? "mri" : ""));
     var modPrinciple = (kn.principlesByModality && kn.principlesByModality[modKey]) ? kn.principlesByModality[modKey] : null;
-    var geSystem = kn.geSignaCreatorVPI;
+    var geSystem = (kn.geSignaExplorerVPI || kn.geSignaCreatorVPI);
 
     // Lấy hướng đặt cắt MRI Master và đối chiếu 3 hãng
     var mriMasterPlan = null;
@@ -809,9 +821,9 @@
           '📊 Bài giảng PPTX KTV 3 Miền ↗' +
         '</a>' +
         (isMRI ?
-          '<a href="https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s" target="_blank" rel="noopener" class="btn-source-link ge" title="Tài liệu đào tạo chính thức GE SIGNA Creator 1.5T BV Vĩnh Phúc VPI">' +
-            '🧲 GE SIGNA Creator VPI Showpad ↗' +
-          '</a>' : '') +
+          '<button type="button" onclick="window.VUDAT_APP.showGeSignaModal()" class="btn-source-link ge" title="Cẩm nang hệ thống máy MRI GE SIGNA™ Explorer 1.5T BV Đa Khoa Vĩnh Phúc VPI">' +
+            '🧲 Cẩm Nang GE SIGNA Explorer VPI' +
+          '</button>' : '') +
         '<a href="https://academy.siemens-healthineers.com/vi-vn" target="_blank" rel="noopener" class="btn-source-link siemens" title="Cổng đào tạo trực tuyến Siemens Healthineers Academy">' +
           '🎓 Siemens Healthineers Academy ↗' +
         '</a>' +
@@ -890,13 +902,13 @@
       '</div>';
 
     // =========================================================================
-    // PHẦN 2: THÔNG SỐ KỸ THUẬT & CẤU HÌNH MÁY (GE SIGNA CREATOR VPI & SIEMENS ACADEMY)
+    // PHẦN 2: THÔNG SỐ KỸ THUẬT & CẤU HÌNH MÁY (GE SIGNA EXPLORER VPI & SIEMENS ACADEMY)
     // =========================================================================
     html +=
       '<div class="learning-step-card step-2">' +
         '<div class="step-badge-title">' +
           '<span class="num">2</span>' +
-          '<h3>THÔNG SỐ KỸ THUẬT & CẤU HÌNH MÁY (GE SIGNA CREATOR VPI & SIEMENS)</h3>' +
+          '<h3>THÔNG SỐ KỸ THUẬT & CẤU HÌNH MÁY (GE SIGNA EXPLORER VPI & SIEMENS)</h3>' +
         '</div>' +
         '<div class="step-card-body">';
 
@@ -913,27 +925,27 @@
       html += '</div>';
     }
 
-    // Nếu là MRI: Bổ sung cấu hình độc quyền GE SIGNA Creator 1.5T tại Bệnh viện Vĩnh Phúc VPI
+    // Nếu là MRI: Bổ sung cấu hình độc quyền GE SIGNA™ Explorer 1.5T tại Bệnh viện Vĩnh Phúc VPI
     if (isMRI) {
       // Xác định coil phù hợp
       var recommendedCoil = "Head-Neck 16-Channel Coil";
       var nhomLower = (item.nhom || "").toLowerCase();
       var tenLower = item.ten.toLowerCase();
-      if (nhomLower.indexOf("gối") !== -1 || tenLower.indexOf("gối") !== -1) recommendedCoil = "Dedicated HD Knee 8-Channel Coil (GE SIGNA Creator VPI)";
-      else if (nhomLower.indexOf("vai") !== -1 || tenLower.indexOf("vai") !== -1) recommendedCoil = "Dedicated Shoulder 8-Channel Coil (GE SIGNA Creator VPI)";
+      if (nhomLower.indexOf("gối") !== -1 || tenLower.indexOf("gối") !== -1) recommendedCoil = "Dedicated HD Knee 8-Channel Coil (GE SIGNA™ Explorer VPI)";
+      else if (nhomLower.indexOf("vai") !== -1 || tenLower.indexOf("vai") !== -1) recommendedCoil = "Dedicated Shoulder 8-Channel Coil (GE SIGNA™ Explorer VPI)";
       else if (nhomLower.indexOf("cột sống") !== -1 || tenLower.indexOf("cột sống") !== -1) recommendedCoil = "Integrated Spine Matrix Coil + Head-Neck Coil";
-      else if (nhomLower.indexOf("bụng") !== -1 || nhomLower.indexOf("chậu") !== -1 || tenLower.indexOf("gan") !== -1 || tenLower.indexOf("tụy") !== -1 || tenLower.indexOf("tiền liệt") !== -1) recommendedCoil = "Body / Torso Array 16-Channel Coil (GE SIGNA Creator VPI)";
+      else if (nhomLower.indexOf("bụng") !== -1 || nhomLower.indexOf("chậu") !== -1 || tenLower.indexOf("gan") !== -1 || tenLower.indexOf("tụy") !== -1 || tenLower.indexOf("tiền liệt") !== -1) recommendedCoil = "Body / Torso Array 16-Channel Coil (GE SIGNA™ Explorer VPI)";
 
       html +=
         '<div class="ge-vpi-box">' +
           '<div class="ge-vpi-header">' +
-            '<div class="ge-vpi-title">🧲 CẤU HÌNH MÁY GE SIGNA™ CREATOR 1.5T — BV ĐA KHOA VĨNH PHÚC VPI</div>' +
-            '<a href="https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s" target="_blank" rel="noopener" style="font-size:12px;color:#0e7490;font-weight:700;text-decoration:none;">Xem Showpad VPI ↗</a>' +
+            '<div class="ge-vpi-title">🧲 CẤU HÌNH MÁY GE SIGNA™ EXPLORER 1.5T — BV ĐA KHOA VĨNH PHÚC VPI</div>' +
+            '<button type="button" onclick="window.VUDAT_APP.showGeSignaModal()" style="font-size:12px;color:#0e7490;font-weight:700;background:none;border:none;cursor:pointer;text-decoration:underline;">Xem Cẩm Nang Chi Tiết ↗</button>' +
           '</div>' +
           '<div style="font-size:13px;line-height:1.5;color:var(--text);">' +
             '<div>• <b>Cuộn thu (Coil) chuyên dụng:</b> ' + esc(recommendedCoil) + '</div>' +
             '<div>• <b>Hệ thống Gradient & RF:</b> OpTix Optical RF 16-channel, Gradient 33 mT/m, Slew Rate 120 T/m/s.</div>' +
-            '<div>• <b>Công nghệ GE SIGNA Creator tối ưu cho kỹ thuật này:</b></div>' +
+            '<div>• <b>Công nghệ GE SIGNA™ Explorer tối ưu cho kỹ thuật này:</b></div>' +
           '</div>' +
           '<div class="ge-tech-pills">' +
             ((nhomLower.indexOf("sọ") !== -1 || tenLower.indexOf("não") !== -1) ?
@@ -969,7 +981,7 @@
           '</div>' +
           '<div class="ref-table-wrap">' +
             '<table class="ref-table">' +
-              '<thead><tr><th>Thông số kỹ thuật</th><th>Siemens Healthineers (Syngo)</th><th>Philips (Achieva/Ingenia)</th><th>GE SIGNA Creator (BV Vĩnh Phúc)</th></tr></thead>' +
+              '<thead><tr><th>Thông số kỹ thuật</th><th>Siemens Healthineers (Syngo)</th><th>Philips (Achieva/Ingenia)</th><th>GE SIGNA™ Explorer (BV Vĩnh Phúc)</th></tr></thead>' +
               '<tbody>';
       (ts3.bangThongSo || []).forEach(function (row) {
         html += '<tr><td><b>' + esc(row.thongSo) + '</b></td><td>' + esc(row.siemens) + '</td><td>' + esc(row.philips) + '</td><td style="color:#0e7490;font-weight:700;">' + esc(row.ge) + '</td></tr>';
@@ -1045,7 +1057,7 @@
       html +=
         '<div style="margin-bottom:14px;padding:12px;border-radius:8px;background:var(--c-mri-wash);border:1px solid var(--c-mri-border);">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
-            '<b style="color:var(--c-mri);font-size:14px;">📐 Định hướng mặt phẳng lát cắt (Nguồn: mrimaster.com & GE Showpad VPI):</b>' +
+            '<b style="color:var(--c-mri);font-size:14px;">📐 Định hướng mặt phẳng lát cắt (Nguồn: mrimaster.com & GE Healthcare VPI):</b>' +
             '<a href="https://mrimaster.com/planning/" target="_blank" rel="noopener" style="color:var(--c-mri);font-weight:700;font-size:12px;text-decoration:none;">Xem mrimaster.com ↗</a>' +
           '</div>' +
           '<div class="mri-plan-grid">';
@@ -1887,6 +1899,13 @@
         } else if (e.key === "Escape" || e.key === "Delete") {
           clearPin();
         }
+      } else if (e.key === "Escape") {
+        hideGeSignaModal();
+        hideKtv3MienModal();
+        hideSettingsModal();
+        hideOfflineInfoModal();
+        hideInstallModal();
+        hideLightbox();
       }
     });
 
@@ -1957,7 +1976,7 @@
   }
 
   /* =========================================================================
-     MODAL CẨM NANG HỆ THỐNG MÁY GE SIGNA CREATOR 1.5T BV ĐA KHOA VĨNH PHÚC VPI
+     MODAL CẨM NANG HỆ THỐNG MÁY GE SIGNA™ EXPLORER 1.5T BV ĐA KHOA VĨNH PHÚC VPI
      ========================================================================= */
   function showGeSignaModal() {
     var overlay = document.getElementById("geSignaModalOverlay");
@@ -1965,7 +1984,7 @@
     if (!overlay || !body) return;
 
     var kn = window.SOTAY_CLINICAL_KNOWLEDGE || {};
-    var ge = kn.geSignaCreatorVPI;
+    var ge = (kn.geSignaExplorerVPI || kn.geSignaCreatorVPI);
     var siemens = kn.siemensAcademy;
     if (!ge) {
       body.innerHTML = '<p style="padding:20px;text-align:center;">Đang cập nhật dữ liệu...</p>';
@@ -1975,14 +1994,9 @@
 
     var html =
       '<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface-2);border-radius:10px;border-left:4px solid #0e7490;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
-          '<b style="font-size:14.5px;color:#0e7490;">HỆ THỐNG CỘNG HƯỞNG TỪ 1.5T TẠI BV ĐA KHOA VĨNH PHÚC VPI</b>' +
-          '<a href="' + esc(ge.showpadUrl) + '" target="_blank" rel="noopener" class="btn-kc-primary" style="background:#0e7490;color:#fff;padding:6px 12px;font-size:12px;text-decoration:none;">' +
-            '↗ Mở Showpad VPI Chính Thức' +
-          '</a>' +
-        '</div>' +
-        '<p style="margin:6px 0 0;font-size:12.5px;color:var(--text-soft);line-height:1.5;">' +
-          'Tài liệu đào tạo thực tế trang bị tại Khoa Chẩn Đoán Hình Ảnh — BV Đa Khoa Vĩnh Phúc VPI. Máy vận hành trên kiến trúc quang học kỹ thuật số OpTix RF và nam châm siêu dẫn đồng nhất cao.' +
+        '<b style="font-size:14.5px;color:#0e7490;display:block;margin-bottom:4px;">HỆ THỐNG CỘNG HƯỞNG TỪ GE SIGNA™ EXPLORER 1.5T — BV ĐA KHOA VĨNH PHÚC VPI</b>' +
+        '<p style="margin:0;font-size:12.5px;color:var(--text-soft);line-height:1.5;">' +
+          'Cẩm nang kỹ thuật thực hành lâm sàng trang bị tại Khoa Chẩn Đoán Hình Ảnh — BV Đa Khoa Vĩnh Phúc VPI. Máy vận hành trên kiến trúc quang học kỹ thuật số OpTix RF và nam châm siêu dẫn đồng nhất cao.' +
         '</p>' +
       '</div>';
 
@@ -2014,7 +2028,7 @@
 
     // 3. 10 Công nghệ tạo ảnh chuyên sâu độc quyền
     html +=
-      '<h4 style="margin:16px 0 6px;color:var(--text);font-size:14px;">🚀 10 Công nghệ tạo ảnh độc quyền của GE SIGNA™ Creator:</h4>' +
+      '<h4 style="margin:16px 0 6px;color:var(--text);font-size:14px;">🚀 10 Công nghệ tạo ảnh độc quyền của GE SIGNA™ Explorer:</h4>' +
       '<div class="modal-tech-list">';
     ge.congNgheDocQuyenGE.forEach(function (t, i) {
       html +=
@@ -2031,7 +2045,7 @@
         '<h4 style="margin:16px 0 6px;color:var(--text);font-size:14px;">🔄 Bảng đối chiếu tương đương chuỗi xung 3 hãng (GE Healthcare • Siemens Healthineers • Philips):</h4>' +
         '<div class="ref-table-wrap">' +
           '<table class="ref-table">' +
-            '<thead><tr><th>Ứng dụng lâm sàng</th><th style="color:#0e7490;">GE SIGNA Creator (BV VPI)</th><th>Siemens (Syngo / Dot)</th><th>Philips Healthcare</th></tr></thead>' +
+            '<thead><tr><th>Ứng dụng lâm sàng</th><th style="color:#0e7490;">GE SIGNA™ Explorer (BV VPI)</th><th>Siemens (Syngo / Dot)</th><th>Philips Healthcare</th></tr></thead>' +
             '<tbody>';
       siemens.mriComparisons.forEach(function (r) {
         html +=
@@ -2044,6 +2058,13 @@
       });
       html += '</tbody></table></div>';
     }
+
+    html +=
+      '<div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;">' +
+        '<button class="btn-action-pill" onclick="window.VUDAT_APP.hideGeSignaModal()" style="background:#0e7490;color:#fff;padding:8px 20px;font-size:13px;font-weight:700;">' +
+          'Đóng Cẩm Nang' +
+        '</button>' +
+      '</div>';
 
     body.innerHTML = html;
     overlay.style.display = "flex";
@@ -2119,6 +2140,13 @@
           '</div>';
       });
     }
+
+    html +=
+      '<div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;">' +
+        '<button class="btn-action-pill" onclick="window.VUDAT_APP.hideKtv3MienModal()" style="background:#d97706;color:#fff;padding:8px 20px;font-size:13px;font-weight:700;">' +
+          'Đóng Bách Khoa' +
+        '</button>' +
+      '</div>';
 
     body.innerHTML = html;
     overlay.style.display = "flex";
@@ -2422,7 +2450,7 @@
     hideOfflineInfoModal: hideOfflineInfoModal,
     syncCloudData: syncCloudData,
 
-    // Cẩm nang GE SIGNA Creator 1.5T BV VPI & Wikiradiology KTV 3 Miền
+    // Cẩm nang GE SIGNA™ Explorer 1.5T BV VPI & Wikiradiology KTV 3 Miền
     showGeSignaModal: showGeSignaModal,
     hideGeSignaModal: hideGeSignaModal,
     showKtv3MienModal: showKtv3MienModal,

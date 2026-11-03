@@ -1,4 +1,4 @@
-/* ============================================================================
+﻿/* ============================================================================
    MRI MASTER PROTOCOLS & 3-VENDOR TECHNICAL COMPARISON
    KHOA CHẨN ĐOÁN HÌNH ẢNH — BỆNH VIỆN VĨNH PHÚC VPI
    Nguồn tham chiếu: MRI Master (mrimaster.com/planning/), Siemens, Philips & GE
@@ -321,7 +321,7 @@ window.SOTAY_MRIMASTER = {
       id: "mri-plan-cot-song-co",
       ten: "MRI Cột Sống Cổ (Cervical Spine Planning)",
       vung: "Cột sống",
-      nguon: "mrimaster.com/plan%20cervical%20spine.html & GE Showpad VPI",
+      nguon: "mrimaster.com/plan%20cervical%20spine.html & GE SIGNA™ Explorer VPI",
       viTriCuonThu: "Head-Neck 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
       hinhMinhHoa: "https://mrimaster.com/images/cervical%20planning%20sagittal.jpg",
       huongDatCat: [
@@ -343,7 +343,7 @@ window.SOTAY_MRIMASTER = {
       thongSoVanHanh3Hang: {
         chuoiXung: "T1W Sagittal, T2W Sagittal, STIR / T2 IDEAL Sagittal, T2* MERGE / Axial T2W",
         bangThongSo: [
-          { thongSo: "TR (ms)", siemens: "3200 - 3800 (T2W)", philips: "3000 - 3600", ge: "3200 - 4000 (GE SIGNA Creator VPI)" },
+          { thongSo: "TR (ms)", siemens: "3200 - 3800 (T2W)", philips: "3000 - 3600", ge: "3200 - 4000 (GE SIGNA™ Explorer VPI)" },
           { thongSo: "TE (ms)", siemens: "95 - 105", philips: "90 - 100", ge: "95 - 110" },
           { thongSo: "Độ dày lát cắt (Sag)", siemens: "3.0 mm (No gap)", philips: "3.0 mm", ge: "3.0 mm (No gap)" },
           { thongSo: "Độ dày lát cắt (Ax)", siemens: "3.0 mm", philips: "3.0 mm", ge: "3.0 mm" },
@@ -357,7 +357,7 @@ window.SOTAY_MRIMASTER = {
       id: "mri-plan-tuyen-yen",
       ten: "MRI Tuyến Yên Khu Trú & Động Học (Pituitary Planning)",
       vung: "Sọ não",
-      nguon: "mrimaster.com/plan%20pituitary.html & GE Showpad VPI",
+      nguon: "mrimaster.com/plan%20pituitary.html & GE SIGNA™ Explorer VPI",
       viTriCuonThu: "Head-Neck 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
       hinhMinhHoa: "https://mrimaster.com/images/pituitary%20coronal%20planning.jpg",
       huongDatCat: [
@@ -386,7 +386,7 @@ window.SOTAY_MRIMASTER = {
       thongSoVanHanh3Hang: {
         chuoiXung: "T1W Coronal/Sagittal 2mm, T2W Coronal 2mm, Dynamic T1 Coronal 5-phase, T1W FS +C 3D",
         bangThongSo: [
-          { thongSo: "Độ dày lát cắt (Slice)", siemens: "2.0 mm (No gap)", philips: "2.0 mm (No gap)", ge: "2.0 mm (GE SIGNA Creator VPI)" },
+          { thongSo: "Độ dày lát cắt (Slice)", siemens: "2.0 mm (No gap)", philips: "2.0 mm (No gap)", ge: "2.0 mm (GE SIGNA™ Explorer VPI)" },
           { thongSo: "Trường nhìn (FOV)", siemens: "160 - 180 mm", philips: "160 - 180 mm", ge: "160 - 180 mm" },
           { thongSo: "Ma trận (Matrix)", siemens: "320 x 256", philips: "320 x 256", ge: "320 x 256" },
           { thongSo: "Chuỗi xung động học", siemens: "Dynamic T1 TSE", philips: "Dynamic T1 FFE", ge: "Dynamic T1 FSE (GE SIGNA)" },
@@ -398,7 +398,7 @@ window.SOTAY_MRIMASTER = {
       id: "mri-plan-khop-hang",
       ten: "MRI Khớp Háng & Khung Chậu (Hip Joint Planning)",
       vung: "Chi dưới",
-      nguon: "mrimaster.com/plan%20hip.html & GE Showpad VPI",
+      nguon: "mrimaster.com/plan%20hip.html & GE SIGNA™ Explorer VPI",
       viTriCuonThu: "Body/Torso Array 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
       hinhMinhHoa: "https://mrimaster.com/images/hip%20planning%20coronal.jpg",
       huongDatCat: [
@@ -420,7 +420,7 @@ window.SOTAY_MRIMASTER = {
       thongSoVanHanh3Hang: {
         chuoiXung: "T1W Coronal (hai bên), T2 FatSat / STIR Coronal, T2W Axial Oblique, PD FatSat Coronal Oblique",
         bangThongSo: [
-          { thongSo: "TR (ms)", siemens: "3000 - 4000 (STIR)", philips: "3200 - 4000", ge: "3000 - 4500 (GE SIGNA Creator VPI)" },
+          { thongSo: "TR (ms)", siemens: "3000 - 4000 (STIR)", philips: "3200 - 4000", ge: "3000 - 4500 (GE SIGNA™ Explorer VPI)" },
           { thongSo: "TE (ms)", siemens: "35 - 45", philips: "35 - 45", ge: "35 - 45" },
           { thongSo: "TI (ms) trên STIR", siemens: "150 - 160 ms", philips: "150 - 165 ms", ge: "150 - 160 ms" },
           { thongSo: "Trường nhìn toàn cảnh 2 bên", siemens: "320 - 360 mm", philips: "320 - 360 mm", ge: "340 - 360 mm" },
@@ -433,7 +433,7 @@ window.SOTAY_MRIMASTER = {
       id: "mri-plan-tien-liet-tuyen",
       ten: "MRI Tiền Liệt Tuyến Đa Thông Số Chuẩn PI-RADS v2.1",
       vung: "Chậu",
-      nguon: "mrimaster.com/plan%20prostate.html & GE Showpad VPI",
+      nguon: "mrimaster.com/plan%20prostate.html & GE SIGNA™ Explorer VPI",
       viTriCuonThu: "Body/Torso Array 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
       hinhMinhHoa: "https://mrimaster.com/images/prostate%20planning%20axial.jpg",
       huongDatCat: [
@@ -462,7 +462,7 @@ window.SOTAY_MRIMASTER = {
       thongSoVanHanh3Hang: {
         chuoiXung: "T2W Axial/Coronal/Sagittal 3mm, FOCUS DWI (b50, 800, 1400, 2000) + ADC, Dynamic T1 3D DCE",
         bangThongSo: [
-          { thongSo: "Độ dày lát cắt T2W", siemens: "3.0 mm (No gap)", philips: "3.0 mm (No gap)", ge: "3.0 mm (GE SIGNA Creator VPI)" },
+          { thongSo: "Độ dày lát cắt T2W", siemens: "3.0 mm (No gap)", philips: "3.0 mm (No gap)", ge: "3.0 mm (GE SIGNA™ Explorer VPI)" },
           { thongSo: "Trường nhìn (FOV T2/DWI)", siemens: "180 - 200 mm", philips: "180 - 200 mm", ge: "180 - 200 mm" },
           { thongSo: "Ma trận (Matrix)", siemens: "320 x 280", philips: "320 x 280", ge: "320 x 280" },
           { thongSo: "Chuỗi xung Diffusion cao cấp", siemens: "RESOLVE DWI (b=1400)", philips: "Zoomed DWI", ge: "FOCUS DWI b=1400 (GE SIGNA)" },

@@ -1,4 +1,4 @@
-/* ============================================================================
+﻿/* ============================================================================
    TỐI ƯU HÓA ĐÁP ỨNG ĐA THIẾT BỊ (RESPONSIVE & MOBILE ADAPTATION)
    SỔ CĐHA — BỆNH VIỆN VĨNH PHÚC VPI
    Đồng bộ nhận diện với 5S VPI & CĐHA VPI.
@@ -553,18 +553,30 @@
     line-height: 1.45;
   }
 
-  /* Hộp thoại Modal trên điện thoại */
+  /* Hộp thoại Modal trên điện thoại - cuộn mượt mà không bị nghẽn */
+  .modal-overlay {
+    padding: 10px !important;
+    align-items: flex-start !important;
+  }
   .modal-box {
-    max-width: 94vw !important;
-    margin: 8px auto !important;
-    border-radius: var(--radius-lg);
+    max-width: 96vw !important;
+    max-height: 92vh !important;
+    margin: auto !important;
+    border-radius: var(--radius-lg) !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   .modal-head {
-    padding: 12px 14px;
+    padding: 12px 14px !important;
+    flex: none !important;
   }
   .modal-body {
-    padding: 14px 12px;
-    max-height: 75vh;
+    padding: 14px 12px !important;
+    max-height: calc(92vh - 60px) !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 }
 
