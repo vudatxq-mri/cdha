@@ -352,6 +352,74 @@
     });
     html += '</div>';
 
+    // =========================================================================
+    // NGUỒN TRI THỨC LÂM SÀNG, CẨM NANG THIẾT BỊ BV VPI & BÁCH KHOA KTV 3 MIỀN
+    // =========================================================================
+    html +=
+      '<div class="dashboard-knowledge-section">' +
+        '<div class="knowledge-section-title">' +
+          '<h2>🔬 NGUỒN TRI THỨC LÂM SÀNG & CẨM NANG THIẾT BỊ BỆNH VIỆN VPI</h2>' +
+          '<span>Đào tạo chuẩn hóa — Wikiradiology, KTV 3 Miền, GE SIGNA Creator VPI & Siemens Academy</span>' +
+        '</div>' +
+        '<div class="knowledge-card-grid">' +
+          // Thẻ 1: Cẩm nang GE SIGNA Creator 1.5T BV Vĩnh Phúc VPI
+          '<div class="knowledge-showcase-card ge-card">' +
+            '<div>' +
+              '<div class="knowledge-card-head">' +
+                '<span class="icon">🧲</span>' +
+                '<span class="knowledge-card-badge">GE SIGNA™ Creator 1.5T</span>' +
+              '</div>' +
+              '<div class="knowledge-card-title">Cẩm Nang Hệ Thống Máy MRI GE SIGNA™ Creator 1.5T — BV Đa Khoa Vĩnh Phúc VPI</div>' +
+              '<div class="knowledge-card-desc">Cấu hình OpTix RF 16 kênh, 6 cuộn thu chuyên dụng, hướng dẫn 10 công nghệ độc quyền (Ready Brain, PROPELLER, IDEAL, 3D CUBE, LAVA-Flex, MAVRIC SL, FOCUS DWI) và bảng đối chiếu Siemens - Philips.</div>' +
+              '<div class="knowledge-card-chips">' +
+                '<span class="knowledge-chip">⚡ Ready Brain</span>' +
+                '<span class="knowledge-chip">🔄 PROPELLER</span>' +
+                '<span class="knowledge-chip">✨ IDEAL</span>' +
+                '<span class="knowledge-chip">⏱️ LAVA-Flex</span>' +
+                '<span class="knowledge-chip">🛡️ MAVRIC SL</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="knowledge-card-actions">' +
+              '<button class="btn-kc-primary" onclick="window.VUDAT_APP.showGeSignaModal()">' +
+                '🔍 Mở Cẩm Nang VPI' +
+              '</button>' +
+              '<a href="https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s" target="_blank" rel="noopener" class="btn-kc-link">' +
+                'GE Showpad ↗' +
+              '</a>' +
+            '</div>' +
+          '</div>' +
+
+          // Thẻ 2: Wikiradiology & Bài giảng PPTX KTV 3 Miền
+          '<div class="knowledge-showcase-card ktv-card">' +
+            '<div>' +
+              '<div class="knowledge-card-head">' +
+                '<span class="icon">📚</span>' +
+                '<span class="knowledge-card-badge">Wikiradiology & KTV 3 Miền</span>' +
+              '</div>' +
+              '<div class="knowledge-card-title">Bách Khoa Chuẩn Hóa & Thư Viện Bài Giảng PPTX Kỹ Thuật CĐHA</div>' +
+              '<div class="knowledge-card-desc">Nguyên lý vật lý tạo ảnh, tiêu chuẩn chất lượng hình ảnh, xảo ảnh (artifacts) và cách khắc phục cho X-quang, CT, MRI. Danh mục bài giảng PPTX chuyên đề chính thức của KTV 3 Miền.</div>' +
+              '<div class="knowledge-card-chips">' +
+                '<span class="knowledge-chip">📖 Wikiradiology</span>' +
+                '<span class="knowledge-chip">📊 Bài Giảng PPTX</span>' +
+                '<span class="knowledge-chip">🎓 Siemens Academy</span>' +
+                '<span class="knowledge-chip">⚠️ Phân tích Xảo ảnh</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="knowledge-card-actions">' +
+              '<button class="btn-kc-primary" onclick="window.VUDAT_APP.showKtv3MienModal()">' +
+                '📖 Mở Bách Khoa KTV' +
+              '</button>' +
+              '<a href="https://wikirad.ktv3mien.com/" target="_blank" rel="noopener" class="btn-kc-link">' +
+                'Wikirad ↗' +
+              '</a>' +
+              '<a href="https://exam.ktv3mien.com/pptx/index.html" target="_blank" rel="noopener" class="btn-kc-link">' +
+                'PPTX ↗' +
+              '</a>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
     container.innerHTML = html;
   }
 
@@ -681,6 +749,7 @@
   }
 
   /* RENDER QUY TRÌNH CHUẨN ĐÚNG THỨ TỰ: THÔNG SỐ LÊN ĐẦU TIÊN (YÊU CẦU #4) */
+  /* RENDER QUY TRÌNH CHUẨN ĐÚNG THỨ TỰ: NGUYÊN LÝ, ĐỊNH NGHĨA, CHI TIẾT, ỨNG DỤNG, THÔNG SỐ (WIKIRAD, GE SIGNA CREATOR VPI, SIEMENS) */
   function renderStructuredProtocolDetail(item, mainPanel, rightPanel) {
     var isXray = (item.modality === "X-quang");
     var isCT = (item.modality === "CT");
@@ -688,16 +757,28 @@
 
     var checklist = window.getChecklistForProtocol(item.id);
 
+    // Lấy tri thức lâm sàng nền tảng từ data-clinical-knowledge.js
+    var kn = window.SOTAY_CLINICAL_KNOWLEDGE || {};
+    var modKey = isXray ? "xray" : (isCT ? "ct" : (isMRI ? "mri" : ""));
+    var modPrinciple = (kn.principlesByModality && kn.principlesByModality[modKey]) ? kn.principlesByModality[modKey] : null;
+    var geSystem = kn.geSignaCreatorVPI;
+
     // Lấy hướng đặt cắt MRI Master và đối chiếu 3 hãng
     var mriMasterPlan = null;
     if (isMRI && window.SOTAY_MRIMASTER && window.SOTAY_MRIMASTER.quyTrinhLapKeHoach) {
       mriMasterPlan = window.SOTAY_MRIMASTER.quyTrinhLapKeHoach.filter(function (p) {
-        return (p.vung && item.nhom && item.nhom.toLowerCase().indexOf(p.vung.toLowerCase()) !== -1) ||
-               (item.ten.toLowerCase().indexOf("sọ não") !== -1 && p.id === "mri-plan-so-nao") ||
-               (item.ten.toLowerCase().indexOf("cột sống") !== -1 && p.id === "mri-plan-cot-song-that-lung") ||
-               (item.ten.toLowerCase().indexOf("gối") !== -1 && p.id === "mri-plan-khop-goi") ||
-               (item.ten.toLowerCase().indexOf("vai") !== -1 && p.id === "mri-plan-khop-vai") ||
-               (item.ten.toLowerCase().indexOf("gan") !== -1 && p.id === "mri-plan-gan-mrcp");
+        var t = item.ten.toLowerCase();
+        var nhom = (item.nhom || "").toLowerCase();
+        return (p.vung && nhom.indexOf(p.vung.toLowerCase()) !== -1) ||
+               (t.indexOf("sọ não") !== -1 && p.id === "mri-plan-so-nao") ||
+               (t.indexOf("tuyến yên") !== -1 && p.id === "mri-plan-tuyen-yen") ||
+               (t.indexOf("cột sống cổ") !== -1 && p.id === "mri-plan-cot-song-co") ||
+               (t.indexOf("cột sống") !== -1 && p.id === "mri-plan-cot-song-that-lung") ||
+               (t.indexOf("gối") !== -1 && p.id === "mri-plan-khop-goi") ||
+               (t.indexOf("vai") !== -1 && p.id === "mri-plan-khop-vai") ||
+               (t.indexOf("háng") !== -1 && p.id === "mri-plan-khop-hang") ||
+               (t.indexOf("tiền liệt") !== -1 && p.id === "mri-plan-tien-liet-tuyen") ||
+               (t.indexOf("gan") !== -1 && p.id === "mri-plan-gan-mrcp");
       })[0];
     }
 
@@ -709,18 +790,37 @@
         '<div class="badges">' +
           '<span class="badge-mod">' + esc(item.modality) + '</span>' +
           '<span class="badge-mod">' + esc(item.nhom || "") + '</span>' +
-          '<span class="badge-mod" style="background:#f1f5f9;color:#334155;">Bệnh viện Vĩnh Phúc VPI</span>' +
+          '<span class="badge-mod" style="background:#f1f5f9;color:#334155;">Bệnh viện Đa Khoa Vĩnh Phúc VPI</span>' +
         '</div>' +
         '<h2>' + esc(item.ten) + '</h2>' +
         (item.nguon ? '<p>Tài liệu tham chiếu chuyên môn: <i>' + esc(item.nguon) + '</i></p>' : '') +
       '</div>';
 
     // =========================================================================
+    // NGUỒN TÀI LIỆU CHUYÊN SÂU & ĐÀO TẠO CHÍNH THỨC (4 NGUỒN YÊU CẦU)
     // =========================================================================
-    // LÀM RÕ CÁC NỘI DUNG CẢNH BÁO QUAN TRỌNG & CHỐNG CHỈ ĐỊNH (YÊU CẦU MỚI)
+    html +=
+      '<div class="source-links-box">' +
+        '<div class="title">📚 NGUỒN TÀI LIỆU CHUYÊN SÂU & ĐÀO TẠO CHÍNH THỨC:</div>' +
+        '<a href="https://wikirad.ktv3mien.com/" target="_blank" rel="noopener" class="btn-source-link wiki" title="Bách khoa toàn thư Kỹ thuật Hình ảnh Y học Việt Nam">' +
+          '📖 Wikiradiology - KTV 3 Miền ↗' +
+        '</a>' +
+        '<a href="https://exam.ktv3mien.com/pptx/index.html" target="_blank" rel="noopener" class="btn-source-link pptx" title="Thư viện Bài giảng chuyên đề Kỹ thuật CĐHA PPTX">' +
+          '📊 Bài giảng PPTX KTV 3 Miền ↗' +
+        '</a>' +
+        (isMRI ?
+          '<a href="https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s" target="_blank" rel="noopener" class="btn-source-link ge" title="Tài liệu đào tạo chính thức GE SIGNA Creator 1.5T BV Vĩnh Phúc VPI">' +
+            '🧲 GE SIGNA Creator VPI Showpad ↗' +
+          '</a>' : '') +
+        '<a href="https://academy.siemens-healthineers.com/vi-vn" target="_blank" rel="noopener" class="btn-source-link siemens" title="Cổng đào tạo trực tuyến Siemens Healthineers Academy">' +
+          '🎓 Siemens Healthineers Academy ↗' +
+        '</a>' +
+      '</div>';
+
+    // =========================================================================
+    // CẢNH BÁO AN TOÀN LÂM SÀNG & CHỐNG CHỈ ĐỊNH QUAN TRỌNG
     // =========================================================================
     var criticalAlerts = [];
-
     (item.noiDung || []).forEach(function (sec) {
       var t = sec.tieuDe.toLowerCase();
       if (t.indexOf("chống chỉ định") !== -1 || t.indexOf("cảnh báo") !== -1 || t.indexOf("bảo vệ bức xạ") !== -1 || t.indexOf("lưu ý") !== -1) {
@@ -760,17 +860,47 @@
         '</div>';
     }
 
-    // YÊU CẦU #4: CHUYỂN PHẦN THÔNG SỐ & AN TOÀN LÊN ĐẦU TIÊN
+    // =========================================================================
+    // PHẦN 1: ĐỊNH NGHĨA KỸ THUẬT & NGUYÊN LÝ TẠO ẢNH (WIKIRADIOLOGY KTV 3 MIỀN)
+    // =========================================================================
+    html +=
+      '<div class="learning-step-card step-1">' +
+        '<div class="step-badge-title">' +
+          '<span class="num">1</span>' +
+          '<h3>ĐỊNH NGHĨA & NGUYÊN LÝ TẠO ẢNH (WIKIRADIOLOGY KTV 3 MIỀN)</h3>' +
+        '</div>' +
+        '<div class="step-card-body">' +
+          '<div style="margin-bottom:12px;">' +
+            '<b style="color:var(--brand);font-size:14px;display:block;margin-bottom:4px;">📖 Định nghĩa kỹ thuật:</b>' +
+            '<p style="margin:0;font-size:13.5px;line-height:1.55;color:var(--text);">' +
+              (item.dinhNghia ? esc(item.dinhNghia) :
+              ('Kỹ thuật <b>' + esc(item.ten) + '</b> là quy trình thăm khám chẩn đoán hình ảnh chuyên sâu thuộc phân hệ <b>' + esc(item.modality) + '</b> của vùng <b>' + esc(item.nhom || "khảo sát") + '</b> tại Bệnh viện Đa Khoa Vĩnh Phúc VPI. Kỹ thuật cung cấp các hình ảnh giải phẫu không gian 2D và thể tích 3D chi tiết phục vụ phát hiện tổn thương, phân độ giai đoạn bệnh lý và định hướng phác đồ điều trị can thiệp - ngoại khoa.')) +
+            '</p>' +
+          '</div>' +
+          '<div style="padding:10px 12px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--brand);">' +
+            '<b style="color:var(--brand-dark);font-size:13.5px;display:block;margin-bottom:4px;">🔬 Cơ sở vật lý & Nguyên lý tạo ảnh (' + esc(item.modality) + '):</b>' +
+            '<p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:var(--text-soft);">' +
+              (modPrinciple ? esc(modPrinciple.nguyenLyVatLy) : 'Phương pháp ghi nhận tín hiệu dựa trên nguyên lý vật lý bức xạ / từ trường.') +
+            '</p>' +
+            '<div style="font-size:12px;color:var(--text-muted);">' +
+              '<i>Nguồn chuẩn hóa: Wikiradiology - Kỹ Thuật Viên 3 Miền (wikirad.ktv3mien.com) & Bài giảng PPTX KTV (exam.ktv3mien.com/pptx)</i>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    // =========================================================================
+    // PHẦN 2: THÔNG SỐ KỸ THUẬT & CẤU HÌNH MÁY (GE SIGNA CREATOR VPI & SIEMENS ACADEMY)
     // =========================================================================
     html +=
       '<div class="learning-step-card step-2">' +
         '<div class="step-badge-title">' +
-          '<span class="num">1</span>' +
-          '<h3>THÔNG SỐ KỸ THUẬT & AN TOÀN VẬN HÀNH</h3>' +
+          '<span class="num">2</span>' +
+          '<h3>THÔNG SỐ KỸ THUẬT & CẤU HÌNH MÁY (GE SIGNA CREATOR VPI & SIEMENS)</h3>' +
         '</div>' +
         '<div class="step-card-body">';
 
-    // Chips thông số nổi bật (kVp, mAs, FOV, Matrix, Collimation...)
+    // Chips thông số nổi bật
     if (item.thongSo && item.thongSo.length > 0) {
       html += '<div class="quick-chips-grid" style="margin:0 0 14px;">';
       item.thongSo.forEach(function (ts) {
@@ -783,18 +913,66 @@
       html += '</div>';
     }
 
+    // Nếu là MRI: Bổ sung cấu hình độc quyền GE SIGNA Creator 1.5T tại Bệnh viện Vĩnh Phúc VPI
+    if (isMRI) {
+      // Xác định coil phù hợp
+      var recommendedCoil = "Head-Neck 16-Channel Coil";
+      var nhomLower = (item.nhom || "").toLowerCase();
+      var tenLower = item.ten.toLowerCase();
+      if (nhomLower.indexOf("gối") !== -1 || tenLower.indexOf("gối") !== -1) recommendedCoil = "Dedicated HD Knee 8-Channel Coil (GE SIGNA Creator VPI)";
+      else if (nhomLower.indexOf("vai") !== -1 || tenLower.indexOf("vai") !== -1) recommendedCoil = "Dedicated Shoulder 8-Channel Coil (GE SIGNA Creator VPI)";
+      else if (nhomLower.indexOf("cột sống") !== -1 || tenLower.indexOf("cột sống") !== -1) recommendedCoil = "Integrated Spine Matrix Coil + Head-Neck Coil";
+      else if (nhomLower.indexOf("bụng") !== -1 || nhomLower.indexOf("chậu") !== -1 || tenLower.indexOf("gan") !== -1 || tenLower.indexOf("tụy") !== -1 || tenLower.indexOf("tiền liệt") !== -1) recommendedCoil = "Body / Torso Array 16-Channel Coil (GE SIGNA Creator VPI)";
+
+      html +=
+        '<div class="ge-vpi-box">' +
+          '<div class="ge-vpi-header">' +
+            '<div class="ge-vpi-title">🧲 CẤU HÌNH MÁY GE SIGNA™ CREATOR 1.5T — BV ĐA KHOA VĨNH PHÚC VPI</div>' +
+            '<a href="https://gehealthcare.showpad.biz/s/01jy5p9n2nn62m12haz8az1r1s" target="_blank" rel="noopener" style="font-size:12px;color:#0e7490;font-weight:700;text-decoration:none;">Xem Showpad VPI ↗</a>' +
+          '</div>' +
+          '<div style="font-size:13px;line-height:1.5;color:var(--text);">' +
+            '<div>• <b>Cuộn thu (Coil) chuyên dụng:</b> ' + esc(recommendedCoil) + '</div>' +
+            '<div>• <b>Hệ thống Gradient & RF:</b> OpTix Optical RF 16-channel, Gradient 33 mT/m, Slew Rate 120 T/m/s.</div>' +
+            '<div>• <b>Công nghệ GE SIGNA Creator tối ưu cho kỹ thuật này:</b></div>' +
+          '</div>' +
+          '<div class="ge-tech-pills">' +
+            ((nhomLower.indexOf("sọ") !== -1 || tenLower.indexOf("não") !== -1) ?
+              '<span class="ge-tech-pill">⚡ Ready Brain (Auto-alignment)</span>' +
+              '<span class="ge-tech-pill">🔄 PROPELLER T2/FLAIR (Chống rung)</span>' +
+              '<span class="ge-tech-pill">🧊 3D BRAVO (T1 giải phẫu mỏng)</span>' +
+              '<span class="ge-tech-pill">🌊 Inhance 3D MRA (Mạch não không tiêm)</span>' : '') +
+            ((nhomLower.indexOf("cột sống") !== -1 || tenLower.indexOf("cột sống") !== -1) ?
+              '<span class="ge-tech-pill">🔄 PROPELLER T2 Sagittal</span>' +
+              '<span class="ge-tech-pill">✨ IDEAL (Tách mỡ nước đồng nhất)</span>' +
+              '<span class="ge-tech-pill">🛡️ MAVRIC SL (Chống xảo ảnh nẹp vít)</span>' : '') +
+            ((nhomLower.indexOf("chi") !== -1 || nhomLower.indexOf("khớp") !== -1 || tenLower.indexOf("gối") !== -1 || tenLower.indexOf("vai") !== -1) ?
+              '<span class="ge-tech-pill">📐 3D CUBE PD FS (Thể tích đa bình diện)</span>' +
+              '<span class="ge-tech-pill">🔍 CartiGram (Bản đồ T2 sụn khớp)</span>' +
+              '<span class="ge-tech-pill">🛡️ MAVRIC SL (Quanh kim loại khớp)</span>' : '') +
+            ((nhomLower.indexOf("bụng") !== -1 || nhomLower.indexOf("chậu") !== -1 || tenLower.indexOf("gan") !== -1 || tenLower.indexOf("mrcp") !== -1) ?
+              '<span class="ge-tech-pill">⏱️ LAVA-Flex (Động học gan 14s nín thở)</span>' +
+              '<span class="ge-tech-pill">🌊 MRCP 3D CUBE (Tái tạo đường mật)</span>' +
+              '<span class="ge-tech-pill">🎯 FOCUS DWI (Khuếch tán khu trú)</span>' : '') +
+            '<span class="ge-tech-pill">🔇 Silent Scan (Giảm tiếng ồn)</span>' +
+          '</div>' +
+        '</div>';
+    }
+
     // Nếu là MRI và có đối chiếu 3 hãng (Siemens, Philips, GE)
     if (mriMasterPlan && mriMasterPlan.thongSoVanHanh3Hang) {
       var ts3 = mriMasterPlan.thongSoVanHanh3Hang;
       html +=
         '<div style="margin-top:10px;">' +
-          '<b style="font-size:13.5px;color:var(--c-mri);">⚙️ Bảng đối chiếu thông số 3 hãng (Siemens, Philips, GE):</b>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+            '<b style="font-size:13.5px;color:var(--c-mri);">⚙️ Bảng đối chiếu thông số 3 hãng (Siemens Healthineers • Philips • GE Healthcare):</b>' +
+            '<a href="https://academy.siemens-healthineers.com/vi-vn" target="_blank" rel="noopener" style="font-size:12px;color:var(--c-mri);font-weight:700;text-decoration:none;">Siemens Academy ↗</a>' +
+          '</div>' +
           '<div class="ref-table-wrap">' +
             '<table class="ref-table">' +
-              '<thead><tr><th>Thông số</th><th>Siemens (Syngo)</th><th>Philips (Achieva/Ingenia)</th><th>GE (Signa)</th></tr></thead>' +
+              '<thead><tr><th>Thông số kỹ thuật</th><th>Siemens Healthineers (Syngo)</th><th>Philips (Achieva/Ingenia)</th><th>GE SIGNA Creator (BV Vĩnh Phúc)</th></tr></thead>' +
               '<tbody>';
       (ts3.bangThongSo || []).forEach(function (row) {
-        html += '<tr><td><b>' + esc(row.thongSo) + '</b></td><td>' + esc(row.siemens) + '</td><td>' + esc(row.philips) + '</td><td>' + esc(row.ge) + '</td></tr>';
+        html += '<tr><td><b>' + esc(row.thongSo) + '</b></td><td>' + esc(row.siemens) + '</td><td>' + esc(row.philips) + '</td><td style="color:#0e7490;font-weight:700;">' + esc(row.ge) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
@@ -803,51 +981,61 @@
     html +=
       '<div style="margin-top:10px;padding:8px 12px;background:var(--surface-2);border-radius:6px;font-size:12.5px;color:var(--text-soft);">' +
         '🛡️ <b>An toàn vận hành:</b> ' +
-        (isMRI ? 'Kiểm tra dị vật kim loại, máy tạo nhịp trước Zone IV. Giám sát SAR <= 2.0 W/kg.' : 'Tuân thủ nghiêm ngặt nguyên lý ALARA, che chắn tuyến giáp và tuyến sinh dục.') +
+        (isMRI ? 'Kiểm tra dị vật kim loại, máy tạo nhịp trước Zone IV. Giám sát SAR <= 2.0 W/kg. Sử dụng tai nghe/nút tai chống ồn.' : 'Tuân thủ nghiêm ngặt nguyên lý ALARA, che chắn tuyến giáp và tuyến sinh dục bằng áo chì. Kiểm soát chỉ số liều CTDIvol & DLP.') +
       '</div>';
 
     html += '</div></div>';
 
     // =========================================================================
-    // 2. PHẦN 2: NGUYÊN LÝ & CHỈ ĐỊNH LÂM SÀNG
+    // PHẦN 3: CHỈ ĐỊNH LÂM SÀNG & ỨNG DỤNG CHUYÊN SÂU
     // =========================================================================
     html +=
-      '<div class="learning-step-card step-1">' +
+      '<div class="learning-step-card step-3">' +
         '<div class="step-badge-title">' +
-          '<span class="num">2</span>' +
-          '<h3>NGUYÊN LÝ & CHỈ ĐỊNH LÂM SÀNG</h3>' +
+          '<span class="num">3</span>' +
+          '<h3>CHỈ ĐỊNH LÂM SÀNG & ỨNG DỤNG CHUYÊN SÂU</h3>' +
         '</div>' +
         '<div class="step-card-body">';
 
     var p1Found = false;
     (item.noiDung || []).forEach(function (sec) {
       var t = sec.tieuDe.toLowerCase();
-      if (t.indexOf("chỉ định") !== -1 || t.indexOf("chống chỉ định") !== -1 || t.indexOf("chuẩn bị") !== -1 || t.indexOf("nguyên lý") !== -1 || t.indexOf("mục đích") !== -1) {
+      if (t.indexOf("chỉ định") !== -1 || t.indexOf("chống chỉ định") !== -1 || t.indexOf("chuẩn bị") !== -1 || t.indexOf("mục đích") !== -1 || t.indexOf("vai trò") !== -1) {
         p1Found = true;
-        html += '<h4 style="margin:8px 0 4px;color:var(--brand);font-size:14px;">' + esc(sec.tieuDe) + '</h4><ul>';
-        (sec.items || []).forEach(function (li) { html += '<li>' + esc(li) + '</li>'; });
-        html += '</ul>';
+        html += '<h4 style="margin:10px 0 4px;color:var(--brand);font-size:14px;">' + esc(sec.tieuDe) + '</h4>';
+        if (sec.bang && sec.bang.cols && sec.bang.rows) {
+          html += '<div class="ref-table-wrap"><table class="ref-table"><thead><tr>';
+          sec.bang.cols.forEach(function (c) { html += '<th>' + esc(c) + '</th>'; });
+          html += '</tr></thead><tbody>';
+          sec.bang.rows.forEach(function (r) {
+            html += '<tr>';
+            r.forEach(function (cell) { html += '<td>' + esc(cell) + '</td>'; });
+            html += '</tr>';
+          });
+          html += '</tbody></table></div>';
+        } else if (sec.items) {
+          html += '<ul>';
+          (sec.items || []).forEach(function (li) { html += '<li>' + esc(li) + '</li>'; });
+          html += '</ul>';
+        }
       }
     });
 
     if (!p1Found) {
       html +=
         '<p style="margin:0;font-size:13.5px;color:var(--text);">' +
-          'Kỹ thuật sử dụng ' + (isMRI ? 'nguyên lý cộng hưởng từ trường tĩnh B0 và sóng cao tần RF' : 'bức xạ tia X ion hóa') +
-          ' để tái tạo cấu trúc giải phẫu ' + esc(item.nhom || "vùng khảo sát") +
-          ' nhằm chẩn đoán tổn thương, đánh giá bất thường và định hướng điều trị lâm sàng tại Bệnh viện Vĩnh Phúc VPI.' +
+          'Kỹ thuật được chỉ định rộng rãi trong chẩn đoán, đánh giá giai đoạn và theo dõi sau điều trị các bệnh lý viêm, chấn thương, thoái hóa, dị tật và u tân sinh thuộc vùng <b>' + esc(item.nhom || "khảo sát") + '</b>.' +
         '</p>';
     }
     html += '</div></div>';
 
     // =========================================================================
-    // 3. PHẦN 3: KỸ THUẬT CHỤP & HƯỚNG ĐẶT CẮT (SLICE PLANNING)
-    //    YÊU CẦU #2: THÊM HÌNH ẢNH GIẢI PHẪU & MINH HỌA (MRIMASTER.COM/PLANNING/)
+    // PHẦN 4: QUY TRÌNH THỰC HÀNH, HƯỚNG ĐẶT LÁT CẮT & TIÊU CHUẨN HÌNH ẢNH
     // =========================================================================
     html +=
-      '<div class="learning-step-card step-3">' +
+      '<div class="learning-step-card step-4">' +
         '<div class="step-badge-title">' +
-          '<span class="num">3</span>' +
+          '<span class="num">4</span>' +
           '<h3>' + (isMRI ? 'QUY TRÌNH KỸ THUẬT & HƯỚNG ĐẶT LÁT CẮT (SLICE PLANNING)' : 'QUY TRÌNH KỸ THUẬT CHỤP & TƯ THẾ') + '</h3>' +
         '</div>' +
         '<div class="step-card-body">';
@@ -856,7 +1044,10 @@
     if (mriMasterPlan && mriMasterPlan.huongDatCat) {
       html +=
         '<div style="margin-bottom:14px;padding:12px;border-radius:8px;background:var(--c-mri-wash);border:1px solid var(--c-mri-border);">' +
-          '<b style="color:var(--c-mri);font-size:14px;display:block;margin-bottom:4px;">📐 Định hướng mặt phẳng lát cắt (Nguồn: mrimaster.com/planning/):</b>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+            '<b style="color:var(--c-mri);font-size:14px;">📐 Định hướng mặt phẳng lát cắt (Nguồn: mrimaster.com & GE Showpad VPI):</b>' +
+            '<a href="https://mrimaster.com/planning/" target="_blank" rel="noopener" style="color:var(--c-mri);font-weight:700;font-size:12px;text-decoration:none;">Xem mrimaster.com ↗</a>' +
+          '</div>' +
           '<div class="mri-plan-grid">';
 
       mriMasterPlan.huongDatCat.forEach(function (h) {
@@ -865,32 +1056,60 @@
             '<div class="plane-name"><span>🔹</span><b>Mặt phẳng ' + esc(h.matPhang) + '</b></div>' +
             '<p class="rule"><b>Nguyên tắc:</b> ' + esc(h.nguyenTac) + '</p>' +
             '<p class="rule" style="color:var(--text-soft);"><b>Phạm vi:</b> ' + esc(h.phamVi) + '</p>' +
+            (h.chongXaoAnh ? '<p class="rule" style="color:var(--brand);"><b>Chống xảo ảnh:</b> ' + esc(h.chongXaoAnh) + '</p>' : '') +
             '<div class="landmarks">📍 <b>Mốc giải phẫu:</b> ' + esc(h.soDoGiaiPhau) + '</div>' +
           '</div>';
       });
 
-      html +=
-          '</div>' +
-          '<div style="margin-top:10px;text-align:right;font-size:12px;">' +
-            '<a href="https://mrimaster.com/planning/" target="_blank" rel="noopener" style="color:var(--c-mri);font-weight:700;text-decoration:none;">Xem trực tiếp sơ đồ lát cắt gốc tại mrimaster.com ➔</a>' +
-          '</div>' +
-        '</div>';
+      html += '</div></div>';
     }
 
     // Các mục nội dung kỹ thuật chụp
     (item.noiDung || []).forEach(function (sec) {
       var t = sec.tieuDe.toLowerCase();
-      if (t.indexOf("chỉ định") === -1 && t.indexOf("chống chỉ định") === -1 && t.indexOf("chuẩn bị") === -1 && t.indexOf("nguyên lý") === -1 && t.indexOf("mục đích") === -1) {
-        html += '<h4 style="margin:12px 0 6px;color:var(--brand-dark);font-size:14px;">' + esc(sec.tieuDe) + '</h4><ul>';
-        (sec.items || []).forEach(function (li) { html += '<li>' + esc(li) + '</li>'; });
-        html += '</ul>';
+      if (t.indexOf("chỉ định") === -1 && t.indexOf("chống chỉ định") === -1 && t.indexOf("chuẩn bị") === -1 && t.indexOf("mục đích") === -1 && t.indexOf("vai trò") === -1) {
+        html += '<h4 style="margin:12px 0 6px;color:var(--brand-dark);font-size:14px;">' + esc(sec.tieuDe) + '</h4>';
+        if (sec.bang && sec.bang.cols && sec.bang.rows) {
+          html += '<div class="ref-table-wrap"><table class="ref-table"><thead><tr>';
+          sec.bang.cols.forEach(function (c) { html += '<th>' + esc(c) + '</th>'; });
+          html += '</tr></thead><tbody>';
+          sec.bang.rows.forEach(function (r) {
+            html += '<tr>';
+            r.forEach(function (cell) { html += '<td>' + esc(cell) + '</td>'; });
+            html += '</tr>';
+          });
+          html += '</tbody></table></div>';
+        } else if (sec.items) {
+          html += '<ul>';
+          (sec.items || []).forEach(function (li) { html += '<li>' + esc(li) + '</li>'; });
+          html += '</ul>';
+        }
       }
     });
+
+    // TIÊU CHUẨN CHẤT LƯỢNG HÌNH ẢNH & XẢO ẢNH THƯỜNG GẶP (WIKIRADIOLOGY KTV 3 MIỀN)
+    if (modPrinciple) {
+      html +=
+        '<div class="quality-standards-box">' +
+          '<b style="color:var(--ok);font-size:13.5px;display:block;margin-bottom:4px;">✨ Tiêu chuẩn đánh giá hình ảnh đạt yêu cầu (Wikiradiology KTV 3 Miền):</b>' +
+          '<p style="margin:0 0 10px;font-size:13px;line-height:1.5;color:var(--text);">' + esc(modPrinciple.tieuChuanChatLuong) + '</p>' +
+          '<b style="color:var(--danger);font-size:13.5px;display:block;margin-bottom:6px;">⚠️ Xảo ảnh (Artifacts) thường gặp & Cách khắc phục:</b>' +
+          '<div class="artifact-list-wrap">';
+      (modPrinciple.xaoAnhThuongGap || []).forEach(function (art) {
+        html +=
+          '<div class="artifact-item-card">' +
+            '<b>• ' + esc(art.ten) + '</b>' +
+            '<div><i>Nguyên nhân:</i> ' + esc(art.nguyenNhan) + '</div>' +
+            '<div style="color:var(--ok);margin-top:2px;"><i>Khắc phục:</i> ' + esc(art.khacPhuc) + '</div>' +
+          '</div>';
+      });
+      html += '</div></div>';
+    }
 
     html += '</div></div>';
 
     // =========================================================================
-    // 4. PHẦN 4: BẢNG KIỂM THỰC HÀNH LÂM SÀNG (SẮP XẾP Ở CUỐI CÙNG KỸ THUẬT)
+    // PHẦN 5: BẢNG KIỂM THỰC HÀNH LÂM SÀNG (CHECKLIST AN TOÀN)
     // =========================================================================
     if (checklist) {
       var checklistKey = "ct_chk_" + item.id;
@@ -899,7 +1118,7 @@
       html +=
         '<div class="learning-step-card step-4" style="border-color:var(--brand);">' +
           '<div class="step-badge-title" style="background:var(--brand-wash);color:var(--brand-dark);">' +
-            '<span class="num" style="background:var(--brand);color:#fff;">4</span>' +
+            '<span class="num" style="background:var(--brand);color:#fff;">5</span>' +
             '<h3>BẢNG KIỂM THỰC HÀNH AN TOÀN (' + esc(checklist.ten) + ')</h3>' +
             '<span class="chk-counter-badge" id="chkCounter_' + item.id + '">' + savedChecks.length + ' / ' + checklist.cacBuoc.length + '</span>' +
           '</div>' +
@@ -1737,6 +1956,179 @@
     }, 800);
   }
 
+  /* =========================================================================
+     MODAL CẨM NANG HỆ THỐNG MÁY GE SIGNA CREATOR 1.5T BV ĐA KHOA VĨNH PHÚC VPI
+     ========================================================================= */
+  function showGeSignaModal() {
+    var overlay = document.getElementById("geSignaModalOverlay");
+    var body = document.getElementById("geSignaModalBody");
+    if (!overlay || !body) return;
+
+    var kn = window.SOTAY_CLINICAL_KNOWLEDGE || {};
+    var ge = kn.geSignaCreatorVPI;
+    var siemens = kn.siemensAcademy;
+    if (!ge) {
+      body.innerHTML = '<p style="padding:20px;text-align:center;">Đang cập nhật dữ liệu...</p>';
+      overlay.style.display = "flex";
+      return;
+    }
+
+    var html =
+      '<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface-2);border-radius:10px;border-left:4px solid #0e7490;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+          '<b style="font-size:14.5px;color:#0e7490;">HỆ THỐNG CỘNG HƯỞNG TỪ 1.5T TẠI BV ĐA KHOA VĨNH PHÚC VPI</b>' +
+          '<a href="' + esc(ge.showpadUrl) + '" target="_blank" rel="noopener" class="btn-kc-primary" style="background:#0e7490;color:#fff;padding:6px 12px;font-size:12px;text-decoration:none;">' +
+            '↗ Mở Showpad VPI Chính Thức' +
+          '</a>' +
+        '</div>' +
+        '<p style="margin:6px 0 0;font-size:12.5px;color:var(--text-soft);line-height:1.5;">' +
+          'Tài liệu đào tạo thực tế trang bị tại Khoa Chẩn Đoán Hình Ảnh — BV Đa Khoa Vĩnh Phúc VPI. Máy vận hành trên kiến trúc quang học kỹ thuật số OpTix RF và nam châm siêu dẫn đồng nhất cao.' +
+        '</p>' +
+      '</div>';
+
+    // 1. Thông số phần cứng cốt lõi
+    html +=
+      '<h4 style="margin:14px 0 6px;color:var(--text);font-size:14px;">⚙️ Thông số kỹ thuật phần cứng (Hardware):</h4>' +
+      '<div class="modal-spec-grid">';
+    for (var k in ge.thongSoPhanCung) {
+      html +=
+        '<div class="modal-spec-card">' +
+          '<span class="lbl">' + esc(k) + '</span>' +
+          '<span class="val">' + esc(ge.thongSoPhanCung[k]) + '</span>' +
+        '</div>';
+    }
+    html += '</div>';
+
+    // 2. Danh sách 6 bộ cuộn thu (Coils) thực tế
+    html +=
+      '<h4 style="margin:16px 0 6px;color:var(--text);font-size:14px;">🧲 Danh mục 6 cuộn thu (Coils) chuyên dụng tại BV VPI:</h4>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
+    ge.danhSachCuonThuCoils.forEach(function (c) {
+      html +=
+        '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;">' +
+          '<b style="color:#0e7490;font-size:13px;display:block;margin-bottom:2px;">• ' + esc(c.ten) + '</b>' +
+          '<span style="font-size:12.5px;color:var(--text-soft);line-height:1.45;">' + esc(c.ungDung) + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+
+    // 3. 10 Công nghệ tạo ảnh chuyên sâu độc quyền
+    html +=
+      '<h4 style="margin:16px 0 6px;color:var(--text);font-size:14px;">🚀 10 Công nghệ tạo ảnh độc quyền của GE SIGNA™ Creator:</h4>' +
+      '<div class="modal-tech-list">';
+    ge.congNgheDocQuyenGE.forEach(function (t, i) {
+      html +=
+        '<div class="modal-tech-item">' +
+          '<b>' + (i + 1) + '. ' + esc(t.ten) + '</b>' +
+          '<p>' + esc(t.moTa) + '</p>' +
+        '</div>';
+    });
+    html += '</div>';
+
+    // 4. Bảng đối chiếu 3 hãng (GE vs Siemens vs Philips)
+    if (siemens && siemens.mriComparisons) {
+      html +=
+        '<h4 style="margin:16px 0 6px;color:var(--text);font-size:14px;">🔄 Bảng đối chiếu tương đương chuỗi xung 3 hãng (GE Healthcare • Siemens Healthineers • Philips):</h4>' +
+        '<div class="ref-table-wrap">' +
+          '<table class="ref-table">' +
+            '<thead><tr><th>Ứng dụng lâm sàng</th><th style="color:#0e7490;">GE SIGNA Creator (BV VPI)</th><th>Siemens (Syngo / Dot)</th><th>Philips Healthcare</th></tr></thead>' +
+            '<tbody>';
+      siemens.mriComparisons.forEach(function (r) {
+        html +=
+          '<tr>' +
+            '<td><b>' + esc(r.ungDung) + '</b></td>' +
+            '<td style="color:#0e7490;font-weight:700;">' + esc(r.ge) + '</td>' +
+            '<td>' + esc(r.siemens) + '</td>' +
+            '<td>' + esc(r.philips) + '</td>' +
+          '</tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+
+    body.innerHTML = html;
+    overlay.style.display = "flex";
+  }
+
+  function hideGeSignaModal() {
+    var overlay = document.getElementById("geSignaModalOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  /* =========================================================================
+     MODAL BÁCH KHOA WIKIRADIOLOGY & THƯ VIỆN BÀI GIẢNG PPTX KTV 3 MIỀN
+     ========================================================================= */
+  function showKtv3MienModal() {
+    var overlay = document.getElementById("ktv3MienModalOverlay");
+    var body = document.getElementById("ktv3MienModalBody");
+    if (!overlay || !body) return;
+
+    var kn = window.SOTAY_CLINICAL_KNOWLEDGE || {};
+    var principles = kn.principlesByModality || {};
+    var lectures = kn.ktv3MienLectures || [];
+
+    var html =
+      '<div style="margin-bottom:14px;padding:12px 14px;background:var(--surface-2);border-radius:10px;border-left:4px solid #d97706;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+          '<b style="font-size:14.5px;color:#d97706;">BÁCH KHOA CHUẨN HÓA & THƯ VIỆN BÀI GIẢNG PPTX KTV 3 MIỀN</b>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+            '<a href="https://wikirad.ktv3mien.com/" target="_blank" rel="noopener" class="btn-action-pill" style="background:#d97706;color:#fff;font-size:12px;text-decoration:none;">📖 Wikirad ↗</a>' +
+            '<a href="https://exam.ktv3mien.com/pptx/index.html" target="_blank" rel="noopener" class="btn-action-pill" style="background:#b45309;color:#fff;font-size:12px;text-decoration:none;">📊 Bài giảng PPTX ↗</a>' +
+            '<a href="https://academy.siemens-healthineers.com/vi-vn" target="_blank" rel="noopener" class="btn-action-pill" style="background:#0f766e;color:#fff;font-size:12px;text-decoration:none;">🎓 Siemens Academy ↗</a>' +
+          '</div>' +
+        '</div>' +
+        '<p style="margin:8px 0 0;font-size:12.5px;color:var(--text-soft);line-height:1.5;">' +
+          'Tập hợp tri thức định nghĩa, nguyên lý vật lý tạo ảnh, tiêu chuẩn đánh giá chất lượng phim và phân tích xảo ảnh lâm sàng từ Wikiradiology KTV 3 Miền.' +
+        '</p>' +
+      '</div>';
+
+    // 1. Nguyên lý tạo ảnh & Định nghĩa 3 phân hệ
+    html += '<h4 style="margin:14px 0 8px;color:var(--text);font-size:14px;">🔬 Cơ sở vật lý & Nguyên lý tạo ảnh chuẩn hóa:</h4>';
+    var mods = [
+      { key: "xray", name: "X-quang Quy ước (Radiography)", color: "var(--c-xray)" },
+      { key: "ct", name: "Cắt lớp vi tính (CT Scanner)", color: "var(--c-ct)" },
+      { key: "mri", name: "Cộng hưởng từ (MRI 1.5T)", color: "var(--c-mri)" }
+    ];
+
+    mods.forEach(function (m) {
+      var p = principles[m.key];
+      if (p) {
+        html +=
+          '<div style="padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;margin-bottom:10px;border-left:3px solid ' + m.color + ';">' +
+            '<b style="color:' + m.color + ';font-size:13.5px;display:block;margin-bottom:4px;">• ' + esc(m.name) + '</b>' +
+            '<p style="margin:0 0 6px;font-size:12.5px;color:var(--text);line-height:1.5;"><b>Định nghĩa:</b> ' + esc(p.dinhNghia) + '</p>' +
+            '<p style="margin:0 0 6px;font-size:12.5px;color:var(--text-soft);line-height:1.5;"><b>Nguyên lý vật lý:</b> ' + esc(p.nguyenLyVatLy) + '</p>' +
+            '<p style="margin:0 0 6px;font-size:12.5px;color:var(--ok);line-height:1.5;"><b>Tiêu chuẩn chất lượng:</b> ' + esc(p.tieuChuanChatLuong) + '</p>' +
+            '<div style="font-size:12px;color:var(--danger);margin-top:4px;"><b>Xảo ảnh tiêu biểu:</b> ' +
+              (p.xaoAnhThuongGap || []).map(function (x) { return esc(x.ten); }).join(", ") +
+            '</div>' +
+          '</div>';
+      }
+    });
+
+    // 2. Danh mục bài giảng PPTX KTV 3 Miền
+    if (lectures.length > 0) {
+      html +=
+        '<h4 style="margin:16px 0 8px;color:var(--text);font-size:14px;">📊 Danh mục Bài giảng chuyên đề KTV 3 Miền (PPTX):</h4>';
+      lectures.forEach(function (l) {
+        html +=
+          '<div class="modal-lecture-card">' +
+            '<div class="title">' + esc(l.chuDe) + '</div>' +
+            '<div class="speaker">Giảng viên / Ban biên soạn: ' + esc(l.giangVien) + '</div>' +
+            '<div class="desc">' + esc(l.noiDungChinh) + '</div>' +
+            '<a href="' + esc(l.link) + '" target="_blank" rel="noopener" style="font-size:12px;color:#d97706;font-weight:700;text-decoration:none;">Xem bài giảng PPTX trên KTV 3 Miền ↗</a>' +
+          '</div>';
+      });
+    }
+
+    body.innerHTML = html;
+    overlay.style.display = "flex";
+  }
+
+  function hideKtv3MienModal() {
+    var overlay = document.getElementById("ktv3MienModalOverlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
   function showPinLockOverlay(prompt) {
     var overlay = document.getElementById("pinLockOverlay");
     var promptEl = document.getElementById("pinPromptText");
@@ -2029,6 +2421,12 @@
     showOfflineInfoModal: showOfflineInfoModal,
     hideOfflineInfoModal: hideOfflineInfoModal,
     syncCloudData: syncCloudData,
+
+    // Cẩm nang GE SIGNA Creator 1.5T BV VPI & Wikiradiology KTV 3 Miền
+    showGeSignaModal: showGeSignaModal,
+    hideGeSignaModal: hideGeSignaModal,
+    showKtv3MienModal: showKtv3MienModal,
+    hideKtv3MienModal: hideKtv3MienModal,
 
     // Bảo mật an toàn mã PIN (như App 5S & Quản lý CĐHA)
     lockAppNow: lockAppNow,

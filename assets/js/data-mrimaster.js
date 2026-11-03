@@ -316,6 +316,159 @@ window.SOTAY_MRIMASTER = {
           { thongSo: "Thuốc đặc hiệu gan mật", siemens: "Primovist (chụp thì gan mật 20 phút)", philips: "Primovist / Eovist", ge: "Primovist / Eovist" }
         ]
       }
+    },
+    {
+      id: "mri-plan-cot-song-co",
+      ten: "MRI Cột Sống Cổ (Cervical Spine Planning)",
+      vung: "Cột sống",
+      nguon: "mrimaster.com/plan%20cervical%20spine.html & GE Showpad VPI",
+      viTriCuonThu: "Head-Neck 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
+      hinhMinhHoa: "https://mrimaster.com/images/cervical%20planning%20sagittal.jpg",
+      huongDatCat: [
+        {
+          matPhang: "Sagittal (Đứng dọc giữa cổ)",
+          nguyenTac: "Trên hình Axial: Đặt các lát cắt song song với đường giữa thân đốt sống và tủy cổ. Trên hình Coronal: Song song với trục cột sống cổ từ mỏm nha C1 đến đốt ngực D2.",
+          phamVi: "Bao phủ từ mỏm khớp bên phải sang mỏm khớp bên trái (hết hai lỗ tiếp hợp).",
+          chongXaoAnh: "Áp dụng kỹ thuật GE PROPELLER T2 Sagittal triệt xảo ảnh nuốt và đập mạch cảnh. Đặt Saturation Band phía trước cổ (xóa vùng hầu họng). Áp dụng IDEAL nếu có kim loại kết hợp xương.",
+          soDoGiaiPhau: "Dọc giữa ➔ Thấy rõ mỏm nha C1-C2, tủy cổ, dịch não tủy và ranh giới đĩa đệm C2-C7"
+        },
+        {
+          matPhang: "Axial (Ngang từng tầng đĩa đệm)",
+          nguyenTac: "Trên hình Sagittal: Đặt các block 3-4 lát cắt song song hoàn toàn với từng khe đĩa đệm (C2-C3, C3-C4, C4-C5, C5-C6, C6-C7, C7-D1).",
+          phamVi: "Bao phủ toàn bộ chiều cao đĩa đệm, lỗ tiếp hợp và rễ thần kinh hai bên.",
+          chongXaoAnh: "Sử dụng chuỗi xung T2* Gradient Echo (GE MERGE / Siemens MEDIC / Philips FFE) để tăng tương phản xương và bao màng cứng.",
+          soDoGiaiPhau: "Song song khe đĩa đệm ➔ Phân biệt chèn ép rễ ngách bên, thoát vị trung tâm, hẹp ống sống"
+        }
+      ],
+      thongSoVanHanh3Hang: {
+        chuoiXung: "T1W Sagittal, T2W Sagittal, STIR / T2 IDEAL Sagittal, T2* MERGE / Axial T2W",
+        bangThongSo: [
+          { thongSo: "TR (ms)", siemens: "3200 - 3800 (T2W)", philips: "3000 - 3600", ge: "3200 - 4000 (GE SIGNA Creator VPI)" },
+          { thongSo: "TE (ms)", siemens: "95 - 105", philips: "90 - 100", ge: "95 - 110" },
+          { thongSo: "Độ dày lát cắt (Sag)", siemens: "3.0 mm (No gap)", philips: "3.0 mm", ge: "3.0 mm (No gap)" },
+          { thongSo: "Độ dày lát cắt (Ax)", siemens: "3.0 mm", philips: "3.0 mm", ge: "3.0 mm" },
+          { thongSo: "Trường nhìn (FOV)", siemens: "200 - 220 mm", philips: "200 - 220 mm", ge: "200 - 220 mm" },
+          { thongSo: "Công nghệ chống cử động nuốt", siemens: "BLADE T2 Sag", philips: "MultiVane T2 Sag", ge: "PROPELLER T2 Sag (GE SIGNA)" },
+          { thongSo: "Chuỗi xung T2* bộc lộ rễ/xương", siemens: "MEDIC Axial", philips: "mFFE Axial", ge: "MERGE Axial (GE SIGNA)" }
+        ]
+      }
+    },
+    {
+      id: "mri-plan-tuyen-yen",
+      ten: "MRI Tuyến Yên Khu Trú & Động Học (Pituitary Planning)",
+      vung: "Sọ não",
+      nguon: "mrimaster.com/plan%20pituitary.html & GE Showpad VPI",
+      viTriCuonThu: "Head-Neck 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
+      hinhMinhHoa: "https://mrimaster.com/images/pituitary%20coronal%20planning.jpg",
+      huongDatCat: [
+        {
+          matPhang: "Coronal (Đứng ngang khu trú hố yên)",
+          nguyenTac: "MẶT CẮT QUAN TRỌNG NHẤT TUYẾN YÊN: Trên hình Sagittal định vị, đặt lát cắt song song với cuống tuyến yên (Infundibulum) và vuông góc với sàn hố yên.",
+          phamVi: "FOV nhỏ khu trú 160-180 mm, bao phủ từ bờ trước giao thoa thị giác đến hết mỏm yên sau.",
+          chongXaoAnh: "Lát cắt siêu mỏng 2.0 mm (no gap), ma trận mịn cao (320x256), triệt tiêu nhiễu đập động mạch cảnh trong xoang hang.",
+          soDoGiaiPhau: "Song song cuống tuyến yên ➔ Bộc lộ thùy trước, thùy sau, giao thoa thị giác, xoang hang hai bên"
+        },
+        {
+          matPhang: "Sagittal (Đứng dọc khu trú)",
+          nguyenTac: "Trên hình Axial/Coronal: Đặt song song tuyệt đối với đường giữa và thân cuống tuyến yên.",
+          phamVi: "Bao phủ từ thành ngoài xoang hang bên phải sang xoang hang bên trái.",
+          chongXaoAnh: "Độ dày lát cắt 2.0 mm, quan sát rõ sàn hố yên và xoang bướm bên dưới.",
+          soDoGiaiPhau: "Dọc giữa ➔ Thấy rõ nốt sáng thùy sau trên T1W và độ lõm hoành yên"
+        },
+        {
+          matPhang: "Dynamic T1 Coronal (Chụp động học đa thì)",
+          nguyenTac: "Chụp liên tục 5-6 pha sau tiêm bolus Gadolinium liều nhỏ (0.05 - 0.1 mmol/kg, tốc độ 1.5 - 2.0 ml/s). Bắt đầu phát xung đồng thời với lúc tiêm thuốc.",
+          phamVi: "Ghi nhận ngấm thuốc tại các mốc: 0s, 30s, 60s, 90s, 120s, 180s.",
+          chongXaoAnh: "Phát hiện vi u tuyến yên (Microadenoma < 10mm) nhờ đặc tính ngấm thuốc chậm hơn nhu mô tuyến yên lành ở thì sớm.",
+          soDoGiaiPhau: "Động học đa thì ➔ Vi u ngấm chậm ➔ Đảo ngược tín hiệu ngấm thuốc thì muộn"
+        }
+      ],
+      thongSoVanHanh3Hang: {
+        chuoiXung: "T1W Coronal/Sagittal 2mm, T2W Coronal 2mm, Dynamic T1 Coronal 5-phase, T1W FS +C 3D",
+        bangThongSo: [
+          { thongSo: "Độ dày lát cắt (Slice)", siemens: "2.0 mm (No gap)", philips: "2.0 mm (No gap)", ge: "2.0 mm (GE SIGNA Creator VPI)" },
+          { thongSo: "Trường nhìn (FOV)", siemens: "160 - 180 mm", philips: "160 - 180 mm", ge: "160 - 180 mm" },
+          { thongSo: "Ma trận (Matrix)", siemens: "320 x 256", philips: "320 x 256", ge: "320 x 256" },
+          { thongSo: "Chuỗi xung động học", siemens: "Dynamic T1 TSE", philips: "Dynamic T1 FFE", ge: "Dynamic T1 FSE (GE SIGNA)" },
+          { thongSo: "Chụp 3D T1 toàn não sau tiêm", siemens: "3D MPRAGE", philips: "3D TFE", ge: "3D BRAVO (GE SIGNA)" }
+        ]
+      }
+    },
+    {
+      id: "mri-plan-khop-hang",
+      ten: "MRI Khớp Háng & Khung Chậu (Hip Joint Planning)",
+      vung: "Chi dưới",
+      nguon: "mrimaster.com/plan%20hip.html & GE Showpad VPI",
+      viTriCuonThu: "Body/Torso Array 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
+      hinhMinhHoa: "https://mrimaster.com/images/hip%20planning%20coronal.jpg",
+      huongDatCat: [
+        {
+          matPhang: "Coronal Oblique (Hai bên khớp háng đối xứng)",
+          nguyenTac: "Trên hình Axial định vị: Đặt các lát cắt song song với đường nối hai mấu chuyển lớn xương đùi hoặc hai chỏm xương đùi.",
+          phamVi: "Bao phủ từ bờ trước khớp háng đến hết ụ ngồi phía sau, lấy cân đối trọn vẹn cả hai bên để so sánh.",
+          chongXaoAnh: "Chuỗi xung T1W Coronal và STIR Coronal là chìa khóa vàng phát hiện hoại tử vô khuẩn chỏm xương đùi (AVN) giai đoạn sớm Ficat 0-I.",
+          soDoGiaiPhau: "Song song đường nối hai mấu chuyển ➔ So sánh đối xứng hai chỏm, khe khớp, sụn viền ổ cối"
+        },
+        {
+          matPhang: "Axial Oblique (Theo trục cổ xương đùi bên tổn thương)",
+          nguyenTac: "Trên hình Coronal: Đặt lát cắt song song với trục dài của cổ xương đùi bên nghi ngờ tổn thương.",
+          phamVi: "Khảo sát khu trú FOV 160-180 mm từ bờ trên ổ cối đến hết mấu chuyển bé.",
+          chongXaoAnh: "Bộc lộ rõ xung đột khớp háng - chậu (FAI: Cam lesion và Pincer lesion), rách sụn viền ổ cối (Acetabular labral tear).",
+          soDoGiaiPhau: "Trục dọc cổ xương đùi ➔ Đánh giá góc Alpha, viền trước ổ cối, sụn khớp"
+        }
+      ],
+      thongSoVanHanh3Hang: {
+        chuoiXung: "T1W Coronal (hai bên), T2 FatSat / STIR Coronal, T2W Axial Oblique, PD FatSat Coronal Oblique",
+        bangThongSo: [
+          { thongSo: "TR (ms)", siemens: "3000 - 4000 (STIR)", philips: "3200 - 4000", ge: "3000 - 4500 (GE SIGNA Creator VPI)" },
+          { thongSo: "TE (ms)", siemens: "35 - 45", philips: "35 - 45", ge: "35 - 45" },
+          { thongSo: "TI (ms) trên STIR", siemens: "150 - 160 ms", philips: "150 - 165 ms", ge: "150 - 160 ms" },
+          { thongSo: "Trường nhìn toàn cảnh 2 bên", siemens: "320 - 360 mm", philips: "320 - 360 mm", ge: "340 - 360 mm" },
+          { thongSo: "Trường nhìn khu trú 1 bên", siemens: "160 - 180 mm", philips: "160 - 180 mm", ge: "160 - 180 mm" },
+          { thongSo: "Triệt xảo ảnh kim loại khớp nhân tạo", siemens: "SEMAC / VAT", philips: "O-MAR", ge: "MAVRIC SL (GE SIGNA)" }
+        ]
+      }
+    },
+    {
+      id: "mri-plan-tien-liet-tuyen",
+      ten: "MRI Tiền Liệt Tuyến Đa Thông Số Chuẩn PI-RADS v2.1",
+      vung: "Chậu",
+      nguon: "mrimaster.com/plan%20prostate.html & GE Showpad VPI",
+      viTriCuonThu: "Body/Torso Array 16-Channel Coil chuyên dụng tại BV Vĩnh Phúc VPI",
+      hinhMinhHoa: "https://mrimaster.com/images/prostate%20planning%20axial.jpg",
+      huongDatCat: [
+        {
+          matPhang: "Axial T2W Lát Mỏng Độ Phân Giải Cao (Trục vuông góc niệu đạo)",
+          nguyenTac: "TRỤC VÀNG TIỀN LIỆT TUYẾN: Trên hình Sagittal T2W, đặt lát cắt vuông góc tuyệt đối với thành sau của trực tràng và trục niệu đạo tuyến tiền liệt.",
+          phamVi: "FOV nhỏ 180-200 mm, lát mỏng 3.0 mm (no gap), ma trận cao 320x320. Bao phủ từ đáy túi tinh đến hết đỉnh tuyến tiền liệt (Apex).",
+          chongXaoAnh: "Cho bệnh nhân thụt tháo làm sạch trực tràng trước chụp để tránh xảo ảnh khí trực tràng. Bật dải Saturation Band trước thành bụng.",
+          soDoGiaiPhau: "Vuông góc niệu đạo ➔ Phân định rõ Vùng ngoại vi (PZ), Vùng chuyển tiếp (TZ), Vùng trung tâm (CZ) và bao tuyến"
+        },
+        {
+          matPhang: "FOCUS DWI (Khuếch tán b-value cao 1400 - 2000 s/mm2)",
+          nguyenTac: "Chụp chuỗi xung khuếch tán trường nhìn khu trú (GE FOCUS DWI / Siemens RESOLVE) với b-value cao (b=50, b=800, b=1400 và tính toán b=2000 s/mm2) kèm bản đồ ADC Map.",
+          phamVi: "Đặt cùng góc nghiêng và trường nhìn với chuỗi T2W Axial.",
+          chongXaoAnh: "FOCUS DWI loại bỏ hiện tượng biến dạng hình ảnh tại ranh giới trực tràng - tuyến tiền liệt, bộc lộ rõ vùng hạn chế khuếch tán của ung thư tuyến tiền liệt (PCa).",
+          soDoGiaiPhau: "DWI b cao + ADC map ➔ Tiêu chuẩn vàng đánh giá tổn thương PI-RADS 3, 4, 5 vùng ngoại vi PZ"
+        },
+        {
+          matPhang: "Dynamic DCE (Ngấm thuốc động học đa thì)",
+          nguyenTac: "Chuỗi xung 3D T1W nín thở có xóa mỡ (GE LAVA / Siemens VIBE), chụp liên tục mỗi pha 5-10 giây trong vòng 3-4 phút sau tiêm thuốc đối quang từ.",
+          phamVi: "Bao phủ toàn bộ tuyến tiền liệt và túi tinh.",
+          chongXaoAnh: "Phát hiện hiện tượng ngấm thuốc nhanh và thải thuốc sớm (Wash-in / Wash-out) điển hình của ổ ung thư xâm lấn.",
+          soDoGiaiPhau: "DCE đa thì ➔ Nâng cấp PI-RADS 3 thành PI-RADS 4 ở vùng ngoại vi PZ"
+        }
+      ],
+      thongSoVanHanh3Hang: {
+        chuoiXung: "T2W Axial/Coronal/Sagittal 3mm, FOCUS DWI (b50, 800, 1400, 2000) + ADC, Dynamic T1 3D DCE",
+        bangThongSo: [
+          { thongSo: "Độ dày lát cắt T2W", siemens: "3.0 mm (No gap)", philips: "3.0 mm (No gap)", ge: "3.0 mm (GE SIGNA Creator VPI)" },
+          { thongSo: "Trường nhìn (FOV T2/DWI)", siemens: "180 - 200 mm", philips: "180 - 200 mm", ge: "180 - 200 mm" },
+          { thongSo: "Ma trận (Matrix)", siemens: "320 x 280", philips: "320 x 280", ge: "320 x 280" },
+          { thongSo: "Chuỗi xung Diffusion cao cấp", siemens: "RESOLVE DWI (b=1400)", philips: "Zoomed DWI", ge: "FOCUS DWI b=1400 (GE SIGNA)" },
+          { thongSo: "Động học tưới máu DCE", siemens: "TWIST / VIBE", philips: "4D-THRIVE", ge: "LAVA / DISCO (GE SIGNA)" }
+        ]
+      }
     }
   ]
 };

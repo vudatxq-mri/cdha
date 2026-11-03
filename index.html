@@ -51,6 +51,16 @@
           <span id="networkStatusText">Ngoại viện: Trực tuyến</span>
         </div>
 
+        <!-- Nút Tra cứu GE SIGNA Creator VPI -->
+        <button class="btn-action-pill" id="geSignaHeaderBtn" onclick="window.VUDAT_APP.showGeSignaModal()" title="Cẩm nang hệ thống GE SIGNA™ Creator 1.5T BV Đa Khoa Vĩnh Phúc VPI" style="border-color:rgba(14,116,144,0.35);color:#0e7490;font-weight:700;">
+          <span>🧲 SIGNA 1.5T</span>
+        </button>
+
+        <!-- Nút Tra cứu Wikiradiology & Bài giảng PPTX KTV 3 Miền -->
+        <button class="btn-action-pill" id="ktv3MienHeaderBtn" onclick="window.VUDAT_APP.showKtv3MienModal()" title="Bách khoa Wikiradiology & Bài giảng PPTX KTV 3 Miền" style="border-color:rgba(217,119,6,0.35);color:#d97706;font-weight:700;">
+          <span>📖 Wikirad KTV</span>
+        </button>
+
         <!-- Nút Cài đặt App ra màn hình điện thoại / máy tính -->
         <button class="btn-pwa-install" id="installAppHeaderBtn" onclick="window.VUDAT_APP.promptInstallApp()" title="Cài đặt Sổ Tay CĐHA ra ngoài màn hình điện thoại hoặc máy tính">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/><path d="m9 11 3 3 3-3"/><path d="M12 7v7"/></svg>
@@ -584,6 +594,44 @@
     </div>
   </div>
 
+  <!-- ===== MODAL CẨM NANG MÁY GE SIGNA CREATOR 1.5T BV VĨNH PHÚC VPI ===== -->
+  <div class="modal-overlay" id="geSignaModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideGeSignaModal()">
+    <div class="modal-box" style="max-width:760px;">
+      <div class="modal-head" style="background:linear-gradient(135deg, #0f172a, #0e7490);color:#fff;border-radius:14px 14px 0 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">🧲</span>
+          <div>
+            <b style="font-size:16px;letter-spacing:-0.2px;">CẨM NANG HỆ THỐNG GE SIGNA™ CREATOR 1.5T</b>
+            <div style="font-size:12px;opacity:0.9;">Khoa Chẩn Đoán Hình Ảnh — Bệnh Viện Đa Khoa Vĩnh Phúc VPI</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="window.VUDAT_APP.hideGeSignaModal()" style="color:#fff;">&times;</button>
+      </div>
+      <div class="modal-body" id="geSignaModalBody">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL BÁCH KHOA WIKIRADIOLOGY & BÀI GIẢNG PPTX KTV 3 MIỀN ===== -->
+  <div class="modal-overlay" id="ktv3MienModalOverlay" style="display:none;" onclick="if(event.target===this)window.VUDAT_APP.hideKtv3MienModal()">
+    <div class="modal-box" style="max-width:760px;">
+      <div class="modal-head" style="background:linear-gradient(135deg, #1e293b, #b45309);color:#fff;border-radius:14px 14px 0 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">📚</span>
+          <div>
+            <b style="font-size:16px;letter-spacing:-0.2px;">WIKIRADIOLOGY & BÀI GIẢNG PPTX KTV 3 MIỀN</b>
+            <div style="font-size:12px;opacity:0.9;">Bách Khoa Kỹ Thuật Hình Ảnh & Thư Viện Đào Tạo CĐHA</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="window.VUDAT_APP.hideKtv3MienModal()" style="color:#fff;">&times;</button>
+      </div>
+      <div class="modal-body" id="ktv3MienModalBody">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
   <!-- ===== BANNER NHẮC CÀI ĐẶT APP NỔI GÓC MÀN HÌNH ===== -->
   <div class="pwa-floating-banner" id="pwaFloatingBanner" style="display:none;">
     <img src="assets/icons/icon-192.png" alt="Icon SỔ CĐHA" class="pwa-banner-icon">
@@ -601,6 +649,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ===== DANH SÁCH DỮ LIỆU & SCRIPT ===== -->
+  <script src="assets/js/data-clinical-knowledge.js"></script>
   <script src="assets/js/data-quytrinh.js"></script>
   <script src="assets/js/data-ct-checklists.js"></script>
   <script src="assets/js/data-mrimaster.js"></script>

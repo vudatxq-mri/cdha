@@ -1738,3 +1738,391 @@ body {
 .install-step-body b {
   color: var(--brand-dark);
 }
+
+/* ============================================================================
+   BỔ SUNG KHỐI TÀI LIỆU CHUYÊN SÂU: GE SIGNA CREATOR VPI, SIEMENS & WIKIRADIOLOGY
+   ============================================================================ */
+.source-links-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.source-links-box .title {
+  width: 100%;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.btn-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--pill);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .2s;
+  border: 1px solid transparent;
+}
+.btn-source-link.ge {
+  background: rgba(14, 116, 144, 0.12);
+  color: #0e7490;
+  border-color: rgba(14, 116, 144, 0.3);
+}
+.btn-source-link.ge:hover {
+  background: #0e7490;
+  color: #fff;
+}
+.btn-source-link.siemens {
+  background: rgba(234, 88, 12, 0.12);
+  color: #ea580c;
+  border-color: rgba(234, 88, 12, 0.3);
+}
+.btn-source-link.siemens:hover {
+  background: #ea580c;
+  color: #fff;
+}
+.btn-source-link.wiki {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.3);
+}
+.btn-source-link.wiki:hover {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-source-link.pptx {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+.btn-source-link.pptx:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* KHỐI CẤU HÌNH MÁY GE SIGNA CREATOR VPI */
+.ge-vpi-box {
+  background: linear-gradient(135deg, rgba(14,116,144,0.06), rgba(2,132,199,0.08));
+  border: 1px solid rgba(14,116,144,0.3);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 12px 0;
+}
+.ge-vpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ge-vpi-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #0e7490;
+  font-weight: 800;
+  font-size: 13.5px;
+}
+.ge-tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ge-tech-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: var(--pill);
+  background: #fff;
+  border: 1px solid rgba(14,116,144,0.25);
+  font-size: 11.5px;
+  color: #0e7490;
+  font-weight: 700;
+}
+:root[data-theme="dark"] .ge-tech-pill {
+  background: var(--surface-2);
+}
+
+/* KHỐI TIÊU CHUẨN CHẤT LƯỢNG HÌNH ẢNH & XẢO ẢNH */
+.quality-standards-box {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+.artifact-list-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+.artifact-item-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.artifact-item-card b {
+  color: var(--danger);
+  display: block;
+  margin-bottom: 3px;
+  font-size: 13px;
+}
+
+/* =========================================================================
+   DASHBOARD KNOWLEDGE SHOWCASE & MODAL STYLING
+   ========================================================================= */
+.dashboard-knowledge-section {
+  margin: 20px 0 24px;
+}
+.knowledge-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.knowledge-section-title h2 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.knowledge-section-title span {
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+.knowledge-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+.knowledge-showcase-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.knowledge-showcase-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand);
+}
+.knowledge-showcase-card.ge-card {
+  border-left: 4px solid #0e7490;
+  background: linear-gradient(180deg, rgba(14,116,144,0.03), transparent);
+}
+.knowledge-showcase-card.ktv-card {
+  border-left: 4px solid #d97706;
+  background: linear-gradient(180deg, rgba(217,119,6,0.03), transparent);
+}
+.knowledge-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+.knowledge-card-head .icon {
+  font-size: 26px;
+  line-height: 1;
+}
+.knowledge-card-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--pill);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.ge-card .knowledge-card-badge {
+  background: rgba(14,116,144,0.12);
+  color: #0e7490;
+}
+.ktv-card .knowledge-card-badge {
+  background: rgba(217,119,6,0.12);
+  color: #d97706;
+}
+.knowledge-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.knowledge-card-desc {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.knowledge-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.knowledge-chip {
+  font-size: 11.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-weight: 600;
+}
+.knowledge-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.btn-kc-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.ge-card .btn-kc-primary {
+  background: #0e7490;
+  color: #fff;
+}
+.ge-card .btn-kc-primary:hover {
+  background: #155e75;
+}
+.ktv-card .btn-kc-primary {
+  background: #d97706;
+  color: #fff;
+}
+.ktv-card .btn-kc-primary:hover {
+  background: #b45309;
+}
+.btn-kc-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: var(--pill);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition: all .15s ease;
+}
+.btn-kc-link:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* Modal Content Styling */
+.modal-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+.modal-spec-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+}
+.modal-spec-card .lbl {
+  font-size: 11px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 3px;
+}
+.modal-spec-card .val {
+  font-weight: 800;
+  color: var(--text);
+  font-size: 13.5px;
+}
+.modal-tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.modal-tech-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid #0e7490;
+}
+.modal-tech-item b {
+  color: #0e7490;
+  font-size: 13.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+.modal-tech-item p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+.modal-lecture-card {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+.modal-lecture-card .title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #d97706;
+  margin-bottom: 4px;
+}
+.modal-lecture-card .speaker {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.modal-lecture-card .desc {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
