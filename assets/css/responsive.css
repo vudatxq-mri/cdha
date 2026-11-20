@@ -634,3 +634,30 @@
     box-shadow: none !important;
   }
 }
+
+/* ============================================================================
+   FIX TRÀN NGANG HEADER (rà soát 11/2026)
+   - Desktop hẹp (<= 1280px): header-actions được phép xuống dòng, ẩn chữ tên viện
+   - Mobile (<= 768px): ẩn các nút đã có ở chỗ khác (Cấp cứu ở bottom nav,
+     SIGNA/Wikirad ở thẻ trang chủ, logo viện ở footer) để không bị bóp méo
+   ============================================================================ */
+html, body { overflow-x: hidden; }
+.header-actions { min-width: 0; flex-wrap: wrap; justify-content: flex-end; }
+.header-actions > * { flex-shrink: 0; }
+
+@media (max-width: 1280px) {
+  .vpi-text-block { display: none !important; }
+  #appbarVisitBadge .txt { display: none; }
+}
+
+@media (max-width: 768px) {
+  .header-actions { flex-wrap: nowrap; }
+  #appbarVisitBadge,
+  #networkStatusBadge,
+  #geSignaHeaderBtn,
+  #ktv3MienHeaderBtn,
+  #emgHeaderBtn,
+  #feedbackHeaderBtn, /* chữ bị ẩn trên mobile -> nút rỗng; góp ý vẫn có ở trang chủ & footer */
+  .hospital-branding-right { display: none !important; }
+  #settingsHeaderBtn, #quickLockBtn { min-width: 30px; justify-content: center; }
+}

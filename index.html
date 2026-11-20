@@ -46,9 +46,9 @@
       <!-- NÚT THAO TÁC & LOGO BỆNH VIỆN Ở GÓC BÊN PHẢI -->
       <div class="header-actions">
         <!-- Huy hiệu thống kê số lượt truy cập -->
-        <div class="visitor-counter-badge" id="appbarVisitBadge" title="Thống kê tổng số lượt truy cập Sổ tay CĐHA">
+        <div class="visitor-counter-badge" id="appbarVisitBadge" title="Số lần bạn đã mở Sổ tay trên thiết bị này">
           <span class="visitor-pulse-dot"></span>
-          <span class="txt">Lượt xem: <b id="visitCounterHeader">15,842</b></span>
+          <span class="txt">Máy này: <b id="visitCounterHeader">—</b> lượt</span>
         </div>
 
         <!-- Huy hiệu trạng thái kết nối & Chế độ xem ngoại viện -->
@@ -135,9 +135,8 @@
           Tài liệu chuẩn hóa quy trình kỹ thuật thực hành lâm sàng, bảng kiểm an toàn và dược thuốc cản quang phục vụ bác sĩ, kỹ thuật viên y tế.
         </p>
         <div class="footer-counter-row">
-          <span>📊 Tổng lượt truy cập: <b id="visitCounterFooter">15,842</b> lượt</span>
-          <span>🕒 Hôm nay: <b id="visitCounterFooterToday">248</b></span>
-          <span>🟢 Trực tuyến: <b>12 đang tra cứu</b></span>
+          <span title="Đếm trên thiết bị này, không phải tổng của mọi người dùng">📊 Bạn đã mở trên máy này: <b id="visitCounterFooter">—</b> lượt</span>
+          <span>🕒 Hôm nay: <b id="visitCounterFooterToday">—</b></span>
         </div>
       </div>
 
@@ -226,8 +225,8 @@
         </div>
 
         <div class="form-field" style="margin-bottom:14px;">
-          <label style="font-weight:700;font-size:13px;display:block;margin-bottom:6px;">Mật khẩu Admin hoặc Mã PIN Quản trị</label>
-          <input type="password" id="adminPassInput" placeholder="Nhập PIN hoặc Mật khẩu Admin..." style="width:100%;height:44px;padding:8px 12px;font-size:15px;border-radius:8px;border:1px solid var(--line);text-align:center;letter-spacing:2px;font-weight:700;" onkeydown="if(event.key==='Enter')window.VUDAT_APP.verifyAdminAccess()">
+          <label for="adminPassInput" style="font-weight:700;font-size:13px;display:block;margin-bottom:6px;">Mã PIN Quản trị</label>
+          <input type="password" id="adminPassInput" aria-label="Mã PIN Quản trị" inputmode="numeric" placeholder="Nhập mã PIN Quản trị..." style="width:100%;height:44px;padding:8px 12px;font-size:15px;border-radius:8px;border:1px solid var(--line);text-align:center;letter-spacing:2px;font-weight:700;" onkeydown="if(event.key==='Enter')window.VUDAT_APP.verifyAdminAccess()">
         </div>
 
         <div id="adminAuthErrorMsg" style="color:var(--danger);font-size:12.5px;font-weight:700;margin-bottom:12px;text-align:center;min-height:18px;"></div>
@@ -242,7 +241,7 @@
         </div>
 
         <div style="font-size:11.5px;color:var(--text-muted);margin-top:14px;text-align:center;border-top:1px dashed var(--line);padding-top:10px;">
-          * Mật khẩu mặc định Admin ban đầu: <b>123</b> hoặc mã PIN <b>1234</b>.
+          * Nhập mã PIN Quản trị. Liên hệ Admin khoa nếu quên mã.
         </div>
       </div>
     </div>
@@ -494,7 +493,7 @@
 
       <div class="pin-footer-hint">
         🔒 Bảo mật theo chuẩn Bộ 83 Tiêu chí BYT.<br>
-        <i>Mã PIN ban đầu: <b>1234</b>. (Quản lý trong mục Cài đặt)</i>
+        <i>Quên mã PIN? Liên hệ Admin khoa CĐHA.</i>
       </div>
     </div>
   </div>
@@ -685,7 +684,7 @@
       </div>
       <div class="modal-body" style="padding:18px;">
         <div style="margin-bottom:14px;padding:10px 12px;background:var(--surface-2);border-radius:8px;border-left:3px solid #059669;font-size:12.5px;color:var(--text-soft);line-height:1.5;">
-          Mọi ý kiến đóng góp, đề xuất cập nhật quy trình hoặc bổ sung kỹ thuật mới của đồng nghiệp sẽ được chuyển trực tiếp tới Admin <b>Vũ Đạt</b> để hoàn thiện sổ tay.
+          Mọi ý kiến đóng góp, đề xuất cập nhật quy trình hoặc bổ sung kỹ thuật mới của đồng nghiệp được gửi tới Admin <b>Vũ Đạt</b> qua <b>Email</b> hoặc <b>Zalo</b> (nội dung được soạn sẵn, bạn chỉ cần bấm Gửi).
         </div>
         <form id="feedbackForm" onsubmit="window.VUDAT_APP.submitFeedback(event)">
           <div style="margin-bottom:12px;">
@@ -719,7 +718,7 @@
           <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
             <button type="button" class="btn-action-pill" onclick="window.VUDAT_APP.hideFeedbackModal()">Hủy</button>
             <button type="button" class="btn-action-pill" onclick="window.VUDAT_APP.sendFeedbackViaZalo()" style="border-color:#0284c7;color:#0284c7;font-weight:700;">💬 Gửi Qua Zalo</button>
-            <button type="submit" class="btn-action-pill" style="background:#059669;color:#fff;font-weight:700;padding:8px 18px;">📤 Gửi Ý Kiến Cho Admin</button>
+            <button type="submit" class="btn-action-pill" style="background:#059669;color:#fff;font-weight:700;padding:8px 18px;">📧 Gửi Qua Email</button>
           </div>
         </form>
       </div>

@@ -207,11 +207,15 @@
 
     var searchInput = document.getElementById("globalSearchInput");
     if (searchInput) {
+      var searchTimer = null;
       searchInput.addEventListener("input", function () {
-        var kw = searchInput.value.trim().toLowerCase();
-        if (kw.length >= 2) {
-          executeGlobalSearch(kw);
-        }
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function () {
+          var kw = searchInput.value.trim().toLowerCase();
+          if (kw.length >= 2) {
+            executeGlobalSearch(kw);
+          }
+        }, 250);
       });
     }
 
@@ -319,8 +323,8 @@
         '</div>' +
         '<div class="home-hero-stats">' +
           '<div class="stat-pill"><span class="dot"></span>Hệ thống: <b>210+ Quy trình chuẩn</b></div>' +
-          '<div class="stat-pill" title="Tổng lượt truy cập Sổ tay CĐHA"><span class="dot" style="background:#10b981;"></span>Lượt truy cập: <b id="visitCounterHero">15,842</b></div>' +
-          '<div class="stat-pill" title="Phiên làm việc hôm nay"><span class="dot" style="background:#06b6d4;"></span>Hôm nay: <b id="visitCounterToday">248</b></div>' +
+          '<div class="stat-pill" title="Số lần bạn đã mở Sổ tay trên thiết bị này (không phải tổng của mọi người dùng)"><span class="dot" style="background:#10b981;"></span>Lượt mở trên máy này: <b id="visitCounterHero">' + readVisitInt("vpi_device_total").toLocaleString("vi-VN") + '</b></div>' +
+          '<div class="stat-pill" title="Số lần mở hôm nay trên thiết bị này"><span class="dot" style="background:#06b6d4;"></span>Hôm nay: <b id="visitCounterToday">' + readVisitInt("vpi_device_today").toLocaleString("vi-VN") + '</b></div>' +
           '<button class="stat-pill" onclick="window.VUDAT_APP.showFeedbackModal()" style="cursor:pointer;border-color:#059669;background:rgba(5,150,105,0.08);color:#059669;font-weight:700;">' +
             '💬 Góp ý Admin' +
           '</button>' +
@@ -1276,21 +1280,31 @@
       '</div>';
 
     // 1. Dụng cụ & An toàn
+    // dungCu có thể là mảng hoặc chuỗi phân tách bằng dấu phẩy (bỏ qua dấu phẩy nằm trong ngoặc)
+    var dungCuList = Array.isArray(item.dungCu) ? item.dungCu :
+      (item.dungCu ? String(item.dungCu).split(/,\s*(?![^()]*\))/).map(function (s) { return s.trim(); }).filter(Boolean) : []);
     html +=
       '<div class="learning-step-card step-2">' +
         '<div class="step-badge-title"><span class="num">1</span><h3>DỤNG CỤ, VÔ TRÙNG & CHUẨN BỊ</h3></div>' +
         '<div class="step-card-body">' +
-          (item.dungCu ? '<b>Dụng cụ can thiệp:</b><ul>' + item.dungCu.map(function(d){ return '<li>'+esc(d)+'</li>'; }).join('') + '</ul>' : '') +
+          (dungCuList.length ? '<b>Dụng cụ can thiệp:</b><ul>' + dungCuList.map(function(d){ return '<li>'+esc(d)+'</li>'; }).join('') + '</ul>' : '') +
         '</div>' +
       '</div>';
 
-    // 2. Kỹ thuật
+    // 2. Kỹ thuật — dữ liệu dùng "cacBuoc" [{buoc, tieuDe, noiDung}]; giữ tương thích "quyTrinh" (mảng chuỗi)
+    var stepsHtml = '';
+    if (Array.isArray(item.cacBuoc) && item.cacBuoc.length) {
+      stepsHtml = '<ol>' + item.cacBuoc.map(function (s) {
+        return '<li style="margin-bottom:10px;"><b>' + esc(s.tieuDe || '') + '</b>' +
+          '<div style="white-space:pre-line;margin-top:4px;">' + esc(s.noiDung || '') + '</div></li>';
+      }).join('') + '</ol>';
+    } else if (Array.isArray(item.quyTrinh)) {
+      stepsHtml = '<ol>' + item.quyTrinh.map(function(q){ return '<li style="margin-bottom:6px;">'+esc(q)+'</li>'; }).join('') + '</ol>';
+    }
     html +=
       '<div class="learning-step-card step-3">' +
         '<div class="step-badge-title"><span class="num">2</span><h3>QUY TRÌNH THỦ THUẬT CAN THIỆP</h3></div>' +
-        '<div class="step-card-body">' +
-          (item.quyTrinh ? '<ol>' + item.quyTrinh.map(function(q){ return '<li style="margin-bottom:6px;">'+esc(q)+'</li>'; }).join('') + '</ol>' : '') +
-        '</div>' +
+        '<div class="step-card-body">' + stepsHtml + '</div>' +
       '</div>';
 
     html += renderLMSUnlockBox(item.id, item.ten);
@@ -1393,6 +1407,11 @@
             '<div class="contrast-meta-info">' +
               '<b style="font-size:15px;color:var(--c-cq);display:block;margin-bottom:4px;">' + esc(t.tenThuongMai) + ' (' + esc(t.hoatChat) + ') — ' + esc(t.hangSanXuat) + '</b>' +
               '<p style="margin:2px 0 6px;font-size:12.5px;"><b>Nồng độ:</b> ' + esc(t.nongDo) + ' • <b>Quy cách:</b> ' + esc(t.quyCach) + ' • <b>Áp lực:</b> ' + esc(t.apLucThamThau) + '</p>' +
+              '<p style="margin:2px 0 6px;font-size:12.5px;">' +
+                (t.cauTruc ? '<b>Cấu trúc:</b> ' + esc(t.cauTruc) : '') +
+                (t.doNhot ? ' • <b>Độ nhớt:</b> ' + esc(t.doNhot) : '') +
+                (t.loaiBaoBi ? ' • <b>Bao bì:</b> ' + esc(t.loaiBaoBi) : '') +
+              '</p>' +
               '<p style="margin:0;font-size:12px;color:var(--text-soft);line-height:1.45;">' + esc(t.dacDiemLamSang) + '</p>' +
             '</div>' +
           '</div>';
@@ -1408,6 +1427,12 @@
             '<div class="contrast-meta-info">' +
               '<b style="font-size:15px;color:var(--c-mri);display:block;margin-bottom:4px;">' + esc(m.tenThuongMai) + ' (' + esc(m.hoatChat) + ') — ' + esc(m.hangSanXuat) + '</b>' +
               '<p style="margin:2px 0 6px;font-size:12.5px;"><b>Cấu trúc:</b> ' + esc(m.cauTruc) + ' • <b>An toàn NSF:</b> <span style="color:var(--ok);font-weight:700;">' + esc(m.anToanNSF) + '</span></p>' +
+              '<p style="margin:2px 0 6px;font-size:12.5px;">' +
+                (m.nongDo ? '<b>Nồng độ:</b> ' + esc(m.nongDo) : '') +
+                (m.quyCach ? ' • <b>Quy cách:</b> ' + esc(m.quyCach) : '') +
+                (m.doThuThaoTu ? ' • <b>Độ thư thái từ:</b> ' + esc(m.doThuThaoTu) : '') +
+                (m.loaiBaoBi ? ' • <b>Bao bì:</b> ' + esc(m.loaiBaoBi) : '') +
+              '</p>' +
               '<p style="margin:0;font-size:12px;color:var(--text-soft);line-height:1.45;">' + esc(m.dacDiemLamSang) + '</p>' +
             '</div>' +
           '</div>';
@@ -1422,6 +1447,21 @@
         html += '<tr><td><b>' + esc(g.mucEGFR) + '</b></td><td>' + esc(g.danhGia) + '</td><td>' + esc(g.khuyenCao) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
+
+      var bd = cq.anToanChucNangThan.phacDoBuDichChuan || [];
+      if (bd.length) {
+        html += '<div class="content-section"><h3>💧 PHÁC ĐỒ BÙ DỊCH DỰ PHÒNG PC-AKI</h3><ul>' +
+          bd.map(function (s) { return '<li style="margin-bottom:6px;">' + esc(s) + '</li>'; }).join('') + '</ul></div>';
+      }
+
+      var tm = cq.phacDoTienMe;
+      if (tm) {
+        html += '<div class="content-section"><h3>💊 PHÁC ĐỒ TIỀN MÊ (BỆNH NHÂN CÓ TIỀN SỬ DỊ ỨNG CẢN QUANG)</h3>' +
+          '<p style="font-size:13.5px;"><b>Chỉ định:</b> ' + esc(tm.chiDinh || '') + '</p>' +
+          ((tm.phacDo13Gio || []).length ? '<b>Phác đồ chuẩn 13 giờ:</b><ul>' + tm.phacDo13Gio.map(function (s) { return '<li style="margin-bottom:6px;">' + esc(s) + '</li>'; }).join('') + '</ul>' : '') +
+          ((tm.phacDoKhanCap4Gio || []).length ? '<b>Phác đồ khẩn cấp:</b><ul>' + tm.phacDoKhanCap4Gio.map(function (s) { return '<li style="margin-bottom:6px;">' + esc(s) + '</li>'; }).join('') + '</ul>' : '') +
+        '</div>';
+      }
     } else {
       html += renderContrastCalculators();
     }
@@ -1460,10 +1500,67 @@
         '<div class="calc-result-box">' +
           '<div class="item">Thể tích thuốc cản quang: <span class="big" id="res_vol">—</span></div>' +
           '<div class="item">Tốc độ tiêm khuyến nghị: <span class="big" id="res_flow">—</span></div>' +
+          '<div class="item">Tổng lượng i-ốt tương ứng: <span class="big" id="res_iod">—</span></div>' +
           '<div class="item">Nước muối sinh lý đuổi: <span class="big">40 – 50 ml</span></div>' +
         '</div>' +
+        ((c.luuY || []).length ? '<ul style="font-size:12.5px;color:var(--text-soft);margin:10px 0 0;padding-left:18px;">' + c.luuY.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' : '') +
+      '</div>' +
+      renderCCTACalculator()
+    );
+  }
+
+  /* Máy tính CCTA theo IDR (dữ liệu & công thức từ SOTAY_CONGCU.lieuCCTA) */
+  function renderCCTACalculator() {
+    var d = window.SOTAY_CONGCU && window.SOTAY_CONGCU.lieuCCTA;
+    if (!d) return '';
+    return (
+      '<div class="calc-card" style="margin-top:16px;">' +
+        '<h3 style="margin:0 0 12px;color:var(--brand);font-size:17px;">Máy Tính Liều Cản Quang CT Động Mạch Vành (CCTA — IDR)</h3>' +
+        '<div class="calc-form-grid">' +
+          '<div class="form-field"><label for="ccta_w">Cân nặng (kg)</label><input id="ccta_w" type="number" value="' + d.canNang.macDinh + '" min="' + d.canNang.min + '" max="' + d.canNang.max + '"></div>' +
+          '<div class="form-field"><label for="ccta_idr">IDR (gI/kg/s)</label><input id="ccta_idr" type="number" step="0.001" value="' + d.idr.macDinh + '" min="' + d.idr.min + '" max="' + d.idr.max + '"></div>' +
+          '<div class="form-field"><label for="ccta_conc">Nồng độ i-ốt</label><select id="ccta_conc">' +
+            d.nongDo.map(function (v) { return '<option value="' + v + '"' + (v === d.nongDoMacDinh ? ' selected' : '') + '>' + v + ' mgI/ml</option>'; }).join('') +
+          '</select></div>' +
+          '<div class="form-field"><label for="ccta_t">Thời gian tiêm (giây)</label><input id="ccta_t" type="number" value="' + d.thoiGian.macDinh + '" min="' + d.thoiGian.min + '" max="' + d.thoiGian.max + '"></div>' +
+        '</div>' +
+        '<div class="calc-result-box">' +
+          '<div class="item">Tốc độ tiêm: <span class="big" id="ccta_flow">—</span></div>' +
+          '<div class="item">Thể tích thuốc: <span class="big" id="ccta_vol">—</span></div>' +
+          '<div class="item" id="ccta_warn" style="color:var(--danger);font-weight:700;"></div>' +
+        '</div>' +
+        '<div class="ref-table-wrap" style="margin-top:10px;"><table class="ref-table"><thead><tr><th>Cân nặng</th><th>BMI</th><th>kVp</th><th>IDR</th><th>Lưu ý</th></tr></thead><tbody>' +
+          d.bangThamChieu.map(function (r) { return '<tr><td>' + esc(r.can) + '</td><td>' + esc(r.bmi) + '</td><td>' + esc(r.kvp) + '</td><td>' + esc(r.idr) + '</td><td>' + esc(r.luuY) + '</td></tr>'; }).join('') +
+        '</tbody></table></div>' +
+        '<ul style="font-size:12.5px;color:var(--text-soft);margin:10px 0 0;padding-left:18px;">' + d.luuY.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' +
+        '<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">Nguồn: ' + esc(d.nguon) + '</div>' +
       '</div>'
     );
+  }
+
+  function setupCCTACalculator() {
+    var d = window.SOTAY_CONGCU && window.SOTAY_CONGCU.lieuCCTA;
+    var w = document.getElementById("ccta_w"), idr = document.getElementById("ccta_idr"),
+        conc = document.getElementById("ccta_conc"), t = document.getElementById("ccta_t");
+    if (!d || !w || !idr || !conc || !t) return;
+    function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+    function recalc() {
+      var wv = parseFloat(w.value), iv = parseFloat(idr.value), cv = parseFloat(conc.value), tv = parseFloat(t.value);
+      var warn = [];
+      if (!(wv >= d.canNang.min && wv <= d.canNang.max)) warn.push("Cân nặng ngoài khoảng " + d.canNang.min + "–" + d.canNang.max + " kg");
+      if (!(iv >= d.idr.min && iv <= d.idr.max)) warn.push("IDR ngoài khoảng " + d.idr.min + "–" + d.idr.max);
+      if (!(tv >= d.thoiGian.min && tv <= d.thoiGian.max)) warn.push("Thời gian ngoài khoảng " + d.thoiGian.min + "–" + d.thoiGian.max + " s");
+      wv = clamp(wv || d.canNang.macDinh, d.canNang.min, d.canNang.max);
+      iv = clamp(iv || d.idr.macDinh, d.idr.min, d.idr.max);
+      tv = clamp(tv || d.thoiGian.macDinh, d.thoiGian.min, d.thoiGian.max);
+      var flow = (wv * iv) / (cv / 1000);
+      document.getElementById("ccta_flow").textContent = flow.toFixed(1) + " ml/s";
+      document.getElementById("ccta_vol").textContent = Math.round(flow * tv) + " ml";
+      document.getElementById("ccta_warn").textContent = warn.length ? "⚠️ " + warn.join("; ") + " — đã giới hạn về khoảng an toàn." : "";
+    }
+    w.oninput = idr.oninput = t.oninput = recalc;
+    conc.onchange = recalc;
+    recalc();
   }
 
   function setupCalculatorEvents() {
@@ -1474,6 +1571,7 @@
 
     function recalculate() {
       var w = parseFloat(wInput.value) || 60;
+      w = Math.min(150, Math.max(20, w)); // giới hạn theo min/max của ô nhập
       var tIdx = parseInt(tSelect.value, 10) || 0;
       var khaoSat = window.SOTAY_CONGCU.lieuCanQuang.loaiKhaoSat[tIdx];
       var volMin = Math.round(w * khaoSat.mlKgMin);
@@ -1482,13 +1580,20 @@
 
       var vElem = document.getElementById("res_vol");
       var fElem = document.getElementById("res_flow");
+      var iElem = document.getElementById("res_iod");
       if (vElem) vElem.textContent = resVol;
       if (fElem) fElem.textContent = khaoSat.tocDo;
+      if (iElem && cSelect) {
+        var conc = parseFloat(cSelect.value) || 350;
+        var gMin = (volMin * conc / 1000).toFixed(1), gMax = (volMax * conc / 1000).toFixed(1);
+        iElem.textContent = (gMin === gMax ? gMin : gMin + " – " + gMax) + " gI";
+      }
     }
     wInput.oninput = recalculate;
     tSelect.onchange = recalculate;
     if (cSelect) cSelect.onchange = recalculate;
     recalculate();
+    setupCCTACalculator();
   }
 
   /* Render Tai biến & Cấp cứu CĐHA */
@@ -1688,7 +1793,7 @@
     var pass = (inp.value || "").trim();
 
     var validPin = (typeof secState !== "undefined" && secState.pinCode) ? secState.pinCode : "1234";
-    if (pass === validPin || pass === "123" || pass === "admin") {
+    if (pass === validPin) {
       adminAuth.isAuthenticated = true;
       hideAdminAuthModal();
       showToast("👑 Xác thực quyền Quản trị viên (Admin) thành công!", "ok");
@@ -1700,7 +1805,7 @@
         box.classList.add("shake");
         setTimeout(function () { box.classList.remove("shake"); }, 400);
       }
-      if (err) err.textContent = "Mật khẩu Admin hoặc Mã PIN không chính xác!";
+      if (err) err.textContent = "Mã PIN Quản trị không chính xác!";
       inp.value = "";
       inp.focus();
     }
@@ -1914,37 +2019,36 @@
   /* =========================================================================
      THỐNG KÊ SỐ LƯỢT TRUY CẬP (YÊU CẦU #3)
      ========================================================================= */
-  var BASE_TOTAL_VISITS = 15840;
-  var BASE_TODAY_VISITS = 248;
+  // Số lượt mở THẬT trên thiết bị này (lưu localStorage, không cộng số nền giả).
+  // Dùng khóa mới "vpi_device_*" để bỏ các giá trị cũ đã bị cộng sẵn 15.840.
+  function readVisitInt(key) {
+    try { var v = parseInt(localStorage.getItem(key), 10); return isNaN(v) ? 0 : v; } catch (e) { return 0; }
+  }
 
   function trackVisitMetrics() {
-    var todayStr = new Date().toISOString().slice(0, 10);
-    var totalVisits = parseInt(localStorage.getItem("vpi_total_visits"), 10);
-    if (isNaN(totalVisits) || totalVisits < BASE_TOTAL_VISITS) {
-      totalVisits = BASE_TOTAL_VISITS;
-    }
+    var d = new Date();
+    var todayStr = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); // theo giờ máy, không theo UTC
+    var lastDate = null;
+    try { lastDate = localStorage.getItem("vpi_device_last_date"); } catch (e) {}
 
-    var lastDate = localStorage.getItem("vpi_last_visit_date");
-    var todayVisits = parseInt(localStorage.getItem("vpi_today_visits"), 10);
-    if (isNaN(todayVisits) || lastDate !== todayStr) {
-      todayVisits = (lastDate !== todayStr) ? 1 : BASE_TODAY_VISITS;
-    }
-
-    totalVisits += 1;
-    todayVisits += 1;
+    var totalVisits = readVisitInt("vpi_device_total") + 1;
+    var todayVisits = (lastDate === todayStr ? readVisitInt("vpi_device_today") : 0) + 1;
 
     try {
-      localStorage.setItem("vpi_total_visits", totalVisits);
-      localStorage.setItem("vpi_today_visits", todayVisits);
-      localStorage.setItem("vpi_last_visit_date", todayStr);
+      localStorage.setItem("vpi_device_total", totalVisits);
+      localStorage.setItem("vpi_device_today", todayVisits);
+      localStorage.setItem("vpi_device_last_date", todayStr);
+      localStorage.removeItem("vpi_total_visits");
+      localStorage.removeItem("vpi_today_visits");
+      localStorage.removeItem("vpi_last_visit_date");
     } catch (e) {}
 
     updateVisitCounterDisplays(totalVisits, todayVisits);
   }
 
   function updateVisitCounterDisplays(total, today) {
-    var t = total || parseInt(localStorage.getItem("vpi_total_visits"), 10) || BASE_TOTAL_VISITS;
-    var d = today || parseInt(localStorage.getItem("vpi_today_visits"), 10) || BASE_TODAY_VISITS;
+    var t = total || readVisitInt("vpi_device_total") || 1;
+    var d = today || readVisitInt("vpi_device_today") || 1;
 
     var totalStr = t.toLocaleString("vi-VN");
     var todayStr = d.toLocaleString("vi-VN");
@@ -2023,7 +2127,15 @@
       localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
     } catch (err) {}
 
-    showToast("🎉 Cảm ơn bạn! Ý kiến đã được gửi thành công đến Admin Vũ Đạt.", "ok");
+    // Ứng dụng chưa có máy chủ nhận góp ý: localStorage chỉ lưu trên máy người gửi.
+    // Mở ứng dụng email với nội dung soạn sẵn để góp ý thực sự đến được Admin.
+    var subject = "[SỔ CĐHA] " + category + (protocol ? " — " + protocol : "");
+    var body = "Người gửi: " + name + "\nSĐT/Zalo: " + (phone || "Chưa cung cấp") +
+      "\nLoại góp ý: " + category + "\nQuy trình liên quan: " + (protocol || "Toàn hệ thống") +
+      "\n\nNội dung:\n" + message + "\n\n(Gửi từ Sổ CĐHA lúc " + newItem.timestamp + ")";
+    window.location.href = "mailto:vudatxq@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+
+    showToast("📧 Đã mở ứng dụng Email với nội dung soạn sẵn — bấm Gửi để chuyển tới Admin. (Hoặc dùng nút Gửi qua Zalo)", "ok");
 
     if (nameInput) nameInput.value = "";
     if (phoneInput) phoneInput.value = "";
