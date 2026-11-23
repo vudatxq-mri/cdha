@@ -1513,24 +1513,40 @@
   function renderCCTACalculator() {
     var d = window.SOTAY_CONGCU && window.SOTAY_CONGCU.lieuCCTA;
     if (!d) return '';
+    var nk = d.nongDoKhoang || { min: 270, max: 400, buoc: 10 };
+    function pair(id, v, lo, hi, step) {
+      return '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input id="' + id + '_r" type="range" value="' + v + '" min="' + lo + '" max="' + hi + '" step="' + step + '" style="flex:1;min-width:0;" aria-hidden="true" tabindex="-1">' +
+        '<input id="' + id + '" type="number" value="' + v + '" min="' + lo + '" max="' + hi + '" step="' + step + '" inputmode="decimal" style="width:84px;flex:0 0 auto;">' +
+      '</div>';
+    }
+    var chip = 'padding:4px 10px;border-radius:14px;border:1px solid var(--border,#ccc);background:transparent;color:inherit;font-weight:600;cursor:pointer;';
     return (
       '<div class="calc-card" style="margin-top:16px;">' +
-        '<h3 style="margin:0 0 12px;color:var(--brand);font-size:17px;">Máy Tính Liều Cản Quang CT Động Mạch Vành (CCTA — IDR)</h3>' +
+        '<h3 style="margin:0 0 12px;color:var(--brand);font-size:17px;">Máy Tính Liều Cản Quang CT Động Mạch Vành (CCTA — WB-IDR)</h3>' +
         '<div class="calc-form-grid">' +
-          '<div class="form-field"><label for="ccta_w">Cân nặng (kg)</label><input id="ccta_w" type="number" value="' + d.canNang.macDinh + '" min="' + d.canNang.min + '" max="' + d.canNang.max + '"></div>' +
-          '<div class="form-field"><label for="ccta_idr">IDR (gI/kg/s)</label><input id="ccta_idr" type="number" step="0.001" value="' + d.idr.macDinh + '" min="' + d.idr.min + '" max="' + d.idr.max + '"></div>' +
-          '<div class="form-field"><label for="ccta_conc">Nồng độ i-ốt</label><select id="ccta_conc">' +
-            d.nongDo.map(function (v) { return '<option value="' + v + '"' + (v === d.nongDoMacDinh ? ' selected' : '') + '>' + v + ' mgI/ml</option>'; }).join('') +
-          '</select></div>' +
-          '<div class="form-field"><label for="ccta_t">Thời gian tiêm (giây)</label><input id="ccta_t" type="number" value="' + d.thoiGian.macDinh + '" min="' + d.thoiGian.min + '" max="' + d.thoiGian.max + '"></div>' +
+          '<div class="form-field"><label for="ccta_w">Cân nặng (kg)</label>' + pair('ccta_w', d.canNang.macDinh, d.canNang.min, d.canNang.max, 1) + '</div>' +
+          '<div class="form-field"><label for="ccta_idr">Hệ số IDR (gI/kg/s)</label>' + pair('ccta_idr', d.idr.macDinh, d.idr.min, d.idr.max, d.idr.buoc || 0.0005) + '</div>' +
+          '<div class="form-field"><label for="ccta_conc">Nồng độ i-ốt (mgI/ml)</label>' + pair('ccta_conc', d.nongDoMacDinh, nk.min, nk.max, nk.buoc) +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">' +
+              d.nongDo.map(function (v) { return '<button type="button" class="ccta-conc-chip" data-v="' + v + '" style="' + chip + '">' + v + '</button>'; }).join('') +
+            '</div></div>' +
+          '<div class="form-field"><label for="ccta_t">Thời gian tiêm (giây)</label>' + pair('ccta_t', d.thoiGian.macDinh, d.thoiGian.min, d.thoiGian.max, d.thoiGian.buoc || 0.5) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 10px;font-size:13px;">' +
+          '<div style="flex:1;min-width:140px;padding:8px 10px;border-radius:10px;border:1px dashed var(--border,#ccc);">Khuyến nghị mức kV: <b id="ccta_kv" style="font-size:15px;">—</b></div>' +
+          '<div style="flex:1;min-width:180px;padding:8px 10px;border-radius:10px;border:1px dashed var(--border,#ccc);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Gợi ý IDR: <b id="ccta_idr_sug" style="font-size:15px;">—</b> <span id="ccta_idr_lbl" style="color:var(--text-soft);"></span>' +
+            '<button type="button" id="ccta_idr_apply" style="' + chip + 'margin-left:auto;">Áp dụng</button></div>' +
         '</div>' +
         '<div class="calc-result-box">' +
-          '<div class="item">Tốc độ tiêm: <span class="big" id="ccta_flow">—</span></div>' +
-          '<div class="item">Thể tích thuốc: <span class="big" id="ccta_vol">—</span></div>' +
+          '<div class="item">Tốc độ tiêm (Flow rate): <span class="big" id="ccta_flow">—</span></div>' +
+          '<div class="item">Tổng thể tích thuốc: <span class="big" id="ccta_vol">—</span></div>' +
+          '<div class="item">Tổng lượng i-ốt: <span class="big" id="ccta_iod">—</span></div>' +
           '<div class="item" id="ccta_warn" style="color:var(--danger);font-weight:700;"></div>' +
         '</div>' +
-        '<div class="ref-table-wrap" style="margin-top:10px;"><table class="ref-table"><thead><tr><th>Cân nặng</th><th>BMI</th><th>kVp</th><th>IDR</th><th>Lưu ý</th></tr></thead><tbody>' +
-          d.bangThamChieu.map(function (r) { return '<tr><td>' + esc(r.can) + '</td><td>' + esc(r.bmi) + '</td><td>' + esc(r.kvp) + '</td><td>' + esc(r.idr) + '</td><td>' + esc(r.luuY) + '</td></tr>'; }).join('') +
+        '<div id="ccta_formula" style="font-size:12.5px;line-height:1.6;margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--surface-2,rgba(127,127,127,.08));font-family:ui-monospace,Consolas,monospace;"></div>' +
+        '<div class="ref-table-wrap" style="margin-top:10px;"><table class="ref-table"><thead><tr><th>Cân nặng</th><th>BMI (kg/m²)</th><th>kVp</th><th>WB-IDR khuyến cáo</th></tr></thead><tbody>' +
+          d.bangThamChieu.map(function (r) { return '<tr><td>' + esc(r.can) + '</td><td>' + esc(r.bmi) + '</td><td>' + esc(r.kvp) + '</td><td>' + esc(r.idr) + '</td></tr>'; }).join('') +
         '</tbody></table></div>' +
         '<ul style="font-size:12.5px;color:var(--text-soft);margin:10px 0 0;padding-left:18px;">' + d.luuY.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' +
         '<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">Nguồn: ' + esc(d.nguon) + '</div>' +
@@ -1543,23 +1559,55 @@
     var w = document.getElementById("ccta_w"), idr = document.getElementById("ccta_idr"),
         conc = document.getElementById("ccta_conc"), t = document.getElementById("ccta_t");
     if (!d || !w || !idr || !conc || !t) return;
+    var nk = d.nongDoKhoang || { min: 270, max: 400 };
+    var $ = function (id) { return document.getElementById(id); };
     function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+    function pick(list, wv) { for (var i = 0; i < list.length; i++) if (wv < list[i].duoiKg) return list[i]; return list[list.length - 1]; }
+    var sugIdr = null;
     function recalc() {
       var wv = parseFloat(w.value), iv = parseFloat(idr.value), cv = parseFloat(conc.value), tv = parseFloat(t.value);
       var warn = [];
       if (!(wv >= d.canNang.min && wv <= d.canNang.max)) warn.push("Cân nặng ngoài khoảng " + d.canNang.min + "–" + d.canNang.max + " kg");
       if (!(iv >= d.idr.min && iv <= d.idr.max)) warn.push("IDR ngoài khoảng " + d.idr.min + "–" + d.idr.max);
+      if (!(cv >= nk.min && cv <= nk.max)) warn.push("Nồng độ ngoài khoảng " + nk.min + "–" + nk.max + " mgI/ml");
       if (!(tv >= d.thoiGian.min && tv <= d.thoiGian.max)) warn.push("Thời gian ngoài khoảng " + d.thoiGian.min + "–" + d.thoiGian.max + " s");
       wv = clamp(wv || d.canNang.macDinh, d.canNang.min, d.canNang.max);
       iv = clamp(iv || d.idr.macDinh, d.idr.min, d.idr.max);
+      cv = clamp(cv || d.nongDoMacDinh, nk.min, nk.max);
       tv = clamp(tv || d.thoiGian.macDinh, d.thoiGian.min, d.thoiGian.max);
+      // đồng bộ thanh trượt
+      $("ccta_w_r").value = wv; $("ccta_idr_r").value = iv; $("ccta_conc_r").value = cv; $("ccta_t_r").value = tv;
+      // gợi ý kV & IDR theo cân nặng
+      if (d.goiYKV) $("ccta_kv").textContent = pick(d.goiYKV, wv).kv + " kV";
+      if (d.goiYIDR) { var g = pick(d.goiYIDR, wv); sugIdr = g.idr; $("ccta_idr_sug").textContent = g.idr.toFixed(3); $("ccta_idr_lbl").textContent = "(" + g.nhan + ")"; }
+      // công thức: Flow = W × IDR ÷ (C/1000); Volume = Flow × t
       var flow = (wv * iv) / (cv / 1000);
-      document.getElementById("ccta_flow").textContent = flow.toFixed(1) + " ml/s";
-      document.getElementById("ccta_vol").textContent = Math.round(flow * tv) + " ml";
-      document.getElementById("ccta_warn").textContent = warn.length ? "⚠️ " + warn.join("; ") + " — đã giới hạn về khoảng an toàn." : "";
+      var flowR = Math.round(flow * 10) / 10;
+      var vol = Math.round(flowR * tv);
+      $("ccta_flow").textContent = flowR.toFixed(1) + " ml/s";
+      $("ccta_vol").textContent = vol + " ml";
+      $("ccta_iod").textContent = (vol * cv / 1000).toFixed(1) + " gI";
+      $("ccta_formula").innerHTML =
+        "<b>FLOW</b> = (" + wv + "kg × " + iv + ") ÷ " + (cv / 1000).toFixed(3) + " g/ml = <b>" + flowR.toFixed(1) + " ml/s</b><br>" +
+        "<b>VOLUME</b> = " + flowR.toFixed(1) + " ml/s × " + tv + "s = <b>" + vol + " ml</b>";
+      $("ccta_warn").textContent = warn.length ? "⚠️ " + warn.join("; ") + " — đã giới hạn về khoảng an toàn." : "";
+      var chips = document.querySelectorAll(".ccta-conc-chip");
+      for (var i = 0; i < chips.length; i++) {
+        var on = parseFloat(chips[i].getAttribute("data-v")) === cv;
+        chips[i].style.background = on ? "var(--brand)" : "transparent";
+        chips[i].style.color = on ? "#fff" : "inherit";
+      }
     }
-    w.oninput = idr.oninput = t.oninput = recalc;
-    conc.onchange = recalc;
+    // liên kết thanh trượt <-> ô số
+    [w, idr, conc, t].forEach(function (inp) {
+      var r = $(inp.id + "_r");
+      inp.oninput = recalc;
+      if (r) r.oninput = function () { inp.value = r.value; recalc(); };
+    });
+    var chips = document.querySelectorAll(".ccta-conc-chip");
+    for (var i = 0; i < chips.length; i++) chips[i].onclick = function () { conc.value = this.getAttribute("data-v"); recalc(); };
+    var ap = $("ccta_idr_apply");
+    if (ap) ap.onclick = function () { if (sugIdr != null) { idr.value = sugIdr; recalc(); } };
     recalc();
   }
 

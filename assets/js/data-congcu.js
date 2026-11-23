@@ -29,17 +29,25 @@ window.SOTAY_CONGCU = {
 
   /* 2. MÁY TÍNH LIỀU CCTA (ĐỘNG MẠCH VÀNH) THEO WB-IDR */
   lieuCCTA: {
-    nguon: "Từ điển CT – CT Coronary Smart Protocol v3.2 (Khoa CĐHA & Hướng dẫn SCCT)",
+    nguon: "CT Coronary Radiant – doc.ktv3mien.com/ccta (WB-IDR) & Hướng dẫn SCCT",
     canNang: { min: 20, max: 150, macDinh: 65 },
-    idr: { min: 0.010, max: 0.030, macDinh: 0.021 }, // gI/kg/s
+    idr: { min: 0.010, max: 0.030, macDinh: 0.021, buoc: 0.0005 }, // gI/kg/s
     nongDo: [300, 320, 350, 370],
     nongDoMacDinh: 350,
-    thoiGian: { min: 10, max: 15, macDinh: 12 }, // giây
+    nongDoKhoang: { min: 270, max: 400, buoc: 10 }, // mgI/ml
+    thoiGian: { min: 10, max: 15, macDinh: 13, buoc: 0.5 }, // giây
+    // Gợi ý tự động theo cân nặng (ngưỡng theo công cụ CT Coronary của ktv3mien)
+    goiYKV: [ { duoiKg: 65, kv: 80 }, { duoiKg: 85, kv: 100 }, { duoiKg: 9999, kv: 120 } ],
+    goiYIDR: [
+      { duoiKg: 60, idr: 0.015, nhan: "Nhẹ cân" },
+      { duoiKg: 90, idr: 0.021, nhan: "Trung bình" },
+      { duoiKg: 9999, idr: 0.026, nhan: "Nặng cân" }
+    ],
     bangThamChieu: [
-      { can: "< 60 kg", bmi: "< 22", kvp: "80 - 100 kVp", idr: "0.018 - 0.020 gI/kg/s", luuY: "Ưu tiên 80-100 kVp để tăng độ tương phản i-ốt và giảm liều tia" },
-      { can: "60 – 75 kg", bmi: "22 - 25", kvp: "100 kVp", idr: "0.021 gI/kg/s", luuY: "Tốc độ tiêm 4.5 - 5.0 ml/s" },
-      { can: "75 – 90 kg", bmi: "25 - 30", kvp: "100 - 120 kVp", idr: "0.022 - 0.025 gI/kg/s", luuY: "Tốc độ tiêm 5.0 - 5.5 ml/s" },
-      { can: "> 90 kg", bmi: "> 30", kvp: "120 kVp", idr: "0.025 - 0.028 gI/kg/s", luuY: "Tốc độ tiêm 5.5 - 6.0 ml/s, kim luồn 18G" }
+      { can: "< 60 kg", bmi: "< 22.5", kvp: "70 - 80 kVp", idr: "0.014 - 0.018 gI/kg/s" },
+      { can: "60 – 75 kg", bmi: "22.5 - 25", kvp: "100 kVp", idr: "0.022 - 0.025 gI/kg/s" },
+      { can: "76 – 90 kg", bmi: "25 - 30", kvp: "100 - 120 kVp", idr: "0.025 - 0.028 gI/kg/s" },
+      { can: "> 90 kg", bmi: "> 30", kvp: "120 kVp", idr: "0.028 - 0.030 gI/kg/s" }
     ],
     luuY: [
       "Công thức: Tốc độ tiêm (Flow rate ml/s) = (Cân nặng x IDR) / (Nồng độ i-ốt / 1000).",
