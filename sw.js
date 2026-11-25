@@ -3,7 +3,7 @@
    Hỗ trợ cài đặt PWA App trên Điện thoại / Máy tính & Chế độ Xem Ngoại Viện Offline
    ============================================================================ */
 
-var CACHE_NAME = 'vpi-cdha-cache-v3.4';
+var CACHE_NAME = 'vpi-cdha-cache-v4.0';
 
 var PRECACHE_ASSETS = [
   './',
@@ -12,6 +12,7 @@ var PRECACHE_ASSETS = [
   './assets/css/style.css',
   './assets/css/modalities.css',
   './assets/css/responsive.css',
+  './assets/css/account.css',
   './assets/images/logo-vpi.jpg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
@@ -28,7 +29,10 @@ var PRECACHE_ASSETS = [
   './assets/js/data-thuoccanquang.js',
   './assets/js/data-taibien.js',
   './assets/js/data-congcu.js',
-  './assets/js/auth-lms.js',
+  './assets/js/config.js',
+  './assets/js/cloud.js',
+  './assets/js/ui-core.js',
+  './assets/js/ui-admin.js',
   './assets/js/app.js'
 ];
 
@@ -66,6 +70,11 @@ self.addEventListener('fetch', function (event) {
 
   // Bỏ qua các yêu cầu không phải GET hoặc ngoài phạm vi
   if (request.method !== 'GET') return;
+
+  // BẢO MẬT: không bao giờ lưu cache dữ liệu từ máy chủ khác (Supabase: đăng nhập, hồ sơ, ảnh)
+  // hay /api/* — trình duyệt tự xử lý các yêu cầu này, không đi qua Service Worker.
+  var reqUrl = new URL(request.url);
+  if (reqUrl.origin !== self.location.origin || reqUrl.pathname.indexOf('/api/') === 0) return;
 
   // Với điều hướng trang (HTML navigation): Network trước, nếu mất mạng thì lấy Cache
   if (request.mode === 'navigate') {

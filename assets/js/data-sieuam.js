@@ -36,7 +36,7 @@ window.SOTAY_SIEUAM = [
       },
       {
         ten: "6. Tiền liệt tuyến (Nam) / Tử cung & Phần phụ (Nữ)",
-        moTa: "Mặt cắt trên xương mu: Đánh giá thể tích tuyến tiền liệt ($V = 0.52 \times D \times R \times C$, bình thường < 20-25g; nhân phì đại, nốt vôi hóa, u xơ); Tử cung (kích thước, tư thế gập trước/ngửa sau, độ dày nội mạc tử cung theo chu kỳ, nhân xơ) và hai buồng trứng (nang buồng trứng, khối u)."
+        moTa: "Mặt cắt trên xương mu: Đánh giá thể tích tuyến tiền liệt (V = 0,52 × D × R × C [D: chiều dài, R: chiều rộng, C: chiều cao],  bình thường < 20-25g; nhân phì đại, nốt vôi hóa, u xơ); Tử cung (kích thước, tư thế gập trước/ngửa sau, độ dày nội mạc tử cung theo chu kỳ, nhân xơ) và hai buồng trứng (nang buồng trứng, khối u)."
       }
     ]
   },

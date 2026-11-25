@@ -1,4 +1,4 @@
-﻿/* ============================================================================
+/* ============================================================================
    ĐIỀU KHIỂN CHÍNH — SỔ TAY ĐIỆN TỬ CĐHA
    BỆNH VIỆN VĨNH PHÚC VPI — KHOA CHẨN ĐOÁN HÌNH ẢNH
    Phiên bản chuẩn hóa cấu trúc 4 phần & phân loại theo Nhóm Vùng Cơ Thể Hàng Ngang
@@ -114,7 +114,7 @@
 
   function esc(str) {
     if (!str) return "";
-    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   /* Phân loại kỹ thuật vào Nhóm Vùng Cơ Thể */
@@ -144,8 +144,11 @@
     return { id: "toan-than", name: "Toàn thân & Mạch máu", icon: "🌐" };
   }
 
-  /* Khởi tạo ứng dụng */
+  /* Khởi tạo ứng dụng — chỉ chạy SAU KHI đăng nhập thành công (do ui-core.js gọi VUDAT_APP.start) */
+  var appStarted = false;
   function initApp() {
+    if (appStarted) return refreshApp();
+    appStarted = true;
     renderNavPills();
     setupGlobalEvents();
     loadChecklistProgress();
@@ -153,8 +156,22 @@
     initSecurityAndPWA();
     trackVisitMetrics();
     initNavPillsAutoScroll();
-    updateInboxBadge();
     handleHashChange();
+  }
+
+  /* Vẽ lại sau khi đăng nhập lại / khi nội dung do Admin thay đổi */
+  function refreshApp() {
+    handleHashChange();
+  }
+
+  function refreshCurrent() {
+    if (appStarted) handleHashChange();
+  }
+
+  function totalContentCount() {
+    var n = 0;
+    ["xq", "ct", "mri", "us", "canthiep", "dlx", "cq", "emg"].forEach(function (m) { n += getItemsForModality(m).length; });
+    return n;
   }
 
   function applySavedTheme() {
@@ -322,14 +339,14 @@
           '<p>Cẩm nang chuẩn hóa kỹ thuật thực hành lâm sàng, bảng kiểm an toàn y tế và dược thư cản quang toàn diện</p>' +
         '</div>' +
         '<div class="home-hero-stats">' +
-          '<div class="stat-pill"><span class="dot"></span>Hệ thống: <b>210+ Quy trình chuẩn</b></div>' +
+          '<div class="stat-pill"><span class="dot"></span>Hệ thống: <b>' + totalContentCount() + ' nội dung chuẩn</b></div>' +
           '<div class="stat-pill" title="Số lần bạn đã mở Sổ tay trên thiết bị này (không phải tổng của mọi người dùng)"><span class="dot" style="background:#10b981;"></span>Lượt mở trên máy này: <b id="visitCounterHero">' + readVisitInt("vpi_device_total").toLocaleString("vi-VN") + '</b></div>' +
           '<div class="stat-pill" title="Số lần mở hôm nay trên thiết bị này"><span class="dot" style="background:#06b6d4;"></span>Hôm nay: <b id="visitCounterToday">' + readVisitInt("vpi_device_today").toLocaleString("vi-VN") + '</b></div>' +
           '<button class="stat-pill" onclick="window.VUDAT_APP.showFeedbackModal()" style="cursor:pointer;border-color:#059669;background:rgba(5,150,105,0.08);color:#059669;font-weight:700;">' +
             '💬 Góp ý Admin' +
           '</button>' +
           '<button class="stat-pill" onclick="window.VUDAT_APP.showSettingsModal()" style="cursor:pointer;border-color:var(--brand);background:var(--brand-wash);color:var(--brand-dark);">' +
-            '⚙️ Quản trị' +
+            '⚙️ Cài đặt' +
           '</button>' +
         '</div>' +
       '</div>';
@@ -746,6 +763,9 @@
     } else {
       renderStructuredProtocolDetail(item, mainPanel, rightPanel);
     }
+
+    // Thanh công cụ chỉnh sửa (chỉ hiện với Admin — do ui-admin.js xử lý)
+    if (window.VPI_UI && window.VPI_UI.onDetailRendered) window.VPI_UI.onDetailRendered(itemId, mainPanel);
 
     // Tự động chuyển tab chi tiết và cuộn mượt trên Mobile khi người dùng chọn bài
     if (window.innerWidth <= 768 && updateHash !== false) {
@@ -1175,7 +1195,7 @@
 
     // Render cột phải: Hình ảnh tư thế chụp & Sơ đồ giải phẫu
     if (rightPanel) {
-      renderImagesSidebar(item.hinhAnh, rightPanel, isXray ? "Hình ảnh Tư thế chụp & Phim chuẩn" : (isMRI ? "Định hướng Lát cắt & Giải phẫu" : "Hình ảnh minh họa kỹ thuật"));
+      renderImagesSidebar(item.hinhAnh, rightPanel, isXray ? "Hình ảnh Tư thế chụp & Phim chuẩn" : (isMRI ? "Định hướng Lát cắt & Giải phẫu" : "Hình ảnh minh họa kỹ thuật"), item);
     }
   }
 
@@ -1752,7 +1772,7 @@
   }
 
   /* Render Sidebar Hình ảnh với cơ chế Fallback */
-  function renderImagesSidebar(hinhAnhList, rightPanel, title) {
+  function renderImagesSidebar(hinhAnhList, rightPanel, title, item) {
     if (!rightPanel) return;
 
     var header = rightPanel.querySelector(".gallery-header");
@@ -1761,28 +1781,52 @@
     var body = rightPanel.querySelector(".gallery-body");
     if (!body) return;
 
+    var isAdmin = !!(window.VPI && window.VPI.isAdmin());
+    var safe = window.VPI_UI ? window.VPI_UI.safeImgUrl : function (u) { return u; };
+
     if (!hinhAnhList || hinhAnhList.length === 0) {
       body.innerHTML =
-        '<div style="text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;">' +
+        '<div class="no-img-box">' +
           '<div style="font-size:28px;margin-bottom:8px;">📷</div>' +
-          'Chưa có ảnh tư thế đính kèm cho kỹ thuật này.' +
+          'Chưa có ảnh tư thế / phim chuẩn cho kỹ thuật này.' +
+          (isAdmin ? '<br><b>Admin: dùng nút 📷 Chụp ảnh / 🖼️ Tải ảnh lên ở trên để bổ sung.</b>' : '') +
         '</div>';
-      return;
+    } else {
+      // Hỗ trợ cả 2 kiểu dữ liệu: {src, caption} (dữ liệu hiện có) và {url, chuThich}
+      var html = '<div class="gallery-grid">';
+      hinhAnhList.forEach(function (img, idx) {
+        var src = safe(img.src || img.url || "");
+        var cap = img.caption || img.chuThich || ("Hình ảnh " + (idx + 1));
+        html +=
+          '<div class="gallery-card" data-idx="' + idx + '" data-src="' + esc(src) + '" data-cap="' + esc(cap) + '">' +
+            (src
+              ? '<img src="' + esc(src) + '" alt="' + esc(cap) + '" loading="lazy">'
+              : '<div class="no-img-box">Ảnh chưa có</div>') +
+            '<div class="cap">' + esc(cap) + '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+      body.innerHTML = html;
+
+      // Ảnh lỗi/không tồn tại → hiện khung báo thay vì ô trống
+      body.querySelectorAll(".gallery-card img").forEach(function (im) {
+        im.addEventListener("error", function () {
+          var ph = document.createElement("div");
+          ph.className = "no-img-box";
+          ph.textContent = "Ảnh chưa được tải lên";
+          if (im.parentNode) im.parentNode.replaceChild(ph, im);
+        });
+      });
+      // Phóng to ảnh — dùng data-attribute thay cho onclick nội tuyến (chống chèn mã)
+      body.querySelectorAll(".gallery-card").forEach(function (card) {
+        card.addEventListener("click", function () {
+          if (!card.getAttribute("data-src") || !card.querySelector("img")) return;
+          showLightbox(card.getAttribute("data-src"), card.getAttribute("data-cap"));
+        });
+      });
     }
 
-    var html = '<div class="gallery-grid">';
-    hinhAnhList.forEach(function (img, idx) {
-      var src = img.url || "";
-      var cap = img.chuThich || ("Hình ảnh " + (idx + 1));
-      html +=
-        '<div class="gallery-card" onclick="window.VUDAT_APP.showLightbox(\'' + esc(src) + '\', \'' + esc(cap) + '\')">' +
-          '<img src="' + esc(src) + '" alt="' + esc(cap) + '" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';">' +
-          '<div class="cap">' + esc(cap) + '</div>' +
-        '</div>';
-    });
-    html += '</div>';
-
-    body.innerHTML = html;
+    if (window.VPI_UI && window.VPI_UI.onGalleryRendered) window.VPI_UI.onGalleryRendered(item, rightPanel);
   }
 
   /* Khung ghi nhận đã học & chuyển bài nhanh (YÊU CẦU #3: KHÔNG KHÓA BÀI HỌC) */
@@ -1814,64 +1858,17 @@
   /* =========================================================================
      4. MODAL DIALOGS, CÀI ĐẶT & GÁN SỰ KIỆN TOÀN CỤC (YÊU CẦU #8)
      ========================================================================= */
-  var adminAuth = {
-    isAuthenticated: false
-  };
-
-  function showAdminAuthModal() {
-    var overlay = document.getElementById("adminAuthModalOverlay");
-    var inp = document.getElementById("adminPassInput");
-    var err = document.getElementById("adminAuthErrorMsg");
-    if (inp) inp.value = "";
-    if (err) err.textContent = "";
-    if (overlay) overlay.style.display = "flex";
-    if (inp) setTimeout(function () { inp.focus(); }, 150);
-  }
-
-  function hideAdminAuthModal() {
-    var overlay = document.getElementById("adminAuthModalOverlay");
-    if (overlay) overlay.style.display = "none";
-  }
-
-  function verifyAdminAccess() {
-    var inp = document.getElementById("adminPassInput");
-    var err = document.getElementById("adminAuthErrorMsg");
-    var box = document.getElementById("adminAuthBox");
-    if (!inp) return;
-    var pass = (inp.value || "").trim();
-
-    var validPin = (typeof secState !== "undefined" && secState.pinCode) ? secState.pinCode : "1234";
-    if (pass === validPin) {
-      adminAuth.isAuthenticated = true;
-      hideAdminAuthModal();
-      showToast("👑 Xác thực quyền Quản trị viên (Admin) thành công!", "ok");
-      var overlay = document.getElementById("settingsModalOverlay");
-      if (overlay) overlay.style.display = "flex";
-      switchSettingsTab("view");
-    } else {
-      if (box) {
-        box.classList.add("shake");
-        setTimeout(function () { box.classList.remove("shake"); }, 400);
-      }
-      if (err) err.textContent = "Mã PIN Quản trị không chính xác!";
-      inp.value = "";
-      inp.focus();
-    }
-  }
-
-  function lockAdminSession() {
-    adminAuth.isAuthenticated = false;
-    hideSettingsModal();
-    showToast("🔒 Đã khóa phiên Quản trị viên (Admin).", "ok");
-  }
-
+  /* Quyền Admin do MÁY CHỦ xác định theo tài khoản đăng nhập (xem cloud.js / schema.sql).
+     Cài đặt cá nhân (giao diện, khóa PIN thiết bị, ngoại tuyến) mở cho mọi tài khoản;
+     chỉnh sửa nội dung & quản lý tài khoản nằm ở bảng "Quản trị" chỉ Admin thấy. */
   function showSettingsModal() {
-    if (!adminAuth.isAuthenticated) {
-      showAdminAuthModal();
-      return;
-    }
     var overlay = document.getElementById("settingsModalOverlay");
     if (overlay) overlay.style.display = "flex";
+    var p = window.VPI && window.VPI.profile();
+    var banner = document.getElementById("settingsRoleBanner");
+    if (banner && p) {
+      banner.textContent = (p.role === "admin" ? "👑 Quản trị viên: " : "👤 Nhân viên: ") + p.full_name;
+    }
     switchSettingsTab("view");
   }
 
@@ -1881,16 +1878,13 @@
   }
 
   function switchSettingsTab(tab) {
-    var tabs = ["view", "sec", "data", "hosp", "inbox"];
+    var tabs = ["view", "sec", "data", "hosp"];
     tabs.forEach(function (t) {
       var btn = document.getElementById("setTab_" + t);
       var pane = document.getElementById("setPane_" + t);
       if (btn) btn.classList.toggle("active", t === tab);
       if (pane) pane.style.display = (t === tab) ? "block" : "none";
     });
-    if (tab === "inbox") {
-      renderAdminInbox();
-    }
   }
 
   function changeTheme(mode) {
@@ -1915,6 +1909,7 @@
       checklists: localStorage.getItem("vudat_cdha_checklists") || "{}",
       theme: localStorage.getItem("vudat_cdha_theme") || "light"
     };
+    data.contact = { developer: "Vũ Đạt", hospital: "Bệnh viện Vĩnh Phúc VPI" };
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
@@ -1946,9 +1941,15 @@
   }
 
   function resetDefaultData() {
-    if (confirm("Bạn có chắc chắn muốn đặt lại dữ liệu về mặc định ban đầu của Bệnh viện Vĩnh Phúc VPI?")) {
-      localStorage.clear();
-      showToast("Đang tải lại dữ liệu mặc định...", "ok");
+    if (confirm("Xóa tiến độ học, bảng kiểm đã tick và cài đặt giao diện CỦA MÁY NÀY? (Tài khoản và nội dung dùng chung trên máy chủ không bị ảnh hưởng.)")) {
+      try {
+        Object.keys(localStorage).forEach(function (k) {
+          if (k.indexOf("vudat_cdha_") === 0 || k === "vpi_device_total" || k === "vpi_device_today" || k === "vpi_device_last_date") {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch (e) {}
+      showToast("Đang tải lại...", "ok");
       setTimeout(function () { location.reload(); }, 600);
     }
   }
@@ -2116,201 +2117,16 @@
   /* =========================================================================
      NHẮN TIN, GÓP Ý KIẾN CHO ADMIN (YÊU CẦU #4)
      ========================================================================= */
+  /* Góp ý gửi lên MÁY CHỦ (bảng feedback) — giao diện nằm ở ui-core.js */
   function showFeedbackModal(protocolName) {
-    var overlay = document.getElementById("feedbackModalOverlay");
-    var ctxInput = document.getElementById("fbProtocolContext");
-    if (ctxInput) {
-      if (protocolName) {
-        ctxInput.value = protocolName;
-      } else if (appState.currentProtocolId) {
-        var item = findItemById(appState.currentProtocolId);
-        if (item) ctxInput.value = item.ten + " (" + (item.modality || "") + ")";
-      }
+    var ctx = protocolName;
+    if (!ctx && appState.currentProtocolId) {
+      var item = findItemById(appState.currentProtocolId);
+      if (item) ctx = item.ten + (item.modality ? " (" + item.modality + ")" : "");
     }
-    if (overlay) overlay.style.display = "flex";
+    if (window.VPI_UI) window.VPI_UI.showFeedback(ctx || "");
   }
-
-  function hideFeedbackModal() {
-    var overlay = document.getElementById("feedbackModalOverlay");
-    if (overlay) overlay.style.display = "none";
-  }
-
-  function submitFeedback(e) {
-    if (e && e.preventDefault) e.preventDefault();
-
-    var nameInput = document.getElementById("fbSenderName");
-    var phoneInput = document.getElementById("fbSenderPhone");
-    var catSelect = document.getElementById("fbCategory");
-    var ctxInput = document.getElementById("fbProtocolContext");
-    var msgTextarea = document.getElementById("fbMessageContent");
-
-    var name = (nameInput ? nameInput.value : "").trim();
-    var phone = (phoneInput ? phoneInput.value : "").trim();
-    var category = catSelect ? catSelect.value : "Góp ý chung";
-    var protocol = (ctxInput ? ctxInput.value : "").trim();
-    var message = (msgTextarea ? msgTextarea.value : "").trim();
-
-    if (!name || !message) {
-      showToast("Vui lòng nhập họ tên và nội dung góp ý!", "err");
-      return;
-    }
-
-    var newItem = {
-      id: "fb_" + Date.now(),
-      senderName: name,
-      senderPhone: phone || "Chưa cung cấp",
-      category: category,
-      protocol: protocol || "Toàn hệ thống",
-      message: message,
-      timestamp: new Date().toLocaleString("vi-VN"),
-      isResolved: false
-    };
-
-    var list = [];
-    try {
-      list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
-    } catch (err) {}
-    list.unshift(newItem);
-    try {
-      localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
-    } catch (err) {}
-
-    // Ứng dụng chưa có máy chủ nhận góp ý: localStorage chỉ lưu trên máy người gửi.
-    // Mở ứng dụng email với nội dung soạn sẵn để góp ý thực sự đến được Admin.
-    var subject = "[SỔ CĐHA] " + category + (protocol ? " — " + protocol : "");
-    var body = "Người gửi: " + name + "\nSĐT/Zalo: " + (phone || "Chưa cung cấp") +
-      "\nLoại góp ý: " + category + "\nQuy trình liên quan: " + (protocol || "Toàn hệ thống") +
-      "\n\nNội dung:\n" + message + "\n\n(Gửi từ Sổ CĐHA lúc " + newItem.timestamp + ")";
-    window.location.href = "mailto:vudatxq@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-
-    showToast("📧 Đã mở ứng dụng Email với nội dung soạn sẵn — bấm Gửi để chuyển tới Admin. (Hoặc dùng nút Gửi qua Zalo)", "ok");
-
-    if (nameInput) nameInput.value = "";
-    if (phoneInput) phoneInput.value = "";
-    if (msgTextarea) msgTextarea.value = "";
-
-    hideFeedbackModal();
-    updateInboxBadge();
-  }
-
-  function sendFeedbackViaZalo() {
-    var name = (document.getElementById("fbSenderName") || {}).value || "Đồng nghiệp";
-    var cat = (document.getElementById("fbCategory") || {}).value || "Góp ý";
-    var ctx = (document.getElementById("fbProtocolContext") || {}).value || "";
-    var msg = (document.getElementById("fbMessageContent") || {}).value || "";
-
-    var text = "Xin chào Admin Vũ Đạt (CĐHA Bệnh viện Vĩnh Phúc VPI),\n" +
-      "Tôi là: " + name + "\n" +
-      "Nội dung góp ý [" + cat + "]: " + msg + (ctx ? " (Liên quan: " + ctx + ")" : "");
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text);
-      showToast("Đã sao chép nội dung tin nhắn! Đang mở Zalo kết nối với Admin...", "ok");
-    }
-    window.open("https://zalo.me/0916306115", "_blank");
-  }
-
-  function updateInboxBadge() {
-    var count = 0;
-    try {
-      var list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
-      count = list.filter(function (x) { return !x.isResolved; }).length;
-    } catch (e) {}
-
-    var badge = document.getElementById("inboxTabCount");
-    if (badge) badge.textContent = count;
-  }
-
-  function renderAdminInbox() {
-    var container = document.getElementById("adminInboxListContainer");
-    if (!container) return;
-
-    var list = [];
-    try {
-      list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
-    } catch (e) {}
-
-    updateInboxBadge();
-
-    if (!list || list.length === 0) {
-      container.innerHTML =
-        '<div style="text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;">' +
-          '<div style="font-size:32px;margin-bottom:8px;">📬</div>' +
-          'Hiện tại chưa có tin nhắn hoặc ý kiến góp ý nào được gửi.' +
-        '</div>';
-      return;
-    }
-
-    var html = "";
-    list.forEach(function (fb) {
-      var statusClass = fb.isResolved ? "resolved" : "unread";
-      var statusTag = fb.isResolved ?
-        '<span style="font-size:11px;color:var(--text-muted);font-weight:700;">✓ Đã xử lý</span>' :
-        '<span style="font-size:11px;color:#059669;font-weight:700;">🟢 Mới nhận</span>';
-
-      html +=
-        '<div class="inbox-item-card ' + statusClass + '">' +
-          '<div class="inbox-item-head">' +
-            '<div>' +
-              '<span class="inbox-sender-name">' + esc(fb.senderName) + '</span>' +
-              (fb.senderPhone && fb.senderPhone !== "Chưa cung cấp" ? ' <span style="font-size:12px;color:var(--text-soft);">(' + esc(fb.senderPhone) + ')</span>' : '') +
-            '</div>' +
-            '<div style="display:flex;align-items:center;gap:6px;">' +
-              '<span class="inbox-cat-badge">' + esc(fb.category) + '</span>' +
-              statusTag +
-            '</div>' +
-          '</div>' +
-          (fb.protocol ? '<div style="font-size:12px;color:var(--brand);margin-bottom:4px;">🎯 <b>Quy trình:</b> ' + esc(fb.protocol) + '</div>' : '') +
-          '<div class="inbox-message-text">' + esc(fb.message) + '</div>' +
-          '<div class="inbox-meta-bar">' +
-            '<span class="inbox-time">🕒 ' + esc(fb.timestamp) + '</span>' +
-            '<div style="display:flex;gap:6px;">' +
-              '<button class="btn-action-pill" onclick="window.VUDAT_APP.toggleFeedbackStatus(\'' + fb.id + '\')" style="padding:4px 8px;font-size:11px;">' +
-                (fb.isResolved ? 'Đánh dấu chưa xử lý' : '✓ Xong') +
-              '</button>' +
-              '<button class="btn-action-pill" onclick="window.VUDAT_APP.deleteFeedbackItem(\'' + fb.id + '\')" style="padding:4px 8px;font-size:11px;color:var(--danger);border-color:var(--danger);">' +
-                'Xóa' +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-    });
-
-    container.innerHTML = html;
-  }
-
-  function toggleFeedbackStatus(id) {
-    try {
-      var list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
-      list.forEach(function (x) {
-        if (x.id === id) x.isResolved = !x.isResolved;
-      });
-      localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
-      renderAdminInbox();
-    } catch (e) {}
-  }
-
-  function deleteFeedbackItem(id) {
-    if (confirm("Bạn có chắc chắn muốn xóa góp ý này?")) {
-      try {
-        var list = JSON.parse(localStorage.getItem("vpi_feedback_list") || "[]");
-        list = list.filter(function (x) { return x.id !== id; });
-        localStorage.setItem("vpi_feedback_list", JSON.stringify(list));
-        renderAdminInbox();
-        showToast("Đã xóa góp ý thành công.", "ok");
-      } catch (e) {}
-    }
-  }
-
-  function clearAllFeedback() {
-    if (confirm("Bạn có chắc chắn muốn xóa toàn bộ hòm thư góp ý của Admin?")) {
-      try {
-        localStorage.removeItem("vpi_feedback_list");
-        renderAdminInbox();
-        showToast("Đã làm sạch toàn bộ hòm thư góp ý.", "ok");
-      } catch (e) {}
-    }
-  }
+  function hideFeedbackModal() {}
 
   /* =========================================================================
      5. PWA ENGINE, XEM NGOẠI VIỆN & BẢO MẬT MÃ PIN (YÊU CẦU MỚI)
@@ -2318,7 +2134,10 @@
   var pwaDeferredPrompt = null;
   var secState = {
     pinEnabled: false,
-    pinCode: "1234",
+    pinHash: "",      // SHA-256(muối + PIN) — KHÔNG lưu PIN dạng rõ, KHÔNG có PIN mặc định
+    pinSalt: "",
+    pinFails: 0,
+    pinWant: false,
     pinScope: "sensitive",
     autoLockMinutes: 15,
     isUnlocked: false,
@@ -2329,8 +2148,16 @@
 
   function initSecurityAndPWA() {
     try {
-      secState.pinEnabled = localStorage.getItem("vpi_cdha_pin_enabled") === "true";
-      secState.pinCode = localStorage.getItem("vpi_cdha_pin_code") || "1234";
+      secState.pinHash = localStorage.getItem("vpi_cdha_pin_hash") || "";
+      secState.pinSalt = localStorage.getItem("vpi_cdha_pin_salt") || "";
+      secState.pinEnabled = localStorage.getItem("vpi_cdha_pin_enabled") === "true" && !!secState.pinHash;
+      // Di chuyển PIN dạng rõ của phiên bản cũ (nếu có) sang dạng băm rồi xóa bản rõ
+      var legacyPin = localStorage.getItem("vpi_cdha_pin_code");
+      if (legacyPin) {
+        localStorage.removeItem("vpi_cdha_pin_code");
+        if (/^\d{4}$/.test(legacyPin) && legacyPin !== "1234") { savePinHash(legacyPin); }
+        else { localStorage.setItem("vpi_cdha_pin_enabled", "false"); secState.pinEnabled = false; }
+      }
       secState.pinScope = localStorage.getItem("vpi_cdha_pin_scope") || "sensitive";
       var al = localStorage.getItem("vpi_cdha_pin_autolock");
       secState.autoLockMinutes = al ? parseInt(al, 10) : 15;
@@ -2679,11 +2506,38 @@
     updatePinDots();
   }
 
+  /* --- Băm mã PIN (Web Crypto). PIN chỉ là khóa tiện lợi của thiết bị; bảo mật chính là tài khoản. --- */
+  function bytesToHex(buf) {
+    return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+  }
+  function hashPin(pin, salt) {
+    if (!window.crypto || !crypto.subtle) return Promise.reject(new Error("no-crypto"));
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(salt + ":" + pin)).then(bytesToHex);
+  }
+  function savePinHash(pin) {
+    var s = new Uint8Array(16);
+    crypto.getRandomValues(s);
+    var salt = bytesToHex(s);
+    return hashPin(pin, salt).then(function (h) {
+      secState.pinSalt = salt; secState.pinHash = h;
+      localStorage.setItem("vpi_cdha_pin_salt", salt);
+      localStorage.setItem("vpi_cdha_pin_hash", h);
+    });
+  }
+
   function verifyEnteredPin() {
+    var digits = secState.enteredDigits;
+    hashPin(digits, secState.pinSalt).then(function (h) {
+      finishVerifyPin(h === secState.pinHash);
+    }, function () { finishVerifyPin(false); });
+  }
+
+  function finishVerifyPin(ok) {
     var errorEl = document.getElementById("pinMsgError");
     var card = document.getElementById("pinCardBox");
 
-    if (secState.enteredDigits === secState.pinCode) {
+    if (ok) {
+      secState.pinFails = 0;
       secState.isUnlocked = true;
       secState.lastActivity = Date.now();
       hidePinLockOverlay();
@@ -2699,7 +2553,16 @@
         card.classList.add("shake");
         setTimeout(function () { card.classList.remove("shake"); }, 400);
       }
-      if (errorEl) errorEl.textContent = "Mã PIN không chính xác. Thử lại!";
+      secState.pinFails++;
+      if (secState.pinFails >= 5) {
+        // Chống dò PIN 4 số: sai 5 lần → đăng xuất tài khoản, phải nhập lại mật khẩu
+        secState.pinFails = 0;
+        hidePinLockOverlay();
+        secState.isUnlocked = true;
+        if (window.VPI) window.VPI.signOut();
+        return;
+      }
+      if (errorEl) errorEl.textContent = "Mã PIN không chính xác (" + secState.pinFails + "/5). Thử lại!";
       setTimeout(function () {
         secState.enteredDigits = "";
         updatePinDots();
@@ -2708,17 +2571,35 @@
   }
 
   function lockAppNow() {
+    if (!secState.pinHash) {
+      showToast("Chưa đặt mã PIN. Vào Cài đặt → Bảo mật để đặt PIN 4 số trước khi dùng khóa nhanh.", "warn");
+      return;
+    }
     secState.isUnlocked = false;
     showPinLockOverlay("Nhập mã PIN để mở khóa sổ tay");
   }
 
-  function togglePinLock(enabled) {
-    secState.pinEnabled = enabled;
-    localStorage.setItem("vpi_cdha_pin_enabled", enabled ? "true" : "false");
+  function setPinUi(enabled) {
     var sliderEl = document.getElementById("cfgPinToggleSlider");
     var boxEl = document.getElementById("cfgPinDetailsBox");
+    var tg = document.getElementById("cfgPinEnableToggle");
+    if (tg) tg.checked = enabled;
     if (sliderEl) sliderEl.style.backgroundColor = enabled ? "var(--brand)" : "#cbd5e1";
     if (boxEl) boxEl.style.display = enabled ? "block" : "none";
+  }
+
+  function togglePinLock(enabled) {
+    if (enabled && !secState.pinHash) {
+      // Chưa có PIN: bắt buộc tự đặt PIN riêng trước (không có PIN mặc định)
+      secState.pinWant = true;
+      setPinUi(true);
+      showToast("Hãy nhập mã PIN 4 số của bạn rồi bấm \"Lưu PIN\" để bật khóa.", "warn");
+      return;
+    }
+    secState.pinWant = false;
+    secState.pinEnabled = enabled;
+    localStorage.setItem("vpi_cdha_pin_enabled", enabled ? "true" : "false");
+    setPinUi(enabled);
     showToast(enabled ? "Đã BẬT khóa bảo mật mã PIN." : "Đã TẮT khóa bảo mật mã PIN.", "ok");
   }
 
@@ -2742,10 +2623,21 @@
       showToast("Mã PIN phải bao gồm đúng 4 chữ số (0-9)!", "err");
       return;
     }
-    secState.pinCode = v;
-    localStorage.setItem("vpi_cdha_pin_code", v);
-    inp.value = "";
-    showToast("🎉 Đã đổi mã PIN bảo vệ mới thành công!", "ok");
+    if (/^(\d)\1{3}$/.test(v) || v === "1234" || v === "0123" || v === "4321") {
+      showToast("PIN quá dễ đoán (1234, 1111...). Hãy chọn số khác.", "err");
+      return;
+    }
+    savePinHash(v).then(function () {
+      inp.value = "";
+      if (secState.pinWant || secState.pinEnabled) {
+        secState.pinEnabled = true; secState.pinWant = false;
+        localStorage.setItem("vpi_cdha_pin_enabled", "true");
+        setPinUi(true);
+      }
+      showToast("🎉 Đã lưu mã PIN mới thành công!", "ok");
+    }, function () {
+      showToast("Trình duyệt không hỗ trợ mã hóa — không thể đặt PIN.", "err");
+    });
   }
 
   function promptInstallApp() {
@@ -2936,11 +2828,6 @@
     // Nhắn tin, góp ý Admin & Thống kê lượt truy cập
     showFeedbackModal: showFeedbackModal,
     hideFeedbackModal: hideFeedbackModal,
-    submitFeedback: submitFeedback,
-    sendFeedbackViaZalo: sendFeedbackViaZalo,
-    clearAllFeedback: clearAllFeedback,
-    toggleFeedbackStatus: toggleFeedbackStatus,
-    deleteFeedbackItem: deleteFeedbackItem,
     trackVisitMetrics: trackVisitMetrics,
     updateVisitCounterDisplays: updateVisitCounterDisplays,
 
@@ -2954,16 +2841,10 @@
     changeAutoLock: changeAutoLock,
     updatePinCode: updatePinCode,
 
-    // Xác thực quyền Admin (Yêu cầu quyền Admin cho Cài đặt & Quản trị)
-    showAdminAuthModal: showAdminAuthModal,
-    hideAdminAuthModal: hideAdminAuthModal,
-    verifyAdminAccess: verifyAdminAccess,
-    lockAdminSession: lockAdminSession
+    // Vòng đời ứng dụng: chỉ khởi động sau khi đăng nhập (xem ui-core.js)
+    start: initApp,
+    refresh: refreshApp,
+    refreshCurrent: refreshCurrent,
+    showToast: showToast
   };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initApp);
-  } else {
-    initApp();
-  }
 })();
