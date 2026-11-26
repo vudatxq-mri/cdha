@@ -571,14 +571,23 @@
     }).catch(netFail);
   }
 
+  /* Admin cấp lại mật khẩu tạm (hàm trong cơ sở dữ liệu tự kiểm tra quyền Admin) */
+  function resetPassword(userId) {
+    return http("/rest/v1/rpc/cdha_admin_reset_password", { method: "POST", body: { target: userId } }).then(function (r) {
+      if (r.ok && typeof r.data === "string") return { ok: true, temp_password: r.data };
+      if (r.status === 404) return { ok: false, message: "Máy chủ chưa có chức năng này. Hãy chạy tools/update-quen-mat-khau.sql trong Supabase." };
+      return { ok: false, message: errMsg(r, "Không đặt lại được mật khẩu.") };
+    }).catch(netFail);
+  }
+
   function submitAccountRequest(d) {
     if (!configured()) return Promise.resolve({ ok: false, message: "Ứng dụng chưa được kết nối máy chủ." });
     return http("/rest/v1/account_requests", {
       method: "POST", anon: true, headers: { Prefer: "return=minimal" },
-      body: {
+      body: Object.assign({
         full_name: d.full_name, phone: d.phone || null, department: d.department || null,
         desired_username: d.desired_username || null, note: d.note || null
-      }
+      }, d.kind === "reset" ? { kind: "reset" } : {})
     }).then(function (r) { return r.ok ? { ok: true } : { ok: false, message: errMsg(r, "Không gửi được yêu cầu.") }; }).catch(netFail);
   }
 
@@ -644,7 +653,7 @@
     sendFeedback: sendFeedback, listFeedback: listFeedback, updateFeedback: updateFeedback, deleteFeedback: deleteFeedback,
     checkNotifications: checkNotifications, startPolling: startPolling, stopPolling: stopPolling,
     listUsers: listUsers, adminUpdateUser: adminUpdateUser, adminApi: adminApi,
-    submitAccountRequest: submitAccountRequest, listRequests: listRequests, updateRequest: updateRequest, deleteRequest: deleteRequest,
+    resetPassword: resetPassword, submitAccountRequest: submitAccountRequest, listRequests: listRequests, updateRequest: updateRequest, deleteRequest: deleteRequest,
     suggestUsername: suggestUsername
   };
 })();

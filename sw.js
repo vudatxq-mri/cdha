@@ -1,9 +1,9 @@
-﻿/* ============================================================================
+/* ============================================================================
    SERVICE WORKER — SỔ CĐHA — BỆNH VIỆN VĨNH PHÚC VPI
    Hỗ trợ cài đặt PWA App trên Điện thoại / Máy tính & Chế độ Xem Ngoại Viện Offline
    ============================================================================ */
 
-var CACHE_NAME = 'vpi-cdha-cache-v4.0';
+var CACHE_NAME = 'vpi-cdha-cache-v4.1';
 
 var PRECACHE_ASSETS = [
   './',

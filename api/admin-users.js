@@ -81,6 +81,7 @@ module.exports = async function handler(req, res) {
   const token = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
   if (!token) return json(res, 401, { error: "Chưa đăng nhập" });
   const me = await sb("/auth/v1/user", { bearer: token });
+  if (!me.ok && /api key/i.test(JSON.stringify(me.data))) return json(res, 500, { error: "Khóa SUPABASE_SERVICE_ROLE_KEY trên Vercel không hợp lệ" });
   if (!me.ok || !me.data || !me.data.id) return json(res, 401, { error: "Phiên đăng nhập không hợp lệ" });
   const caller = me.data.id;
   const prof = await sb("/rest/v1/profiles?select=id,role,status,full_name&id=eq." + encodeURIComponent(caller));
@@ -92,6 +93,14 @@ module.exports = async function handler(req, res) {
   const action = b.action;
 
   try {
+    // Dự án Supabase dùng chung với app khác: chỉ thao tác trên tài khoản có hồ sơ Sổ CĐHA
+    if (action !== "create") {
+      const tid = str(b.user_id, 64);
+      if (!tid) return json(res, 400, { error: "Thiếu user_id" });
+      const t = await sb("/rest/v1/profiles?select=id&id=eq." + encodeURIComponent(tid));
+      if (!t.ok || !t.data || !t.data[0]) return json(res, 404, { error: "Không tìm thấy tài khoản" });
+    }
+
     // ---------------------------------------------------------------- create
     if (action === "create") {
       const username = String(b.username || "").trim().toLowerCase();
@@ -126,19 +135,6 @@ module.exports = async function handler(req, res) {
         });
       }
       return json(res, 200, { ok: true, user_id: uid, username, temp_password: password });
-    }
-
-    // -------------------------------------------------------- reset_password
-    if (action === "reset_password") {
-      const uid = str(b.user_id, 64);
-      if (!uid) return json(res, 400, { error: "Thiếu user_id" });
-      const password = tempPassword();
-      const r = await sb("/auth/v1/admin/users/" + encodeURIComponent(uid), { method: "PUT", body: { password } });
-      if (!r.ok) return json(res, 500, { error: "Không đặt lại được mật khẩu" });
-      await sb("/rest/v1/profiles?id=eq." + encodeURIComponent(uid), {
-        method: "PATCH", headers: { Prefer: "return=minimal" }, body: { must_change_password: true }
-      });
-      return json(res, 200, { ok: true, temp_password: password });
     }
 
     // ------------------------------------------------------------ set_status

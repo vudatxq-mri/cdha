@@ -208,3 +208,5 @@ details.ed-card > .ed-card-body { padding: 4px 12px 6px; border-top: 1px solid v
 .ed-card-ctl { display: flex; gap: 3px; }
 .ed-add { margin: 2px 0 12px; }
 .ed-sticky { position: sticky; bottom: -18px; background: var(--surface); padding: 10px 0 2px; border-top: 1px solid var(--line); margin-top: 10px; }
+
+.auth-link { background: none; border: 0; padding: 6px; margin-top: 4px; color: var(--brand-dark); font: inherit; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; align-self: center; }

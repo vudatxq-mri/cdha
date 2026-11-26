@@ -124,6 +124,17 @@
             '<button type="button" class="pw-toggle" data-pw aria-label="Hiện/ẩn mật khẩu">👁</button></div></div>' +
           '<div class="auth-err" id="vpiLoginErr" role="alert"></div>' +
           '<button class="btn-primary" type="submit">Đăng nhập</button>' +
+          '<button type="button" class="auth-link" data-go="forgot">Quên mật khẩu?</button>' +
+        "</form>" +
+        '<form class="auth-form" data-pane="forgot" style="display:none" autocomplete="off">' +
+          '<p class="auth-hint">Gửi yêu cầu để Admin <b>cấp lại mật khẩu tạm</b>. Admin sẽ xác minh và gửi mật khẩu trực tiếp cho bạn.</p>' +
+          '<div class="fld"><label>Tên đăng nhập *</label><input name="username" type="text" maxlength="32" autocapitalize="none" spellcheck="false" required placeholder="VD: hanh.nd"></div>' +
+          '<div class="fld"><label>Họ và tên *</label><input name="full_name" type="text" minlength="2" maxlength="100" required></div>' +
+          '<div class="fld"><label>Số điện thoại / Zalo</label><input name="phone" type="tel" maxlength="30"></div>' +
+          '<div class="auth-err" id="vpiForgotErr" role="alert"></div>' +
+          '<button class="btn-primary" type="submit">Gửi yêu cầu cấp lại mật khẩu</button>' +
+          '<button type="button" class="auth-link" data-go="login">← Quay lại đăng nhập</button>' +
+          '<p class="auth-hint">Admin quên mật khẩu: nhờ một Admin khác cấp lại, hoặc người quản trị hệ thống khôi phục trong Supabase.</p>' +
         "</form>" +
         '<form class="auth-form" data-pane="request" style="display:none" autocomplete="off">' +
           '<div class="fld"><label>Họ và tên *</label><input name="full_name" type="text" maxlength="100" required placeholder="VD: Nguyễn Văn A"></div>' +
@@ -134,18 +145,45 @@
           '<button class="btn-primary" type="submit">Gửi yêu cầu cấp tài khoản</button>' +
           '<p class="auth-hint">Yêu cầu <b>không chứa mật khẩu</b>. Admin sẽ duyệt, tạo tài khoản và gửi mật khẩu tạm cho bạn trực tiếp; bạn phải đổi mật khẩu ngay lần đăng nhập đầu tiên.</p>' +
         "</form>" +
-        '<p class="auth-hint" data-pane-hint="login">Quên mật khẩu hoặc chưa có tài khoản? Liên hệ Admin khoa để được cấp lại.</p>' +
+        '<p class="auth-hint" data-pane-hint="login">Chưa có tài khoản? Chọn "Nhân viên mới" hoặc liên hệ Admin khoa.</p>' +
         '<div class="auth-dev">Phát triển bởi: <b>' + esc(C.DEVELOPER || "Vũ Đạt") + "</b>, " + esc(C.HOSPITAL || "Bệnh viện Vĩnh Phúc VPI") + "</div>" +
       "</div>";
     document.body.appendChild(authEl);
 
     var tabs = authEl.querySelectorAll(".auth-tabs button");
+    function showPane(name) {
+      var active = name === "request" ? "request" : "login";   // "forgot" thuộc nhóm đăng nhập
+      tabs.forEach(function (x) { x.classList.toggle("active", x.getAttribute("data-tab") === active); });
+      authEl.querySelectorAll("[data-pane]").forEach(function (p) { p.style.display = p.getAttribute("data-pane") === name ? "" : "none"; });
+      var hint = authEl.querySelector("[data-pane-hint]");
+      if (hint) hint.style.display = name === "login" ? "" : "none";
+    }
     tabs.forEach(function (b) {
+      b.addEventListener("click", function () { showPane(b.getAttribute("data-tab")); });
+    });
+    authEl.querySelectorAll("[data-go]").forEach(function (b) {
       b.addEventListener("click", function () {
-        tabs.forEach(function (x) { x.classList.toggle("active", x === b); });
-        authEl.querySelectorAll("[data-pane]").forEach(function (p) { p.style.display = p.getAttribute("data-pane") === b.getAttribute("data-tab") ? "" : "none"; });
-        var hint = authEl.querySelector("[data-pane-hint]");
-        if (hint) hint.style.display = b.getAttribute("data-tab") === "login" ? "" : "none";
+        var to = b.getAttribute("data-go");
+        showPane(to);
+        document.getElementById("vpiForgotErr").textContent = "";
+        if (to === "forgot") authEl.querySelector('[data-pane="forgot"] [name=username]').value = document.getElementById("vpiLoginUser").value.trim();
+      });
+    });
+
+    authEl.querySelector('[data-pane="forgot"]').addEventListener("submit", function (e) {
+      e.preventDefault();
+      var f = e.currentTarget, btn = f.querySelector("button[type=submit]"), err = document.getElementById("vpiForgotErr");
+      err.className = "auth-err"; err.textContent = "";
+      var uname = val(f, "[name=username]").toLowerCase().split("@")[0];
+      setBusy(btn, true, "Đang gửi...");
+      V.submitAccountRequest({
+        kind: "reset", desired_username: uname, full_name: val(f, "[name=full_name]"), phone: val(f, "[name=phone]")
+      }).then(function (r) {
+        setBusy(btn, false);
+        if (!r.ok) { err.textContent = r.message; return; }
+        f.reset();
+        err.className = "auth-err auth-ok";
+        err.textContent = "✓ Đã gửi yêu cầu. Admin sẽ liên hệ để cấp mật khẩu tạm.";
       });
     });
 

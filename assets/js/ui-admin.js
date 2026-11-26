@@ -87,8 +87,8 @@
             "<small>@" + esc(u.username) + [u.title, u.department, u.phone].filter(Boolean).map(function (x) { return " · " + esc(x); }).join("") + "</small></div>" +
             '<div class="acts">' +
               '<button type="button" class="vpi-btn sm" data-a="edit">✏️ Sửa</button>' +
-              '<button type="button" class="vpi-btn sm" data-a="reset">🔑 Đặt lại MK</button>' +
               (self ? "" :
+                '<button type="button" class="vpi-btn sm" data-a="reset">🔑 Cấp lại MK</button>' +
                 '<button type="button" class="vpi-btn sm" data-a="status">' + (u.status === "active" ? "🔒 Khóa" : "🔓 Mở khóa") + "</button>" +
                 '<button type="button" class="vpi-btn sm" data-a="role">' + (u.role === "admin" ? "↓ Hạ xuống Nhân viên" : "👑 Cấp quyền Admin") + "</button>" +
                 '<button type="button" class="vpi-btn sm danger" data-a="del">🗑 Xóa</button>') +
@@ -105,14 +105,7 @@
         if (!u) return;
         if (a === "edit") return editUserDialog(u);
         if (a === "reset") {
-          if (!confirm("Đặt lại mật khẩu cho " + u.full_name + "?\nMật khẩu cũ sẽ không còn dùng được; nhân viên phải đổi mật khẩu ở lần đăng nhập tới.")) return;
-          setBusy(b, true, "...");
-          V.adminApi({ action: "reset_password", user_id: u.id }).then(function (r) {
-            setBusy(b, false);
-            if (!r.ok) return toast(r.message, "err");
-            credDialog([{ name: u.full_name, username: u.username, password: r.temp_password }], "Đã đặt lại mật khẩu");
-            renderTab();
-          });
+          reissuePassword(u, b);
         } else if (a === "status") {
           var to = u.status === "active" ? "disabled" : "active";
           if (to === "disabled" && !confirm("Khóa tài khoản " + u.full_name + "? Người này sẽ không đăng nhập được nữa.")) return;
@@ -207,6 +200,19 @@
     ov.querySelector("[data-csv]").addEventListener("click", function () { dlFile("tai-khoan-moi.csv", toCsv(rows)); });
   }
 
+  function reissuePassword(u, btn, requestId) {
+    var ask = "Cấp lại mật khẩu cho " + u.full_name + " (@" + u.username + ")?\nMật khẩu cũ sẽ không còn dùng được; người này phải đổi mật khẩu ở lần đăng nhập tới." +
+      (requestId ? "\n\nHãy XÁC MINH đúng người đã gửi yêu cầu (gặp trực tiếp hoặc gọi số đã biết)." : "");
+    if (!confirm(ask)) return;
+    setBusy(btn, true, "...");
+    V.resetPassword(u.id).then(function (r) {
+      setBusy(btn, false);
+      if (!r.ok) return toast(r.message, "err");
+      credDialog([{ name: u.full_name, username: u.username, password: r.temp_password }], "Đã cấp lại mật khẩu");
+      if (requestId) V.updateRequest(requestId, "approved").then(renderTab); else renderTab();
+    });
+  }
+
   function toCsv(rows) {
     function q(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
     return ["Họ tên,Tên đăng nhập,Mật khẩu tạm"].concat(rows.map(function (r) { return [q(r.name), q(r.username), q(r.password)].join(","); })).join("\r\n");
@@ -256,22 +262,32 @@
 
   /* ------------------------------------------------------------------ YÊU CẦU -- */
   function renderRequests(body) {
-    V.listRequests().then(function (list) {
-      if (!list.length) { body.innerHTML = '<div class="vpi-note">Chưa có yêu cầu cấp tài khoản nào.</div>'; return; }
+    Promise.all([V.listRequests(), V.listUsers()]).then(function (res) {
+      var list = res[0], users = res[1], me = V.profile();
+      if (!list.length) { body.innerHTML = '<div class="vpi-note">Chưa có yêu cầu nào.</div>'; return; }
       var ST = { pending: "Chờ duyệt", approved: "Đã duyệt", rejected: "Đã từ chối" };
+      function account(r) { return users.filter(function (u) { return u.username === r.desired_username; })[0]; }
       body.innerHTML = '<div class="vpi-list">' + list.map(function (r) {
-        return '<div class="vpi-item ' + (r.status === "pending" ? "new" : "off") + '" data-id="' + esc(r.id) + '">' +
-          '<div class="main"><b>' + esc(r.full_name) + ' <span class="role-badge">' + ST[r.status] + "</span></b>" +
-          "<small>" + [r.department, r.phone, r.note].filter(Boolean).map(esc).join(" · ") + " · " + esc(U.fmtDate(r.created_at)) + "</small></div>" +
-          '<div class="acts">' + (r.status === "pending" ?
-            '<button type="button" class="vpi-btn sm primary" data-a="ok">✓ Duyệt & tạo tài khoản</button><button type="button" class="vpi-btn sm" data-a="no">Từ chối</button>' : "") +
-          '<button type="button" class="vpi-btn sm danger" data-a="del">Xóa</button></div></div>';
+        var reset = r.kind === "reset", u = reset ? account(r) : null, pending = r.status === "pending";
+        var title = reset ? "🔑 Quên mật khẩu: @" + esc(r.desired_username) : "➕ " + esc(r.full_name);
+        var info = reset
+          ? ["Người gửi khai: " + r.full_name, r.phone, u ? "Tài khoản của: " + u.full_name + (u.phone ? " (SĐT hồ sơ: " + u.phone + ")" : "") : "⚠️ Không có tài khoản này"]
+          : [r.department, r.phone, r.note];
+        var acts = "";
+        if (pending && !reset) acts = '<button type="button" class="vpi-btn sm primary" data-a="ok">✓ Duyệt & tạo tài khoản</button>';
+        if (pending && u && u.id !== me.id) acts = '<button type="button" class="vpi-btn sm primary" data-a="pw">🔑 Cấp lại mật khẩu</button>';
+        if (pending) acts += '<button type="button" class="vpi-btn sm" data-a="no">Từ chối</button>';
+        return '<div class="vpi-item ' + (pending ? "new" : "off") + '" data-id="' + esc(r.id) + '">' +
+          '<div class="main"><b>' + title + ' <span class="role-badge">' + ST[r.status] + "</span></b>" +
+          "<small>" + info.filter(Boolean).map(esc).join(" · ") + " · " + esc(U.fmtDate(r.created_at)) + "</small></div>" +
+          '<div class="acts">' + acts + '<button type="button" class="vpi-btn sm danger" data-a="del">Xóa</button></div></div>';
       }).join("") + "</div>";
       body.onclick = function (e) {
         var b = e.target.closest("button[data-a]"); if (!b) return;
         var row = b.closest("[data-id]"), id = row.getAttribute("data-id"), a = b.getAttribute("data-a");
         var r = list.filter(function (x) { return x.id === id; })[0];
         if (a === "ok") createDialog({ full_name: r.full_name, department: r.department, phone: r.phone, request_id: r.id });
+        else if (a === "pw") reissuePassword(account(r), b, r.id);
         else if (a === "no") V.updateRequest(id, "rejected").then(renderTab);
         else if (a === "del") { if (confirm("Xóa yêu cầu này?")) V.deleteRequest(id).then(renderTab); }
       };
