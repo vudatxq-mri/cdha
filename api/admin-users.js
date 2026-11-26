@@ -32,13 +32,13 @@ function tempPassword() {
 
 async function sb(path, opts) {
   opts = opts || {};
+  const hdr = { apikey: SB_SERVICE, "Content-Type": "application/json" };
+  // Khóa kiểu mới (sb_secret_...) không phải JWT: chỉ gửi qua apikey. Khóa service_role cũ (JWT) thì gửi cả Authorization.
+  if (opts.bearer) hdr.Authorization = "Bearer " + opts.bearer;
+  else if (!/^sb_/.test(SB_SERVICE)) hdr.Authorization = "Bearer " + SB_SERVICE;
   const r = await fetch(SB_URL + path, {
     method: opts.method || "GET",
-    headers: Object.assign({
-      apikey: SB_SERVICE,
-      Authorization: "Bearer " + (opts.bearer || SB_SERVICE),
-      "Content-Type": "application/json"
-    }, opts.headers || {}),
+    headers: Object.assign(hdr, opts.headers || {}),
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
   const text = await r.text();
