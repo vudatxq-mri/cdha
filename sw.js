@@ -3,7 +3,7 @@
    Hỗ trợ cài đặt PWA App trên Điện thoại / Máy tính & Chế độ Xem Ngoại Viện Offline
    ============================================================================ */
 
-var CACHE_NAME = 'vpi-cdha-cache-v4.1';
+var CACHE_NAME = 'vpi-cdha-cache-v4.2';
 
 var PRECACHE_ASSETS = [
   './',
@@ -29,6 +29,7 @@ var PRECACHE_ASSETS = [
   './assets/js/data-thuoccanquang.js',
   './assets/js/data-taibien.js',
   './assets/js/data-congcu.js',
+  './assets/js/data-protocol-vpi.js',
   './assets/js/config.js',
   './assets/js/cloud.js',
   './assets/js/ui-core.js',
@@ -88,7 +89,24 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // Với tệp tĩnh (CSS, JS, hình ảnh, icon): Ưu tiên Cache, đồng thời cập nhật nền nếu có mạng
+  // Mã nguồn & dữ liệu (JS, CSS, JSON): MẠNG TRƯỚC → mọi máy luôn chạy bản mới nhất ngay sau khi cập nhật web;
+  // mất mạng mới dùng bản đã lưu (vẫn dùng ngoại tuyến được).
+  if (/\.(js|css|json)$/i.test(reqUrl.pathname)) {
+    event.respondWith(
+      fetch(request).then(function (networkResponse) {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          var copy = networkResponse.clone();
+          caches.open(CACHE_NAME).then(function (cache) { cache.put(request, copy); });
+        }
+        return networkResponse;
+      })["catch"](function () {
+        return caches.match(request);
+      })
+    );
+    return;
+  }
+
+  // Hình ảnh, icon: Ưu tiên Cache, đồng thời cập nhật nền nếu có mạng
   event.respondWith(
     caches.match(request).then(function (cachedResponse) {
       if (cachedResponse) {

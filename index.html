@@ -643,6 +643,7 @@
   <script src="assets/js/data-thuoccanquang.js"></script>
   <script src="assets/js/data-taibien.js"></script>
   <script src="assets/js/data-congcu.js"></script>
+  <script src="assets/js/data-protocol-vpi.js"></script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/cloud.js"></script>
   <script src="assets/js/app.js"></script>
@@ -653,10 +654,21 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
+        var hadController = !!navigator.serviceWorker.controller;
         navigator.serviceWorker.register('./sw.js').then(function (reg) {
           console.log('VPI ServiceWorker registered with scope:', reg.scope);
+          // Kiểm tra bản mới mỗi khi quay lại app
+          document.addEventListener('visibilitychange', function () { if (!document.hidden) reg.update().catch(function () {}); });
         }).catch(function (err) {
           console.warn('VPI ServiceWorker failed:', err);
+        });
+        // Có phiên bản app mới → tự tải lại (đợi nếu đang mở hộp thoại / đang chỉnh sửa)
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (!hadController) return;
+          (function tryReload() {
+            if (document.querySelector('.vpi-modal')) return setTimeout(tryReload, 5000);
+            location.reload();
+          })();
         });
       });
     }

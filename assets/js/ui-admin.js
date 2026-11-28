@@ -394,14 +394,36 @@
 
   /* ============================================================ TRÌNH CHỈNH SỬA == */
   var LBL = {
-    ten: "Tên", nhom: "Nhóm", tuKhoa: "Từ khóa tìm kiếm", thongSo: "Bảng thông số", giaTri: "Giá trị", noiDung: "Nội dung",
+    ten: "Tên", nhom: "Nhóm / vùng cơ thể", tuKhoa: "Từ khóa tìm kiếm", thongSo: "Bảng thông số", giaTri: "Giá trị", noiDung: "Nội dung",
     tieuDe: "Tiêu đề", items: "Các ý", nguon: "Nguồn tài liệu", moTa: "Mô tả", xuTri: "Xử trí", trieuChung: "Triệu chứng",
     cacBuoc: "Các bước", buoc: "Bước", cacMatCatChuan: "Các mặt cắt chuẩn", dauDo: "Đầu dò", chuanBi: "Chuẩn bị",
     dungCu: "Dụng cụ", chuThich: "Chú thích", caption: "Chú thích", viTri: "Vị trí", tuThe: "Tư thế", phanTichRoi: "Phân tích ROI",
     chiDinh: "Chỉ định", chongChiDinh: "Chống chỉ định", tenThuongMai: "Tên thương mại", hoatChat: "Hoạt chất", nongDo: "Nồng độ",
     hangSanXuat: "Hãng sản xuất", dacDiemLamSang: "Đặc điểm lâm sàng", tieuDeChinh: "Tiêu đề chính", ten_: "Tên", vung: "Vùng",
-    targetIds: "Áp dụng cho mã bài", nguyenTacVang: "Nguyên tắc vàng", bonMucDo: "Các mức độ", "do": "Mức độ"
+    targetIds: "Áp dụng cho mã bài", nguyenTacVang: "Nguyên tắc vàng", bonMucDo: "Các mức độ", "do": "Mức độ",
+    dinhNghia: "Định nghĩa kỹ thuật", nguyenLy: "Nguyên lý tạo ảnh (riêng bài này)", coil: "Cuộn thu (Coil) áp dụng",
+    huongDatCat: "Hướng đặt lát cắt (từng mặt phẳng)", matPhang: "Mặt phẳng", nguyenTac: "Nguyên tắc", phamVi: "Phạm vi",
+    soDoGiaiPhau: "Mốc giải phẫu", chongXaoAnh: "Chống xảo ảnh", ghiChu: "Ghi chú", tieuChuan: "Tiêu chuẩn hình ảnh đạt",
+    xaoAnh: "Xảo ảnh thường gặp", nguyenNhan: "Nguyên nhân", khacPhuc: "Khắc phục", bang: "Bảng",
+    loai: "Loại kỹ thuật (MRI / CT / X-quang / Siêu âm / Khác)", thuTu: "Thứ tự hiển thị", mayApDung: "Thiết bị áp dụng",
+    chuoiXung: "Chuỗi xung / thì chụp", thongSo_: "Thông số", thuocCanQuang: "Thuốc cản quang / đối quang từ",
+    daXoa: "Đã xóa (ẩn khỏi danh sách)", luuY: "Lưu ý", tieuChuanDat: "Tiêu chuẩn hình ảnh đạt", nguoiDuyet: "Người duyệt", capNhat: "Ngày cập nhật"
   };
+  /* Mẫu dòng mới cho các danh sách (kể cả khi danh sách đang trống) */
+  var TEMPLATES = {
+    thongSo: { ten: "", giaTri: "" },
+    noiDung: { tieuDe: "", items: [""] },
+    huongDatCat: { matPhang: "", nguyenTac: "", phamVi: "", soDoGiaiPhau: "", chongXaoAnh: "", ghiChu: "" },
+    xaoAnh: { ten: "", nguyenNhan: "", khacPhuc: "" },
+    chuoiXung: { ten: "", matPhang: "", thongSo: "", ghiChu: "" }
+  };
+  function isBlankVal(v) {
+    if (v === null || v === undefined) return true;
+    if (typeof v === "string") return !v.trim();
+    if (Array.isArray(v)) return v.every(isBlankVal);
+    if (typeof v === "object") return Object.keys(v).every(function (k) { return k === "buoc" || k === "hinhAnh" || isBlankVal(v[k]); });
+    return false;
+  }
   var READONLY = { id: 1, phanHe: 1, modality: 1, type: 1 };
   var SKIP = { hinhAnh: 1 };
 
@@ -410,7 +432,7 @@
 
   function textFieldNode(v, key, forceMulti) {
     var s = v == null ? "" : String(v);
-    var multi = forceMulti || s.length > 70 || /\n/.test(s);
+    var multi = forceMulti || s.length > 70 || /\n/.test(s) || /^(dinhNghia|nguyenLy|tieuChuan|tuThe|thuocCanQuang|nguyenTac|phamVi|soDoGiaiPhau|chongXaoAnh|moTa)$/.test(key || "");
     var wrap = document.createElement("div"); wrap.className = "ed-field";
     var inp;
     if (multi) {
@@ -418,7 +440,7 @@
       inp.rows = Math.min(14, Math.max(2, s.split("\n").length + Math.floor(s.length / 100)));
     } else { inp = document.createElement("input"); inp.type = "text"; }
     inp.value = s;
-    if (key) { var l = document.createElement("label"); l.textContent = label(key); if (label(key) !== key) { var sm = document.createElement("small"); sm.textContent = key; l.appendChild(sm); } wrap.appendChild(l); }
+    if (key) { var l = document.createElement("label"); var lb = key === "thongSo" ? "Thông số" : label(key); l.textContent = lb; if (lb !== key) { var sm = document.createElement("small"); sm.textContent = key; l.appendChild(sm); } wrap.appendChild(l); }
     wrap.appendChild(inp);
     return { el: wrap, get: function () { return v == null && inp.value === "" ? null : inp.value; } };
   }
@@ -476,10 +498,11 @@
   }
 
   function listNode(arr, key) {
-    var isObj = arr.length && arr.every(isPlain);
-    var prim = !arr.length || arr.every(function (x) { return typeof x !== "object" || x === null; });
+    var tpl = TEMPLATES[key];
+    var isObj = (arr.length && arr.every(isPlain)) || (!arr.length && !!tpl);
+    var prim = !isObj && (!arr.length || arr.every(function (x) { return typeof x !== "object" || x === null; }));
     if (!isObj && !prim) return rawNode(arr, key);
-    var template = arr.length ? blankOf(arr[0]) : "";
+    var template = tpl ? JSON.parse(JSON.stringify(tpl)) : (arr.length ? blankOf(arr[0]) : "");
     var multiStr = /^(items|xuTri|noiDung|trieuChung|chiDinh|chongChiDinh|luuY)$/.test(key || "");
     var wrap = document.createElement("div"); wrap.className = "ed-field";
     if (key) { var l = document.createElement("label"); l.textContent = label(key); var sm = document.createElement("small"); sm.textContent = key; l.appendChild(sm); wrap.appendChild(l); }
@@ -532,7 +555,8 @@
     return {
       el: wrap,
       get: function () {
-        var out = Array.prototype.map.call(rows.children, function (r) { return r._n.get(); });
+        var out = Array.prototype.map.call(rows.children, function (r) { return r._n.get(); })
+          .filter(function (x) { return !isBlankVal(x); });            // bỏ dòng để trống
         if (out.length && out.every(function (o) { return isPlain(o) && typeof o.buoc === "number"; })) out.forEach(function (o, i) { o.buoc = i + 1; });
         return out;
       }
@@ -547,22 +571,36 @@
     return textFieldNode(v, key, multi);
   }
 
-  function openEditor(docKey, title) {
+  /* opts: { fields: [..] chỉ sửa vài trường, defaults: {trường: giá trị mặc định}, initial: tài liệu MỚI,
+            note: ghi chú thêm, onSaved: fn(docKey) } */
+  function openEditor(docKey, title, opts) {
+    opts = opts || {};
     if (!guard()) return;
-    var doc = V.getDoc(docKey);
-    if (doc === undefined) { toast("Mục này chưa chỉnh sửa được.", "err"); return; }
-    var inf = V.editInfo(docKey), dirty = false;
-    var root = makeNode(doc, null);
+    var isNew = opts.initial !== undefined;
+    var doc = isNew ? JSON.parse(JSON.stringify(opts.initial)) : V.getDoc(docKey);
+    if (doc === undefined || doc === null) { toast("Mục này chưa chỉnh sửa được.", "err"); return; }
+    var fields = opts.fields, defs = opts.defaults || {};
+    var view = doc;
+    if (fields) {
+      view = {};
+      fields.forEach(function (k) {
+        var has = doc[k] !== undefined && doc[k] !== null;
+        view[k] = JSON.parse(JSON.stringify(has ? doc[k] : (defs[k] !== undefined ? defs[k] : "")));
+      });
+    }
+    var inf = isNew ? null : V.editInfo(docKey), dirty = false;
+    var root = makeNode(view, null);
     var ov = openModal({
       cls: "mid", title: "✏️ " + esc(title || docKey),
       onClose: function () { if (dirty && !confirm("Bạn có thay đổi chưa lưu. Đóng và bỏ thay đổi?")) return false; },
       body:
         '<div class="vpi-note warn">⚠️ Đây là nội dung y khoa: kiểm tra kỹ <b>thông số (kV, mAs, liều thuốc, ngưỡng eGFR…)</b> với tài liệu đã được duyệt trước khi lưu.' +
-        (inf ? "<br>Lần sửa gần nhất: <b>" + esc(inf.by || "") + "</b> · " + esc(U.fmtDate(inf.at)) : "<br>Đang hiển thị nội dung gốc.") + "</div>" +
+        (isNew ? "<br>Đang tạo <b>mục mới</b>." : inf ? "<br>Lần sửa gần nhất: <b>" + esc(inf.by || "") + "</b> · " + esc(U.fmtDate(inf.at)) : "<br>Đang hiển thị nội dung gốc.") +
+        (opts.note ? "<br>" + opts.note : "") + "</div>" +
         '<div id="vpiEdBox"></div><div class="auth-err" id="vpiEdErr" role="alert"></div>' +
         '<div class="vpi-actions ed-sticky"><button type="button" class="vpi-btn" data-close>Hủy</button>' +
-        '<button type="button" class="vpi-btn" data-hist>🕘 Lịch sử</button>' +
-        (inf ? '<button type="button" class="vpi-btn danger" data-rs>↩ Khôi phục gốc</button>' : "") +
+        (isNew ? "" : '<button type="button" class="vpi-btn" data-hist>🕘 Lịch sử</button>') +
+        (inf && !fields && V.getBase(docKey) !== undefined ? '<button type="button" class="vpi-btn danger" data-rs>↩ Khôi phục gốc</button>' : "") +
         '<button type="button" class="vpi-btn primary" data-save>💾 Lưu thay đổi</button></div>'
     });
     ov.querySelector("#vpiEdBox").appendChild(root.el);
@@ -571,22 +609,33 @@
 
     ov.querySelector("[data-save]").addEventListener("click", function (e) {
       var err = ov.querySelector("#vpiEdErr"); err.textContent = "";
-      var full;
-      try { full = root.get(); } catch (ex) { err.textContent = ex.message; return; }
+      var part, full;
+      try { part = root.get(); } catch (ex) { err.textContent = ex.message; return; }
+      if (fields) {
+        full = isNew ? doc : (V.getDoc(docKey) || doc);
+        fields.forEach(function (k) {
+          var had = doc[k] !== undefined && doc[k] !== null;
+          // Không ghi giá trị mặc định (dữ liệu chung) vào bài nếu Admin không đổi gì
+          if (!had && (JSON.stringify(part[k]) === JSON.stringify(defs[k]) || isBlankVal(part[k]))) return;
+          full[k] = part[k];
+        });
+      } else full = part;
       if (isPlain(full) && "ten" in full && !String(full.ten || "").trim()) { err.textContent = "Tên không được để trống."; return; }
+      if (/^SOTAY_PROTOCOL_VPI\./.test(docKey) && isPlain(full)) full.capNhat = new Date().toLocaleDateString("vi-VN");
       var btn = e.currentTarget; setBusy(btn, true, "Đang lưu...");
       V.saveDoc(docKey, full).then(function (r) {
         setBusy(btn, false);
         if (!r.ok) { err.textContent = r.message; return; }
         dirty = false; closeModal(ov);
-        toast("✓ Đã lưu — mọi nhân viên sẽ thấy nội dung mới.", "ok");
+        toast("✓ Đã lưu — mọi tài khoản sẽ thấy nội dung mới ngay.", "ok");
         window.VUDAT_APP.refreshCurrent();
         if (adminOv) renderTab();
+        if (opts.onSaved) opts.onSaved(docKey);
       });
-    });
-    var rs = ov.querySelector("[data-rs]");
+    });    var rs = ov.querySelector("[data-rs]");
     if (rs) rs.addEventListener("click", function () { dirty = false; closeModal(ov); restoreWithConfirm(docKey, function () { if (adminOv) renderTab(); }); });
-    ov.querySelector("[data-hist]").addEventListener("click", function () {
+    var hb = ov.querySelector("[data-hist]");
+    if (hb) hb.addEventListener("click", function () {
       V.listHistory(docKey).then(function (h) {
         openModal({ title: "🕘 Lịch sử chỉnh sửa", body: h.length ? '<table class="vpi-table"><tr><th>Thời gian</th><th>Người sửa</th><th>Thao tác</th></tr>' +
           h.map(function (x) { return "<tr><td>" + esc(U.fmtDate(x.created_at)) + "</td><td>" + esc(x.actor_name || "") + "</td><td>" + esc({ insert: "Sửa lần đầu", update: "Cập nhật", "restore-default": "Khôi phục gốc" }[x.action] || x.action) + "</td></tr>"; }).join("") + "</table>" : '<div class="vpi-note">Chưa có lịch sử.</div>' });
@@ -595,12 +644,28 @@
   }
 
   /* ===================================================== THANH CÔNG CỤ TRANG ==== */
+  function itemKeyFor(itemId) {
+    function inArr(name) { return (window[name] || []).some(function (x) { return x.id === itemId; }); }
+    if (inArr("SOTAY_QUYTRINH")) return "SOTAY_QUYTRINH#" + itemId;
+    if (inArr("SOTAY_SIEUAM")) return "SOTAY_SIEUAM#" + itemId;
+    if (inArr("SOTAY_CANTHIEP")) return "SOTAY_CANTHIEP#" + itemId;
+    if (window.SOTAY_PROTOCOL_VPI && window.SOTAY_PROTOCOL_VPI[itemId]) return "SOTAY_PROTOCOL_VPI." + itemId;
+    return null;
+  }
+  function isVpiKey(k) { return /^SOTAY_PROTOCOL_VPI\./.test(k || ""); }
+
+  function checklistKeyFor(itemId) {
+    var cl = window.getChecklistForProtocol && window.getChecklistForProtocol(itemId), out = null;
+    if (cl && window.SOTAY_CT_CHECKLISTS_MAP) {
+      Object.keys(window.SOTAY_CT_CHECKLISTS_MAP).forEach(function (k) { if (window.SOTAY_CT_CHECKLISTS_MAP[k] === cl) out = "SOTAY_CT_CHECKLISTS_MAP." + k; });
+    }
+    return out;
+  }
+
   function docsFor(itemId) {
     var out = [];
-    function inArr(name) { return (window[name] || []).some(function (x) { return x.id === itemId; }); }
-    if (inArr("SOTAY_QUYTRINH")) out.push({ key: "SOTAY_QUYTRINH#" + itemId, label: "Sửa nội dung" });
-    else if (inArr("SOTAY_SIEUAM")) out.push({ key: "SOTAY_SIEUAM#" + itemId, label: "Sửa nội dung" });
-    else if (inArr("SOTAY_CANTHIEP")) out.push({ key: "SOTAY_CANTHIEP#" + itemId, label: "Sửa nội dung" });
+    var main = itemKeyFor(itemId);
+    if (main) out.push({ key: main, label: isVpiKey(main) ? "Sửa protocol" : "Sửa toàn bộ bài" });
     var map = {
       "emg-phan-ve": [["SOTAY_TAIBIEN.phanVe", "Sửa phác đồ phản vệ"]], "emg-thoat-mach": [["SOTAY_TAIBIEN.thoatMach", "Sửa quy trình thoát mạch"]],
       "emg-an-toan-mri": [["SOTAY_TAIBIEN.anToanMRI", "Sửa an toàn MRI"]], "emg-cpr": [["SOTAY_TAIBIEN.cpr", "Sửa CPR"]],
@@ -612,60 +677,272 @@
       "cq-may-tinh-lieu": [["SOTAY_CONGCU.lieuCanQuang", "Sửa tham số liều CT"], ["SOTAY_CONGCU.lieuCCTA", "Sửa tham số CCTA"]]
     };
     (map[itemId] || []).forEach(function (m) { out.push({ key: m[0], label: m[1] }); });
-    var cl = window.getChecklistForProtocol && window.getChecklistForProtocol(itemId);
-    if (cl && window.SOTAY_CT_CHECKLISTS_MAP) {
-      Object.keys(window.SOTAY_CT_CHECKLISTS_MAP).forEach(function (k) {
-        if (window.SOTAY_CT_CHECKLISTS_MAP[k] === cl) out.push({ key: "SOTAY_CT_CHECKLISTS_MAP." + k, label: "Sửa bảng kiểm CT" });
-      });
-    }
+    var ck = checklistKeyFor(itemId);
+    if (ck) out.push({ key: ck, label: "Sửa bảng kiểm" });
     return out.filter(function (d) { return V.getDoc(d.key) !== undefined; });
+  }
+
+  function titleOfPage(mainPanel) { var h2 = mainPanel.querySelector(".detail-header h2"); return h2 ? h2.textContent.trim() : ""; }
+
+  /* Nút "✏️ Sửa" trên từng phần của bài (1. Định nghĩa · 2. Thông số · 3. Chỉ định · 4. Quy trình · 5. Bảng kiểm) */
+  function sectionEditors(itemId) {
+    var key = itemKeyFor(itemId);
+    if (!key || !/^SOTAY_QUYTRINH#/.test(key)) return {};
+    var it = window.VUDAT_APP.findItem(itemId) || {};
+    var pr = window.VUDAT_APP.principleFor(itemId) || {};
+    var isMRI = it.modality === "MRI";
+    var secs = {
+      dinhnghia: { label: "Định nghĩa & nguyên lý", fields: ["dinhNghia", "nguyenLy"], defaults: { dinhNghia: "", nguyenLy: pr.nguyenLyVatLy || "" },
+        note: "Để trống <b>Nguyên lý</b> = dùng nội dung chung của " + esc(it.modality || "kỹ thuật") + "." },
+      thongso: { label: "Thông số kỹ thuật", fields: isMRI ? ["thongSo", "coil"] : ["thongSo"], defaults: { thongSo: [], coil: "" },
+        note: isMRI ? "<b>Cuộn thu</b> để trống = app tự chọn theo vùng khảo sát." : "" },
+      chidinh: { label: "Chỉ định & chuẩn bị", fields: ["noiDung"], defaults: { noiDung: [] },
+        note: "Mục có tiêu đề chứa <b>chỉ định / chuẩn bị / mục đích / vai trò</b> hiện ở phần 3; các mục khác hiện ở phần 4.1 (Quy trình thực hiện)." },
+      quytrinh: { label: "Quy trình & hướng đặt lát cắt", fields: ["noiDung", "huongDatCat", "tieuChuan", "xaoAnh"],
+        defaults: { noiDung: [], huongDatCat: window.VUDAT_APP.masterPlanFor(itemId), tieuChuan: pr.tieuChuanChatLuong || "", xaoAnh: JSON.parse(JSON.stringify(pr.xaoAnhThuongGap || [])) },
+        note: "Ảnh của từng mặt phẳng thêm/xóa trực tiếp trên trang (nút 📷 🖼️ trên mỗi mặt phẳng). Để trống tiêu chuẩn/xảo ảnh = dùng nội dung chung." }
+    };
+    Object.keys(secs).forEach(function (k) { secs[k].key = key; });
+    var ck = checklistKeyFor(itemId);
+    if (ck) secs.bangkiem = { label: "Bảng kiểm", key: ck };
+    return secs;
   }
 
   function onDetailRendered(itemId, mainPanel) {
     if (!mainPanel) return;
     var old = mainPanel.querySelector(".admin-toolbar"); if (old) old.remove();
+    mainPanel.querySelectorAll(".sec-edit-btn").forEach(function (b) { b.remove(); });
     if (!V.isAdmin()) return;
     var docs = docsFor(itemId);
-    if (!docs.length) return;
-    var edited = docs.filter(function (d) { return V.isEdited(d.key); });
+    var mainKey = itemKeyFor(itemId);
+    var vpi = isVpiKey(mainKey);
+    var edited = docs.filter(function (d) { return V.isEdited(d.key) && V.getBase(d.key) !== undefined; });
     var bar = document.createElement("div"); bar.className = "admin-toolbar";
     bar.innerHTML = "<b>👑 Admin</b>" + docs.map(function (d, i) { return '<button type="button" class="vpi-btn sm primary" data-ed="' + i + '">✏️ ' + esc(d.label) + "</button>"; }).join("") +
+      (vpi ? '<button type="button" class="vpi-btn sm" data-dup>📄 Nhân bản</button><button type="button" class="vpi-btn sm danger" data-del>🗑 Xóa protocol</button><button type="button" class="vpi-btn sm" data-vpi-add>➕ Thêm protocol</button>' : "") +
       '<span class="grow"></span>' +
       (edited.length ? "<small>Đã chỉnh sửa" + (V.editInfo(edited[0].key).by ? " bởi " + esc(V.editInfo(edited[0].key).by) : "") + "</small>" +
-        '<button type="button" class="vpi-btn sm" data-rs>↩ Khôi phục gốc</button>' : "<small>Nội dung gốc</small>");
+        '<button type="button" class="vpi-btn sm" data-rs>↩ Khôi phục gốc</button>' : (vpi && V.getBase(mainKey) === undefined ? "<small>Protocol do Admin tạo</small>" : "<small>Nội dung gốc</small>"));
     bar.addEventListener("click", function (e) {
       var b = e.target.closest("button"); if (!b) return;
       if (b.hasAttribute("data-ed")) {
-        var d = docs[+b.getAttribute("data-ed")];
-        var h2 = mainPanel.querySelector(".detail-header h2");
-        var base = h2 ? h2.textContent.trim() : "";
+        var d = docs[+b.getAttribute("data-ed")], base = titleOfPage(mainPanel);
         openEditor(d.key, (base ? base + " — " : "") + d.label.replace(/^Sửa /, ""));
-      }
-      else if (b.hasAttribute("data-rs")) {
+      } else if (b.hasAttribute("data-rs")) {
         var keys = edited.map(function (d) { return d.key; });
         if (!confirm("Khôi phục " + keys.length + " mục của bài này về nội dung GỐC?")) return;
         Promise.all(keys.map(function (k) { return V.restoreDoc(k); })).then(function () { toast("Đã khôi phục bản gốc.", "ok"); window.VUDAT_APP.refreshCurrent(); });
-      }
+      } else if (b.hasAttribute("data-del")) deleteProtocol(mainKey);
+      else if (b.hasAttribute("data-dup")) newProtocol(V.getDoc(mainKey));
     });
     mainPanel.insertBefore(bar, mainPanel.firstChild);
+
+    // Nút sửa trên từng phần
+    var secs = sectionEditors(itemId);
+    mainPanel.querySelectorAll(".learning-step-card[data-sec]").forEach(function (card) {
+      var s = secs[card.getAttribute("data-sec")], head = card.querySelector(".step-badge-title");
+      if (!s || !head) return;
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = "vpi-btn sm sec-edit-btn"; btn.textContent = "✏️ Sửa";
+      btn.title = "Sửa phần: " + s.label;
+      btn.addEventListener("click", function () {
+        var base = titleOfPage(mainPanel);
+        openEditor(s.key, (base ? base + " — " : "") + s.label, s.fields ? { fields: s.fields, defaults: s.defaults, note: s.note } : null);
+      });
+      head.appendChild(btn);
+    });
+
+    if (mainKey && /^SOTAY_QUYTRINH#/.test(mainKey)) planeTools(itemId, mainKey, mainPanel);
   }
+
+  /* ---------------------------------------------- HƯỚNG ĐẶT LÁT CẮT: TỪNG MẶT PHẲNG */
+  function planeTools(itemId, key, mainPanel) {
+    var listEl = mainPanel.querySelector(".plane-list");
+    if (!listEl) return;
+    function currentPlanes() {
+      var doc = V.getDoc(key) || {};
+      var p = Array.isArray(doc.huongDatCat) ? doc.huongDatCat : window.VUDAT_APP.masterPlanFor(itemId);
+      return JSON.parse(JSON.stringify(p || []));
+    }
+    function savePlanes(planes, msg) {
+      var doc = V.getDoc(key);
+      if (!doc) return Promise.resolve({ ok: false, message: "Không tìm thấy bài." });
+      doc.huongDatCat = planes;
+      return V.saveDoc(key, doc).then(function (r) {
+        if (!r.ok) toast(r.message, "err"); else { if (msg) toast(msg, "ok"); window.VUDAT_APP.refreshCurrent(); }
+        return r;
+      });
+    }
+
+    listEl.querySelectorAll(".plane-card[data-plane]").forEach(function (card) {
+      var idx = +card.getAttribute("data-plane");
+      var slot = card.querySelector(".plane-admin");
+      if (slot) {
+        slot.innerHTML =
+          '<button type="button" class="vpi-btn sm primary" data-pa="cam" title="Chụp ảnh bằng camera">📷</button>' +
+          '<button type="button" class="vpi-btn sm" data-pa="up" title="Tải ảnh lên">🖼️</button>' +
+          '<button type="button" class="vpi-btn sm" data-pa="edit" title="Sửa nội dung mặt phẳng">✏️</button>' +
+          '<button type="button" class="vpi-btn sm" data-pa="upm" title="Lên">↑</button>' +
+          '<button type="button" class="vpi-btn sm" data-pa="down" title="Xuống">↓</button>' +
+          '<button type="button" class="vpi-btn sm danger" data-pa="del" title="Xóa mặt phẳng">🗑</button>' +
+          '<input type="file" accept="image/*" capture="environment" hidden data-fc><input type="file" accept="image/*" multiple hidden data-fu>';
+        slot.addEventListener("click", function (e) {
+          var b = e.target.closest("button[data-pa]"); if (!b) return;
+          var a = b.getAttribute("data-pa"), planes = currentPlanes();
+          if (a === "cam") slot.querySelector("[data-fc]").click();
+          else if (a === "up") slot.querySelector("[data-fu]").click();
+          else if (a === "edit") planeDialog(planes[idx], function (np) { np.hinhAnh = planes[idx].hinhAnh || []; planes[idx] = np; return savePlanes(planes, "✓ Đã lưu mặt phẳng."); });
+          else if (a === "upm" && idx > 0) { planes.splice(idx - 1, 0, planes.splice(idx, 1)[0]); savePlanes(planes); }
+          else if (a === "down" && idx < planes.length - 1) { planes.splice(idx + 1, 0, planes.splice(idx, 1)[0]); savePlanes(planes); }
+          else if (a === "del") {
+            if (!confirm("Xóa mặt phẳng \"" + (planes[idx].matPhang || "") + "\" khỏi bài này?")) return;
+            var gone = planes.splice(idx, 1)[0];
+            savePlanes(planes, "Đã xóa mặt phẳng.").then(function (r) { if (r.ok) (gone.hinhAnh || []).forEach(dropMedia); });
+          }
+        });
+        slot.querySelectorAll("input[type=file]").forEach(function (inp) {
+          inp.addEventListener("change", function () {
+            var files = Array.prototype.slice.call(inp.files || [], 0, 10); inp.value = "";
+            if (!files.length) return;
+            var pname = (currentPlanes()[idx] || {}).matPhang || "";
+            askImages(files, "Mặt phẳng " + pname, PLANE_CAPS, function (added) {
+              var planes = currentPlanes();
+              if (!planes[idx]) return Promise.resolve({ ok: false, message: "Mặt phẳng không còn tồn tại." });
+              planes[idx].hinhAnh = (planes[idx].hinhAnh || []).concat(added);
+              return savePlanes(planes);
+            });
+          });
+        });
+      }
+      card.querySelectorAll(".plane-img[data-idx]").forEach(function (fig) {
+        var j = +fig.getAttribute("data-idx");
+        var c = document.createElement("div"); c.className = "gc-admin";
+        c.innerHTML = '<button type="button" class="cap" title="Đổi chú thích">✎</button><button type="button" title="Xóa ảnh">🗑</button>';
+        c.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var b = e.target.closest("button"); if (!b) return;
+          var planes = currentPlanes(), list = (planes[idx] && planes[idx].hinhAnh) || [], im = list[j];
+          if (!im) return;
+          if (b.classList.contains("cap")) {
+            var nc = prompt("Chú thích ảnh:", im.caption || im.chuThich || ""); if (nc === null) return;
+            list[j] = { src: im.src || im.url, caption: nc.trim() };
+            savePlanes(planes);
+          } else {
+            if (!confirm("Xóa ảnh này?")) return;
+            list.splice(j, 1);
+            savePlanes(planes).then(function (r) { if (r.ok) dropMedia(im); });
+          }
+        });
+        fig.appendChild(c);
+      });
+    });
+
+    var addSlot = mainPanel.querySelector(".plane-add-slot");
+    if (addSlot) {
+      var doc = V.getDoc(key) || {}, own = Array.isArray(doc.huongDatCat), hasMaster = window.VUDAT_APP.masterPlanFor(itemId).length > 0;
+      addSlot.innerHTML = '<button type="button" class="vpi-btn sm primary" data-padd>➕ Thêm mặt phẳng</button>' +
+        (own && hasMaster ? ' <button type="button" class="vpi-btn sm" data-preset>↩ Dùng lại hướng đặt cắt chung</button>' : "");
+      addSlot.querySelector("[data-padd]").addEventListener("click", function () {
+        planeDialog({}, function (np) { var planes = currentPlanes(); np.hinhAnh = []; planes.push(np); return savePlanes(planes, "✓ Đã thêm mặt phẳng."); });
+      });
+      var pr = addSlot.querySelector("[data-preset]");
+      if (pr) pr.addEventListener("click", function () {
+        if (!confirm("Bỏ hướng đặt cắt riêng của bài (kể cả ảnh đã thêm cho từng mặt phẳng) và dùng lại dữ liệu chung?")) return;
+        var d = V.getDoc(key), imgs = [];
+        (d.huongDatCat || []).forEach(function (p) { imgs = imgs.concat(p.hinhAnh || []); });
+        delete d.huongDatCat;
+        V.saveDoc(key, d).then(function (r) { if (!r.ok) return toast(r.message, "err"); imgs.forEach(dropMedia); toast("Đã dùng lại dữ liệu chung.", "ok"); window.VUDAT_APP.refreshCurrent(); });
+      });
+    }
+  }
+
+  function planeDialog(p, onSave) {
+    p = p || {};
+    var F = [["matPhang", "Mặt phẳng *", "VD: Axial (Ngang trục)"], ["nguyenTac", "Nguyên tắc đặt cắt", ""], ["phamVi", "Phạm vi", ""],
+      ["soDoGiaiPhau", "Mốc giải phẫu", ""], ["chongXaoAnh", "Chống xảo ảnh", ""], ["ghiChu", "Ghi chú", ""]];
+    var ov = openModal({
+      cls: "mid", title: p.matPhang ? "✏️ Mặt phẳng " + esc(p.matPhang) : "➕ Thêm mặt phẳng",
+      body: F.map(function (f, i) {
+        return '<div class="vpi-field"><label>' + esc(f[1]) + "</label>" + (i === 0
+          ? '<input data-k="' + f[0] + '" maxlength="80" placeholder="' + esc(f[2]) + '" value="' + esc(p[f[0]] || "") + '">'
+          : '<textarea data-k="' + f[0] + '" rows="2" maxlength="1500">' + esc(p[f[0]] || "") + "</textarea>") + "</div>";
+      }).join("") +
+        '<div class="auth-err" role="alert"></div><div class="vpi-actions"><button type="button" class="vpi-btn" data-close>Hủy</button><button type="button" class="vpi-btn primary" data-ok>💾 Lưu</button></div>'
+    });
+    ov.querySelector("[data-ok]").addEventListener("click", function (e) {
+      var np = {};
+      ov.querySelectorAll("[data-k]").forEach(function (i) { var v = i.value.trim(); if (v) np[i.getAttribute("data-k")] = v; });
+      if (!np.matPhang) { ov.querySelector(".auth-err").textContent = "Cần nhập tên mặt phẳng."; return; }
+      var btn = e.currentTarget; setBusy(btn, true, "Đang lưu...");
+      Promise.resolve(onSave(np)).then(function (r) { setBusy(btn, false); if (r && r.ok) closeModal(ov); else if (r) ov.querySelector(".auth-err").textContent = r.message || "Không lưu được."; });
+    });
+  }
+
+  function dropMedia(im) {
+    var u = String((im && (im.src || im.url)) || ""), mk = "/object/public/cdha-media/";
+    if (u.indexOf(mk) > -1) V.deleteMedia(u.split(mk)[1]);
+  }
+
+  /* ------------------------------------------------- PROTOCOL BV VĨNH PHÚC VPI ---- */
+  function newProtocol(copyFrom) {
+    if (!guard()) return;
+    var id = "vpi-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 6);
+    var base = copyFrom ? JSON.parse(JSON.stringify(copyFrom)) : {
+      loai: "MRI", nhom: "", ten: "", thuTu: 50, mayApDung: "GE SIGNA™ Explorer 1.5T",
+      chiDinh: [""], chuanBi: [""], tuThe: "", chuoiXung: [{ ten: "", matPhang: "", thongSo: "", ghiChu: "" }],
+      thuocCanQuang: "", luuY: [""], tieuChuanDat: [""], nguoiDuyet: "", capNhat: "", hinhAnh: []
+    };
+    delete base.type; delete base.daXoa;
+    base.id = id;
+    if (copyFrom) { base.ten = (copyFrom.ten || "Protocol") + " (bản sao)"; base.hinhAnh = []; }
+    openEditor("SOTAY_PROTOCOL_VPI." + id, copyFrom ? "Nhân bản protocol" : "Protocol mới — BV Vĩnh Phúc VPI", {
+      initial: base,
+      note: "Nhập <b>Loại kỹ thuật</b> đúng một trong: MRI, CT, X-quang, Siêu âm, Khác (để xếp nhóm). Có thể thêm ảnh minh họa sau khi lưu.",
+      onSaved: function () { location.hash = "item:" + id; }
+    });
+  }
+
+  function deleteProtocol(key) {
+    if (!guard()) return;
+    var doc = V.getDoc(key); if (!doc) return;
+    var custom = V.getBase(key) === undefined;
+    if (!confirm("Xóa protocol \"" + (doc.ten || "") + "\"?\n" + (custom ? "Protocol do Admin tạo sẽ bị gỡ (vẫn còn trong lịch sử chỉnh sửa)." : "Protocol mẫu sẽ bị ẩn; có thể khôi phục trong 👑 Quản trị → Nội dung."))) return;
+    var p = custom ? V.restoreDoc(key) : V.saveDoc(key, Object.assign(doc, { daXoa: true }));
+    p.then(function (r) {
+      if (!r.ok) return toast(r.message, "err");
+      toast("Đã xóa protocol.", "ok");
+      location.hash = "mod-vpi";
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vpi-add]");
+    if (b) { e.preventDefault(); newProtocol(null); }
+  });
 
   /* ========================================================== ẢNH TƯ THẾ / PHIM == */
   var PRESET_CAPS = ["Tư thế & hướng tia", "Phim đạt yêu cầu", "Phim đạt yêu cầu (có chú thích)", "Ảnh đặt tư thế người bệnh", "Khác..."];
+  var PLANE_CAPS = ["Ảnh định vị (localizer) & đặt lát cắt", "Ảnh kết quả mặt phẳng này", "Mốc giải phẫu", "Khác..."];
 
   function onGalleryRendered(item, rightPanel) {
     if (!rightPanel) return;
     var body = rightPanel.querySelector(".gallery-body"); if (!body) return;
     var old = rightPanel.querySelector(".gallery-admin-bar"); if (old) old.remove();
     if (!V.isAdmin() || !item || !item.id) return;
-    var key = "SOTAY_QUYTRINH#" + item.id;
-    if (V.getDoc(key) === undefined) return;
+    var key = itemKeyFor(item.id);
+    if (!key || V.getDoc(key) === undefined) return;
 
     var bar = document.createElement("div"); bar.className = "gallery-admin-bar";
     bar.innerHTML = '<button type="button" class="vpi-btn sm primary" data-cam>📷 Chụp ảnh</button><button type="button" class="vpi-btn sm" data-up>🖼️ Tải ảnh lên</button>' +
       '<input type="file" accept="image/*" capture="environment" hidden data-fc><input type="file" accept="image/*" multiple hidden data-fu>';
     body.parentNode.insertBefore(bar, body);
-    function pick(files) { if (files && files.length) askMeta(key, Array.prototype.slice.call(files, 0, 10)); }
+    function pick(files) {
+      if (!files || !files.length) return;
+      askImages(Array.prototype.slice.call(files, 0, 10), "bài", PRESET_CAPS, function (added) {
+        var doc = V.getDoc(key);
+        return V.saveDoc(key, Object.assign(doc, { hinhAnh: (doc.hinhAnh || []).concat(added) })).then(function (r) { if (r.ok) window.VUDAT_APP.refreshCurrent(); return r; });
+      });
+    }
     bar.querySelector("[data-cam]").addEventListener("click", function () { bar.querySelector("[data-fc]").click(); });
     bar.querySelector("[data-up]").addEventListener("click", function () { bar.querySelector("[data-fu]").click(); });
     bar.querySelectorAll("input[type=file]").forEach(function (i) { i.addEventListener("change", function () { pick(i.files); i.value = ""; }); });
@@ -688,10 +965,7 @@
         }
         V.saveDoc(key, Object.assign(doc, { hinhAnh: list })).then(function (r) {
           if (!r.ok) return toast(r.message, "err");
-          if (!b.classList.contains("cap")) {
-            var u = String(im.src || im.url || ""), mk = "/object/public/cdha-media/";
-            if (u.indexOf(mk) > -1) V.deleteMedia(u.split(mk)[1]);
-          }
+          if (!b.classList.contains("cap")) dropMedia(im);
           window.VUDAT_APP.refreshCurrent();
         });
       });
@@ -699,13 +973,13 @@
     });
   }
 
-  function askMeta(key, files) {
+  /* Hộp thoại tải ảnh dùng chung: chọn chú thích, xác nhận ẩn danh, tải lần lượt rồi gọi commit(danh sách ảnh) */
+  function askImages(files, where, caps, commit) {
     var thumbs = files.map(function (f) { return '<img src="' + URL.createObjectURL(f) + '" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">'; }).join("");
     var ov = openModal({
-      title: "🖼️ Thêm " + files.length + " ảnh vào bài",
-      onClose: function () { files.forEach(function (_, i) {}); },
+      title: "🖼️ Thêm " + files.length + " ảnh — " + esc(where),
       body: '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">' + thumbs + "</div>" +
-        '<div class="vpi-field"><label>Chú thích</label><select id="vpiCapSel">' + PRESET_CAPS.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("") + "</select></div>" +
+        '<div class="vpi-field"><label>Chú thích</label><select id="vpiCapSel">' + caps.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("") + "</select></div>" +
         '<div class="vpi-field" id="vpiCapOther" style="display:none"><input id="vpiCapTxt" maxlength="120" placeholder="Nhập chú thích riêng"></div>' +
         '<label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;margin:6px 0 10px;cursor:pointer"><input type="checkbox" id="vpiAnon" style="margin-top:3px"> ' +
           "<span>Tôi xác nhận ảnh <b>không chứa thông tin nhận dạng người bệnh</b> (họ tên, mã bệnh nhân, ngày sinh trên phim đã được che/xóa).</span></label>" +
@@ -720,25 +994,23 @@
       var cap = sel.value === "Khác..." ? ov.querySelector("#vpiCapTxt").value.trim() : sel.value;
       var btn = e.currentTarget; btn.disabled = true;
       var added = [], i = 0;
+      function finish() {
+        Promise.resolve(commit(added)).then(function (r) {
+          if (r && !r.ok) { err.textContent = r.message || "Không lưu được."; btn.disabled = false; btn.textContent = "Tải lên"; return; }
+          closeModal(ov); toast("✓ Đã thêm " + added.length + " ảnh.", "ok");
+        });
+      }
       (function nxt() {
-        if (i >= files.length) {
-          var doc = V.getDoc(key), list = (doc.hinhAnh || []).concat(added);
-          V.saveDoc(key, Object.assign(doc, { hinhAnh: list })).then(function (r) {
-            if (!r.ok) { err.textContent = r.message; btn.disabled = false; btn.textContent = "Tải lên"; return; }
-            closeModal(ov); toast("✓ Đã thêm " + added.length + " ảnh.", "ok"); window.VUDAT_APP.refreshCurrent();
-          });
-          return;
-        }
+        if (i >= files.length) return finish();
         btn.textContent = "Đang tải " + (i + 1) + "/" + files.length + "...";
         V.uploadContentImage(files[i]).then(function (r) {
-          if (!r.ok) { err.textContent = r.message; btn.disabled = false; btn.textContent = "Tải lên"; if (added.length) { var d2 = V.getDoc(key); V.saveDoc(key, Object.assign(d2, { hinhAnh: (d2.hinhAnh || []).concat(added) })); } return; }
+          if (!r.ok) { err.textContent = r.message; btn.disabled = false; btn.textContent = "Tải lên"; if (added.length) commit(added); return; }
           added.push({ src: r.url, caption: cap + (files.length > 1 ? " (" + (i + 1) + ")" : "") });
           i++; nxt();
         });
       })();
     });
   }
-
   U.showAdmin = showAdmin;
   U.openEditor = openEditor;
   U.onDetailRendered = onDetailRendered;

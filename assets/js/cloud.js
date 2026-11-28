@@ -57,6 +57,7 @@
       if (!d || !d.access_token) { clearSession(); emit("signedout", { reason: "expired" }); return false; }
       state.session = parseSession(d);
       lsSet(KEY_SESSION, state.session);
+      liveToken();
       return true;
     }).catch(function () { return false; }).then(function (ok) { refreshing = null; return ok; });
     return refreshing;
@@ -332,7 +333,8 @@
   var ROOT_KIND = {
     SOTAY_QUYTRINH: "arr", SOTAY_SIEUAM: "arr", SOTAY_CANTHIEP: "arr",
     SOTAY_TAIBIEN: "obj", SOTAY_DOLOANGXUONG: "obj", SOTAY_THUOCCANQUANG: "obj", SOTAY_CONGCU: "obj",
-    SOTAY_CT_CHECKLISTS_MAP: "obj", SOTAY_MRIMASTER: "obj", SOTAY_CLINICAL_KNOWLEDGE: "obj"
+    SOTAY_CT_CHECKLISTS_MAP: "obj", SOTAY_MRIMASTER: "obj", SOTAY_CLINICAL_KNOWLEDGE: "obj",
+    SOTAY_PROTOCOL_VPI: "obj"   // mỗi protocol là 1 khóa → Admin thêm / xóa tự do
   };
 
   function parseKey(docKey) {
@@ -385,6 +387,7 @@
     var p = parseKey(docKey);
     if (!p) return;
     if (p.kind === "arr") { var i = arrIndex(p.root, p.id); if (i >= 0) p.root[i] = clone(state.base[docKey]); }
+    else if (state.base[docKey] === undefined) delete p.root[p.id];   // mục do Admin thêm mới → gỡ hẳn
     else p.root[p.id] = clone(state.base[docKey]);
     delete state.base[docKey];
   }
@@ -415,18 +418,139 @@
     }).catch(function () { applyCachedOverrides(); return false; });
   }
 
-  /* Nạp lại nội dung từ máy chủ (khi Admin khác vừa sửa). Tối đa 1 lần / 2 phút; chỉ báo khi có thay đổi. */
-  var lastContentSync = Date.now();
-  function refreshContent() {
-    if (!state.profile || state.offline || Date.now() - lastContentSync < 120000) return Promise.resolve(false);
-    lastContentSync = Date.now();
-    var before = JSON.stringify(Object.keys(state.overrides).sort().map(function (k) { return [k, state.overrides[k].at]; }));
-    return loadOverrides().then(function () {
-      var after = JSON.stringify(Object.keys(state.overrides).sort().map(function (k) { return [k, state.overrides[k].at]; }));
-      if (before !== after) { emit("contentchanged", null); return true; }
-      return false;
-    });
+  /* Nạp lại nội dung từ máy chủ (khi Admin khác vừa sửa). Gộp các lần gọi dồn dập; chỉ báo khi NỘI DUNG thực sự đổi. */
+  function fingerprint() {
+    return JSON.stringify(Object.keys(state.overrides).sort().map(function (k) { return [k, state.overrides[k].value]; }));
   }
+  var contentSync = { running: null, again: false, last: 0 };
+  function refreshContent(force) {
+    if (!state.profile || state.offline) return Promise.resolve(false);
+    if (contentSync.running) { contentSync.again = true; return contentSync.running; }
+    if (!force && Date.now() - contentSync.last < 3000) return Promise.resolve(false);
+    contentSync.last = Date.now();
+    var before = fingerprint(), beforeRows = state.overrides;
+    contentSync.running = loadOverrides().then(function () {
+      if (before === fingerprint()) return false;
+      // Ai vừa sửa? (bản ghi mới nhất khác với bản đang có)
+      var who = null, at = "";
+      Object.keys(state.overrides).forEach(function (k) {
+        var r = state.overrides[k], o = beforeRows[k];
+        if ((!o || !same(o.value, r.value)) && String(r.at || "") > at) { at = String(r.at || ""); who = r.by; }
+      });
+      emit("contentchanged", { remote: true, by: who });
+      return true;
+    }).catch(function () { return false; }).then(function (changed) {
+      contentSync.running = null;
+      if (contentSync.again) { contentSync.again = false; setTimeout(function () { refreshContent(true); }, 400); }
+      return changed;
+    });
+    return contentSync.running;
+  }
+
+  /* ---------------------------------------------------- ĐỒNG BỘ TỨC THÌ (REALTIME) --
+     Kết nối WebSocket tới Supabase Realtime: khi Admin lưu nội dung trên điện thoại/máy tính,
+     mọi máy đang mở nhận được sự kiện trong ~1 giây và tự nạp lại. Không cần thư viện ngoài.
+     Nếu mạng/chính sách chặn WebSocket → tự chuyển sang kiểm tra định kỳ (15 giây). */
+  var live = { ws: null, ref: 0, hb: null, joined: false, retry: 0, timer: null, poll: null, on: false, lastSig: null, notifyT: null };
+
+  function liveUrl() {
+    return BASE.replace(/^http/, "ws") + "/realtime/v1/websocket?apikey=" + encodeURIComponent(C.SUPABASE_ANON_KEY) + "&vsn=1.0.0";
+  }
+  function liveSend(topic, event, payload) {
+    if (!live.ws || live.ws.readyState !== 1) return;
+    try { live.ws.send(JSON.stringify({ topic: topic, event: event, payload: payload || {}, ref: String(++live.ref) })); } catch (e) {}
+  }
+  var LIVE_TOPIC = "realtime:cdha-sync";
+
+  function liveConnect() {
+    if (!live.on || live.ws || typeof WebSocket === "undefined" || !configured()) return;
+    var ws;
+    try { ws = new WebSocket(liveUrl()); } catch (e) { liveRetry(); return; }
+    live.ws = ws;
+    ws.onopen = function () {
+      freshToken().then(function (tok) {
+        liveSend(LIVE_TOPIC, "phx_join", {
+          config: {
+            broadcast: { self: false }, presence: { key: "" },
+            postgres_changes: [
+              { event: "*", schema: "public", table: "content_overrides" },
+              { event: "*", schema: "public", table: "feedback" },
+              { event: "*", schema: "public", table: "account_requests" }
+            ]
+          },
+          access_token: tok
+        });
+      });
+      live.hb = setInterval(function () { liveSend("phoenix", "heartbeat", {}); }, 25000);
+    };
+    ws.onmessage = function (ev) {
+      var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (m.topic !== LIVE_TOPIC) return;
+      if (m.event === "phx_reply" && m.payload && m.payload.status === "ok" && !live.joined) {
+        live.joined = true; live.retry = 0; emit("live", { connected: true });
+        refreshContent(true);                       // bù các thay đổi trong lúc chưa kết nối
+      } else if (m.event === "phx_reply" && m.payload && m.payload.status === "error") {
+        try { ws.close(); } catch (e) {}
+      } else if (m.event === "postgres_changes") {
+        var t = m.payload && m.payload.data && m.payload.data.table;
+        if (t === "content_overrides") refreshContent(true);
+        else { clearTimeout(live.notifyT); live.notifyT = setTimeout(checkNotifications, 600); }
+      } else if (m.event === "phx_error" || m.event === "phx_close") {
+        try { ws.close(); } catch (e) {}
+      }
+    };
+    ws.onclose = function () {
+      clearInterval(live.hb); live.hb = null; live.ws = null;
+      if (live.joined) emit("live", { connected: false });
+      live.joined = false;
+      liveRetry();
+    };
+    ws.onerror = function () { /* onclose sẽ xử lý */ };
+  }
+  function liveRetry() {
+    if (!live.on) return;
+    clearTimeout(live.timer);
+    var wait = Math.min(60000, 2000 * Math.pow(2, live.retry++));
+    live.timer = setTimeout(liveConnect, wait);
+  }
+  /* Kiểm tra dự phòng: chỉ tải danh sách (khóa + thời điểm sửa) — rất nhẹ */
+  function livePoll() {
+    if (!live.on || document.hidden || !state.profile || state.offline) return;
+    if (live.joined && Date.now() - contentSync.last < 300000) return;   // đã có realtime → 5 phút kiểm tra 1 lần
+    http("/rest/v1/content_overrides?select=doc_key,updated_at&order=doc_key.asc").then(function (r) {
+      if (!r.ok || !Array.isArray(r.data)) return;
+      // So với nội dung ĐANG HIỂN THỊ: khác danh sách khóa hoặc thời điểm sửa → nạp lại
+      var server = {}, diff = r.data.length !== Object.keys(state.overrides).length;
+      r.data.forEach(function (x) { server[x.doc_key] = x.updated_at; });
+      Object.keys(state.overrides).forEach(function (k) {
+        if (!(k in server) || String(server[k]) !== String(state.overrides[k].at)) diff = true;
+      });
+      if (diff) refreshContent(true);
+    }).catch(function () {});
+  }
+  function startLive() {
+    if (live.on || !configured()) return;
+    live.on = true; live.retry = 0; live.lastSig = null;
+    liveConnect();
+    live.poll = setInterval(livePoll, 15000);
+  }
+  function stopLive() {
+    live.on = false;
+    clearTimeout(live.timer); clearInterval(live.poll); clearInterval(live.hb);
+    live.poll = live.hb = live.timer = null;
+    if (live.ws) { try { live.ws.close(); } catch (e) {} live.ws = null; }
+    live.joined = false;
+  }
+  /* Token phiên được làm mới → báo cho kênh realtime (để RLS tiếp tục đúng người) */
+  function liveToken() {
+    if (live.joined && state.session) liveSend(LIVE_TOPIC, "access_token", { access_token: state.session.access_token });
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden || !live.on) return;
+    if (!live.ws) { live.retry = 0; clearTimeout(live.timer); liveConnect(); }
+    refreshContent(true);
+  });
+  window.addEventListener("online", function () { if (live.on && !live.ws) { live.retry = 0; liveConnect(); } });
 
   function isEdited(docKey) { return !!state.overrides[docKey]; }
   function editInfo(docKey) { return state.overrides[docKey] || null; }
@@ -535,11 +659,12 @@
 
   function startPolling() {
     stopPolling();
+    startLive();
     poll.lastAdmin = null; poll.lastMine = null;
     checkNotifications();
     poll.timer = setInterval(function () { if (!document.hidden) checkNotifications(); }, 60000);
   }
-  function stopPolling() { if (poll.timer) clearInterval(poll.timer); poll.timer = null; }
+  function stopPolling() { if (poll.timer) clearInterval(poll.timer); poll.timer = null; stopLive(); }
   document.addEventListener("visibilitychange", function () { if (!document.hidden && poll.timer) checkNotifications(); });
 
   /* -------------------------------------------------- QUẢN TRỊ TÀI KHOẢN ------ */
@@ -628,6 +753,10 @@
     addObj("SOTAY_CONGCU", { _g: "Công cụ tính liều", lieuCanQuang: "Liều cản quang CT (tham số máy tính)", lieuCCTA: "Liều CCTA (tham số máy tính)" }, ["lieuCanQuang", "lieuCCTA"]);
     addObj("SOTAY_MRIMASTER", { _g: "MRI Master", bangDoiChieuHang: "Đối chiếu 3 hãng MRI", quyTrinhLapKeHoach: "Hướng đặt cắt MRI" }, ["bangDoiChieuHang", "quyTrinhLapKeHoach"]);
     addObj("SOTAY_CLINICAL_KNOWLEDGE", { _g: "Tri thức nền", geSignaExplorerVPI: "GE SIGNA Explorer 1.5T", siemensAcademy: "Siemens Academy", principlesByModality: "Nguyên lý theo kỹ thuật", ktv3MienLectures: "Bài giảng KTV 3 Miền" }, ["geSignaExplorerVPI", "siemensAcademy", "principlesByModality", "ktv3MienLectures"]);
+    Object.keys(window.SOTAY_PROTOCOL_VPI || {}).forEach(function (k) {
+      var v = window.SOTAY_PROTOCOL_VPI[k];
+      if (v && typeof v === "object") out.push({ key: "SOTAY_PROTOCOL_VPI." + k, label: (v.ten || k) + (v.daXoa ? " — đã xóa (bấm ↩ để hiện lại)" : ""), group: "Protocol BV Vĩnh Phúc VPI", sub: v.loai || "" });
+    });
     if (window.SOTAY_CT_CHECKLISTS_MAP) {
       Object.keys(window.SOTAY_CT_CHECKLISTS_MAP).forEach(function (k) {
         var v = window.SOTAY_CT_CHECKLISTS_MAP[k];
@@ -652,6 +781,7 @@
     listHistory: listHistory, docCatalog: docCatalog, applyCachedOverrides: applyCachedOverrides, refreshContent: refreshContent,
     sendFeedback: sendFeedback, listFeedback: listFeedback, updateFeedback: updateFeedback, deleteFeedback: deleteFeedback,
     checkNotifications: checkNotifications, startPolling: startPolling, stopPolling: stopPolling,
+    liveStatus: function () { return { on: live.on, connected: live.joined }; },
     listUsers: listUsers, adminUpdateUser: adminUpdateUser, adminApi: adminApi,
     resetPassword: resetPassword, submitAccountRequest: submitAccountRequest, listRequests: listRequests, updateRequest: updateRequest, deleteRequest: deleteRequest,
     suggestUsername: suggestUsername

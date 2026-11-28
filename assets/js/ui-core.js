@@ -547,8 +547,14 @@
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden && V.profile() && !V.isOffline() && started) V.refreshContent();
   });
-  V.on("contentchanged", function () {
-    if (started && V.profile()) window.VUDAT_APP.refreshCurrent();
+  V.on("contentchanged", function (d) {
+    if (!started || !V.profile()) return;
+    window.VUDAT_APP.refreshCurrent();
+    if (d && d.remote) toast("🔄 Nội dung vừa được cập nhật" + (d.by ? " bởi " + d.by : "") + ".", "ok");
+  });
+  /* Chấm trạng thái đồng bộ trên nút tài khoản: xanh = tức thì, xám = kiểm tra định kỳ */
+  V.on("live", function (d) {
+    document.body.classList.toggle("vpi-live", !!(d && d.connected));
   });
 
   /* --------------------------------------------------------------- KHỞI ĐỘNG -- */

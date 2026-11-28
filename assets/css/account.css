@@ -210,3 +210,79 @@ details.ed-card > .ed-card-body { padding: 4px 12px 6px; border-top: 1px solid v
 .ed-sticky { position: sticky; bottom: -18px; background: var(--surface); padding: 10px 0 2px; border-top: 1px solid var(--line); margin-top: 10px; }
 
 .auth-link { background: none; border: 0; padding: 6px; margin-top: 4px; color: var(--brand-dark); font: inherit; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; align-self: center; }
+
+/* =====================================================================
+   PROTOCOL BV VĨNH PHÚC VPI · PHẦN 4 (BỐ CỤC MỚI) · CÔNG CỤ ADMIN TỪNG MỤC
+   ===================================================================== */
+:root { --c-vpi: #0f766e; --c-vpi-dark: #115e59; --c-vpi-wash: #f0fdfa; --c-vpi-border: #99f6e4; --c-vpi-ink: #134e4a; }
+:root[data-theme="dark"] { --c-vpi: #2dd4bf; --c-vpi-dark: #14b8a6; --c-vpi-wash: #042f2e; --c-vpi-border: #115e59; --c-vpi-ink: #ccfbf1; }
+.theme-vpi { --theme-color: var(--c-vpi); --theme-wash: var(--c-vpi-wash); --theme-border: var(--c-vpi-border); --theme-ink: var(--c-vpi-ink); }
+.navpill.theme-vpi .dot { background: var(--c-vpi); }
+.mod-card.theme-vpi { border-top: 4px solid var(--c-vpi); }
+.mod-card.theme-vpi .mod-card-count { color: var(--c-vpi); }
+.modality-page-wrap.theme-vpi { --mod-border: var(--c-vpi-border); }
+.theme-vpi .col-sidebar-left { border-color: var(--c-vpi-border); }
+.theme-vpi .detail-header { background: linear-gradient(135deg, rgba(15,118,110,.12) 0%, rgba(204,251,241,.4) 100%); border-left: 5px solid var(--c-vpi); border-radius: var(--radius); padding: 16px; }
+:root[data-theme="dark"] .theme-vpi .detail-header { background: rgba(45,212,191,.08); }
+.theme-vpi .lesson-item-btn.active { background: var(--c-vpi-wash) !important; border-left: 4px solid var(--c-vpi) !important; color: var(--c-vpi-dark) !important; font-weight: 700; }
+.theme-vpi .region-pill.active { background: var(--c-vpi) !important; color: #fff !important; }
+.list-filter-bar .vpi-add-btn { width: 100%; justify-content: center; margin-top: 8px; }
+.vpi-proto-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0 16px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); font-size: 12.5px; color: var(--text-soft); }
+.vpi-proto-meta .muted { flex-basis: 100%; font-style: italic; color: var(--text-muted); }
+.learning-step-card.vpi-step .step-badge-title { background: var(--c-vpi-wash); border-color: var(--c-vpi-border); }
+.learning-step-card.vpi-step .num { background: var(--c-vpi); color: #fff; }
+.learning-step-card.vpi-step h3 { color: var(--c-vpi-dark); }
+.vpi-p { margin: 0; white-space: pre-line; }
+.ref-table.vpi-seq td:first-child { width: 28px; text-align: center; color: var(--text-muted); }
+
+/* ---- PHẦN 4: mục lục + 3 khối */
+.s4-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 14px; position: sticky; top: 0; z-index: 3; padding: 6px 0; background: var(--surface); }
+.s4-toc button { border: 1px solid var(--line); background: var(--surface-2); color: var(--text); border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.s4-toc button:hover { border-color: var(--brand); color: var(--brand-dark); }
+.s4-toc button b { color: var(--brand); margin-right: 2px; }
+.s4-block { scroll-margin-top: 70px; }
+.s4-block + .s4-block { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.s4-title { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 15px; color: var(--brand-dark); }
+.s4-title span { display: inline-grid; place-items: center; min-width: 34px; height: 24px; padding: 0 6px; border-radius: 6px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 800; }
+.s4-src { margin: -4px 0 10px; font-size: 12px; color: var(--text-muted); }
+.s4-src a { color: var(--c-mri); font-weight: 700; text-decoration: none; }
+
+/* ---- Thẻ mặt phẳng: nội dung trên, ảnh minh họa ngay dưới */
+.plane-list { display: flex; flex-direction: column; gap: 12px; }
+.plane-card { border: 1px solid var(--c-mri-border); border-left: 4px solid var(--c-mri); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.plane-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; background: var(--c-mri-wash); color: var(--c-mri-ink); font-size: 14px; }
+.plane-head b { flex: 1 1 auto; }
+.plane-no { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--c-mri); color: #fff; font-size: 12px; font-weight: 800; }
+.plane-admin { display: flex; gap: 4px; flex-wrap: wrap; }
+.plane-rules { margin: 0; padding: 10px 12px 4px; display: grid; gap: 6px; }
+.plane-rules > div { display: grid; grid-template-columns: 130px 1fr; gap: 8px; font-size: 13px; line-height: 1.5; }
+.plane-rules dt { font-weight: 700; color: var(--text-soft); }
+.plane-rules dd { margin: 0; color: var(--text); }
+.plane-rules .warn dd { color: var(--brand-dark); }
+.plane-imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; padding: 8px 12px 12px; }
+.plane-imgs:empty { display: none; }
+.plane-img { position: relative; margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #000; cursor: zoom-in; }
+.plane-img img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #000; }
+.plane-img figcaption { padding: 4px 6px; font-size: 11.5px; background: var(--surface); color: var(--text-soft); line-height: 1.35; }
+.plane-img.broken img { visibility: hidden; }
+.plane-img.broken::after { content: "Ảnh chưa tải được"; position: absolute; inset: 0 0 24px; display: grid; place-items: center; color: #fff; font-size: 12px; }
+.plane-img .gc-admin { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 2; }
+.plane-img .gc-admin button { width: 28px; height: 28px; border: 0; border-radius: 6px; background: rgba(15,23,42,.75); color: #fff; cursor: pointer; }
+.plane-img .gc-admin button:hover { background: #dc2626; }
+.plane-img .gc-admin button.cap:hover { background: var(--brand); }
+.plane-noimg { grid-column: 1 / -1; padding: 12px; border: 1px dashed var(--line-strong, var(--line)); border-radius: 8px; text-align: center; font-size: 12.5px; color: var(--text-muted); }
+.plane-add-slot { margin-top: 10px; }
+@media (max-width: 640px) {
+  .plane-rules > div { grid-template-columns: 1fr; gap: 0; }
+  .plane-rules dt { font-size: 12px; }
+  .plane-imgs { grid-template-columns: repeat(2, 1fr); }
+  .s4-toc { position: static; }
+}
+
+/* ---- Nút sửa từng phần (chỉ Admin) */
+.sec-edit-btn { margin-left: auto; flex: none; }
+.step-badge-title .sec-edit-btn { height: 26px; padding: 0 9px; font-size: 11.5px; }
+
+/* ---- Chấm trạng thái đồng bộ trên thẻ tài khoản */
+.user-chip { position: relative; }
+body.vpi-live .user-chip::after { content: ""; position: absolute; right: 2px; bottom: 2px; width: 9px; height: 9px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 2px var(--surface); }
