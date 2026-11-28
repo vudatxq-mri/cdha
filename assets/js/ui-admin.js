@@ -407,7 +407,7 @@
     xaoAnh: "Xảo ảnh thường gặp", nguyenNhan: "Nguyên nhân", khacPhuc: "Khắc phục", bang: "Bảng",
     loai: "Loại kỹ thuật (MRI / CT / X-quang / Siêu âm / Khác)", thuTu: "Thứ tự hiển thị", mayApDung: "Thiết bị áp dụng",
     chuoiXung: "Chuỗi xung / thì chụp", thongSo_: "Thông số", thuocCanQuang: "Thuốc cản quang / đối quang từ",
-    daXoa: "Đã xóa (ẩn khỏi danh sách)", luuY: "Lưu ý", tieuChuanDat: "Tiêu chuẩn hình ảnh đạt", nguoiDuyet: "Người duyệt", capNhat: "Ngày cập nhật"
+    daXoa: "Đã xóa (ẩn khỏi danh sách)", apDungNhom: "Áp dụng cho nhóm (Phân hệ|Nhóm)", boQua: "Không áp dụng cho mã bài", luuY: "Lưu ý", tieuChuanDat: "Tiêu chuẩn hình ảnh đạt", nguoiDuyet: "Người duyệt", capNhat: "Ngày cập nhật"
   };
   /* Mẫu dòng mới cho các danh sách (kể cả khi danh sách đang trống) */
   var TEMPLATES = {
@@ -425,7 +425,7 @@
     return false;
   }
   var READONLY = { id: 1, phanHe: 1, modality: 1, type: 1 };
-  var SKIP = { hinhAnh: 1 };
+  var SKIP = { hinhAnh: 1, anhHuongTia: 1 };   // ảnh: thêm/xóa trực tiếp trên trang
 
   function label(k) { return LBL[k] || k; }
   function isPlain(v) { return v !== null && typeof v === "object" && !Array.isArray(v); }
@@ -687,7 +687,8 @@
   /* Nút "✏️ Sửa" trên từng phần của bài (1. Định nghĩa · 2. Thông số · 3. Chỉ định · 4. Quy trình · 5. Bảng kiểm) */
   function sectionEditors(itemId) {
     var key = itemKeyFor(itemId);
-    if (!key || !/^SOTAY_QUYTRINH#/.test(key)) return {};
+    var ck0 = checklistKeyFor(itemId);
+    if (!key || !/^SOTAY_QUYTRINH#/.test(key)) return ck0 ? { bangkiem: { label: "Bảng kiểm", key: ck0 } } : {};
     var it = window.VUDAT_APP.findItem(itemId) || {};
     var pr = window.VUDAT_APP.principleFor(itemId) || {};
     var isMRI = it.modality === "MRI";
@@ -752,7 +753,58 @@
       head.appendChild(btn);
     });
 
-    if (mainKey && /^SOTAY_QUYTRINH#/.test(mainKey)) planeTools(itemId, mainKey, mainPanel);
+    if (mainKey && /^SOTAY_QUYTRINH#/.test(mainKey)) { planeTools(itemId, mainKey, mainPanel); beamTools(mainKey, mainPanel); }
+  }
+
+  /* ---------------------------- X-QUANG / CT: ẢNH HƯỚNG TIA & MẶT PHẲNG TÁI TẠO --- */
+  function beamTools(key, mainPanel) {
+    var gal = mainPanel.querySelector(".beam-gallery");
+    if (!gal) return;
+    function saveImgs(list, msg) {
+      var doc = V.getDoc(key); if (!doc) return Promise.resolve({ ok: false, message: "Không tìm thấy bài." });
+      doc.anhHuongTia = list;
+      return V.saveDoc(key, doc).then(function (r) {
+        if (!r.ok) toast(r.message, "err"); else { if (msg) toast(msg, "ok"); window.VUDAT_APP.refreshCurrent(); }
+        return r;
+      });
+    }
+    function current() { var d = V.getDoc(key) || {}; return Array.isArray(d.anhHuongTia) ? d.anhHuongTia.slice() : []; }
+    var slot = gal.querySelector(".beam-admin");
+    var title = (mainPanel.querySelector(".detail-header h2") || {}).textContent || "";
+    var isXq = /^X-quang/i.test((window.VUDAT_APP.findItem(key.split("#")[1]) || {}).modality || "");
+    slot.innerHTML = '<button type="button" class="vpi-btn sm primary" data-cam>📷 Chụp ảnh</button><button type="button" class="vpi-btn sm" data-up>🖼️ Tải ảnh lên</button>' +
+      '<input type="file" accept="image/*" capture="environment" hidden data-fc><input type="file" accept="image/*" multiple hidden data-fu>';
+    slot.querySelector("[data-cam]").addEventListener("click", function () { slot.querySelector("[data-fc]").click(); });
+    slot.querySelector("[data-up]").addEventListener("click", function () { slot.querySelector("[data-fu]").click(); });
+    slot.querySelectorAll("input[type=file]").forEach(function (inp) {
+      inp.addEventListener("change", function () {
+        var files = Array.prototype.slice.call(inp.files || [], 0, 10); inp.value = "";
+        if (!files.length) return;
+        askImages(files, isXq ? "Hướng tia & tư thế" : "Mặt phẳng tái tạo", isXq ? BEAM_CAPS_XQ : BEAM_CAPS_CT, function (added) {
+          return saveImgs(current().concat(added));
+        });
+      });
+    });
+    gal.querySelectorAll(".plane-img[data-bidx]").forEach(function (fig) {
+      var j = +fig.getAttribute("data-bidx");
+      var c = document.createElement("div"); c.className = "gc-admin";
+      c.innerHTML = '<button type="button" class="cap" title="Đổi chú thích">✎</button><button type="button" title="Xóa ảnh">🗑</button>';
+      c.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var b = e.target.closest("button"); if (!b) return;
+        var list = current(), im = list[j]; if (!im) return;
+        if (b.classList.contains("cap")) {
+          var nc = prompt("Chú thích ảnh:", im.caption || im.chuThich || ""); if (nc === null) return;
+          list[j] = { src: im.src || im.url, caption: nc.trim() };
+          saveImgs(list);
+        } else {
+          if (!confirm("Xóa ảnh này?")) return;
+          list.splice(j, 1);
+          saveImgs(list, "Đã xóa ảnh.").then(function (r) { if (r.ok) dropMedia(im); });
+        }
+      });
+      fig.appendChild(c);
+    });
   }
 
   /* ---------------------------------------------- HƯỚNG ĐẶT LÁT CẮT: TỪNG MẶT PHẲNG */
@@ -922,6 +974,8 @@
 
   /* ========================================================== ẢNH TƯ THẾ / PHIM == */
   var PRESET_CAPS = ["Tư thế & hướng tia", "Phim đạt yêu cầu", "Phim đạt yêu cầu (có chú thích)", "Ảnh đặt tư thế người bệnh", "Khác..."];
+  var BEAM_CAPS_XQ = ["Tư thế đặt bệnh nhân", "Hướng tia trung tâm & khu trú chùm tia", "Phim đạt yêu cầu", "Phim đạt yêu cầu (có chú thích)", "Khác..."];
+  var BEAM_CAPS_CT = ["Ảnh định vị (Scout) & phạm vi quét", "Tái tạo Axial", "Tái tạo Coronal", "Tái tạo Sagittal", "MIP / MinIP", "Dựng hình 3D VRT", "Khác..."];
   var PLANE_CAPS = ["Ảnh định vị (localizer) & đặt lát cắt", "Ảnh kết quả mặt phẳng này", "Mốc giải phẫu", "Khác..."];
 
   function onGalleryRendered(item, rightPanel) {

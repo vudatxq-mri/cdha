@@ -869,6 +869,52 @@
   }
   function safeImg(u) { return window.VPI_UI ? window.VPI_UI.safeImgUrl(u) : u; }
 
+  /* X-quang / CT — khối "Hướng tia & mặt phẳng khảo sát (tái tạo)": nội dung + ảnh minh họa (Admin chụp/tải lên) */
+  function renderBeamBlock(item, secs, imgs, isXray) {
+    var h = '<div class="beam-block">';
+    secs.forEach(function (sec) { h += renderContentSection(sec, "s4-sec"); });
+    h +=
+      '<div class="beam-gallery">' +
+        '<div class="beam-head"><b>🖼️ ' + (isXray ? 'Ảnh hướng tia, tư thế & phim minh họa' : 'Ảnh mặt phẳng khảo sát & tái tạo (MPR / MIP / 3D)') + '</b><span class="beam-admin"></span></div>' +
+        '<div class="plane-imgs beam-imgs">' +
+          imgs.map(function (im, j) {
+            var src = safeImg(im.src || im.url || "");
+            var cap = im.caption || im.chuThich || ("Ảnh minh họa " + (j + 1));
+            return src ? '<figure class="plane-img" data-bidx="' + j + '" data-src="' + esc(src) + '" data-cap="' + esc(cap) + '"><img src="' + esc(src) + '" alt="' + esc(cap) + '" loading="lazy"><figcaption>' + esc(cap) + '</figcaption></figure>' : '';
+          }).join("") +
+          (imgs.length ? '' : '<div class="plane-noimg admin-only">Chưa có ảnh — bấm 📷 Chụp ảnh / 🖼️ Tải ảnh lên để thêm ' + (isXray ? 'ảnh hướng tia, tư thế đặt bệnh nhân.' : 'ảnh tái tạo các mặt phẳng.') + '</div>') +
+        '</div>' +
+      '</div>';
+    return h + '</div>';
+  }
+
+  /* Bảng kiểm thực hành (dùng chung cho X-quang, CT, MRI, Siêu âm, Đo loãng xương) */
+  function renderChecklistCard(itemId, num) {
+    var checklist = window.getChecklistForProtocol ? window.getChecklistForProtocol(itemId) : null;
+    if (!checklist || !checklist.cacBuoc || !checklist.cacBuoc.length) return "";
+    var savedChecks = appState.checklistProgress["ct_chk_" + itemId] || [];
+    var h =
+      '<div class="learning-step-card step-4" data-sec="bangkiem" style="border-color:var(--brand);">' +
+        '<div class="step-badge-title" style="background:var(--brand-wash);color:var(--brand-dark);">' +
+          '<span class="num" style="background:var(--brand);color:#fff;">' + num + '</span>' +
+          '<h3>BẢNG KIỂM THỰC HÀNH (' + esc(checklist.ten) + ')</h3>' +
+          '<span class="chk-counter-badge" id="chkCounter_' + itemId + '">' + savedChecks.length + ' / ' + checklist.cacBuoc.length + '</span>' +
+        '</div>' +
+        '<div class="step-card-body" style="padding:0;"><div class="checklist-body">';
+    checklist.cacBuoc.forEach(function (b, idx) {
+      var isChecked = savedChecks.indexOf(idx) !== -1;
+      h +=
+        '<label class="checklist-step' + (isChecked ? ' checked' : '') + '" id="chkRow_' + itemId + '_' + idx + '">' +
+          '<input type="checkbox" onchange="window.VUDAT_APP.toggleChecklistInline(\'' + itemId + '\', ' + idx + ', this.checked)"' + (isChecked ? ' checked' : '') + '>' +
+          '<div style="flex:1;">' +
+            '<span class="t">Bước ' + (b.buoc || idx + 1) + ': ' + esc(b.tieuDe) + '</span>' +
+            '<span class="desc">' + esc(b.noiDung) + '</span>' +
+          '</div>' +
+        '</label>';
+    });
+    return h + '</div></div></div>';
+  }
+
   /* Sau khi vẽ bài: mục lục phần 4 + phóng to ảnh minh họa mặt phẳng */
   function bindDetailExtras(mainPanel) {
     mainPanel.querySelectorAll("[data-jump]").forEach(function (b) {
@@ -1159,12 +1205,17 @@
     //   Dữ liệu riêng của từng bài (Admin sửa được): huongDatCat, tieuChuan, xaoAnh — nếu chưa có thì dùng dữ liệu chung.
     // =========================================================================
     var isAdminView = !!(window.VPI && window.VPI.isAdmin && window.VPI.isAdmin());
-    var stepSecs = (item.noiDung || []).filter(function (sec) { return !isIndicationSection(sec); });
+    // X-quang: mục "Tia trung tâm / khu trú chùm tia"; CT: mục "Dựng hình / tái tạo / cửa sổ" → đưa vào 4.2
+    var beamRe = isXray ? /tia trung tâm|khu trú chùm tia|hướng tia/i : (isCT ? /dựng hình|tái tạo|cửa sổ|mặt phẳng/i : null);
+    var allSteps = (item.noiDung || []).filter(function (sec) { return !isIndicationSection(sec); });
+    var beamSecs = beamRe ? allSteps.filter(function (sec) { return beamRe.test(sec.tieuDe || ""); }) : [];
+    var stepSecs = allSteps.filter(function (sec) { return beamSecs.indexOf(sec) === -1; });
+    var beamImgs = (!isMRI && Array.isArray(item.anhHuongTia)) ? item.anhHuongTia : [];
     var planes = Array.isArray(item.huongDatCat) ? item.huongDatCat : ((mriMasterPlan && mriMasterPlan.huongDatCat) || []);
     var planesShared = !Array.isArray(item.huongDatCat) && planes.length > 0;
     var qualityText = (typeof item.tieuChuan === "string" && item.tieuChuan.trim()) ? item.tieuChuan : (modPrinciple ? modPrinciple.tieuChuanChatLuong : "");
     var artifacts = Array.isArray(item.xaoAnh) ? item.xaoAnh : ((modPrinciple && modPrinciple.xaoAnhThuongGap) || []);
-    var showPlanes = planes.length > 0 || isAdminView;
+    var showPlanes = planes.length > 0 || beamSecs.length > 0 || beamImgs.length > 0 || isAdminView;
 
     var subs = [];
     if (stepSecs.length) subs.push({ id: "s4a", t: "Quy trình thực hiện" });
@@ -1199,6 +1250,7 @@
       html +=
         '<section class="s4-block" id="s4b_' + esc(item.id) + '">' +
           '<h4 class="s4-title"><span>' + subNo.s4b + '</span> ' + esc(isMRI ? "Hướng đặt lát cắt theo từng mặt phẳng" : (isCT ? "Hướng cắt & mặt phẳng tái tạo" : "Hướng tia & mặt phẳng khảo sát")) + '</h4>' +
+          (!isMRI ? renderBeamBlock(item, beamSecs, beamImgs, isXray) : '') +
           (planesShared ? '<p class="s4-src">📐 Nguồn: MRI Master (<a href="https://mrimaster.com/planning/" target="_blank" rel="noopener">mrimaster.com ↗</a>) & GE Healthcare VPI' + (isAdminView ? ' — <i>dữ liệu dùng chung; Admin sửa/thêm ảnh sẽ tạo bản riêng cho bài này.</i>' : '') + '</p>' : '') +
           '<div class="plane-list" data-planes-shared="' + (planesShared ? "1" : "0") + '">';
       planes.forEach(function (h, idx) {
@@ -1227,7 +1279,7 @@
             '</div>' +
           '</article>';
       });
-      if (!planes.length) html += '<div class="plane-noimg admin-only">Bài này chưa có hướng đặt lát cắt. Bấm <b>➕ Thêm mặt phẳng</b> để bổ sung.</div>';
+      if (!planes.length && isMRI) html += '<div class="plane-noimg admin-only">Bài này chưa có hướng đặt lát cắt. Bấm <b>➕ Thêm mặt phẳng</b> để bổ sung.</div>';
       html += '</div><div class="plane-add-slot admin-only"></div></section>';
     }
 
@@ -1253,37 +1305,7 @@
     // =========================================================================
     // PHẦN 5: BẢNG KIỂM THỰC HÀNH LÂM SÀNG (CHECKLIST AN TOÀN)
     // =========================================================================
-    if (checklist) {
-      var checklistKey = "ct_chk_" + item.id;
-      var savedChecks = appState.checklistProgress[checklistKey] || [];
-
-      html +=
-        '<div class="learning-step-card step-4" data-sec="bangkiem" style="border-color:var(--brand);">' +
-          '<div class="step-badge-title" style="background:var(--brand-wash);color:var(--brand-dark);">' +
-            '<span class="num" style="background:var(--brand);color:#fff;">5</span>' +
-            '<h3>BẢNG KIỂM THỰC HÀNH AN TOÀN (' + esc(checklist.ten) + ')</h3>' +
-            '<span class="chk-counter-badge" id="chkCounter_' + item.id + '">' + savedChecks.length + ' / ' + checklist.cacBuoc.length + '</span>' +
-          '</div>' +
-          '<div class="step-card-body" style="padding:0;">' +
-            '<div class="checklist-body">';
-
-      checklist.cacBuoc.forEach(function (b, idx) {
-        var isChecked = savedChecks.indexOf(idx) !== -1;
-        html +=
-          '<label class="checklist-step' + (isChecked ? ' checked' : '') + '" id="chkRow_' + item.id + '_' + idx + '">' +
-            '<input type="checkbox" onchange="window.VUDAT_APP.toggleChecklistInline(\'' + item.id + '\', ' + idx + ', this.checked)"' + (isChecked ? ' checked' : '') + '>' +
-            '<div style="flex:1;">' +
-              '<span class="t">Bước ' + b.buoc + ': ' + esc(b.tieuDe) + '</span>' +
-              '<span class="desc">' + esc(b.noiDung) + '</span>' +
-            '</div>' +
-          '</label>';
-      });
-
-      html +=
-            '</div>' +
-          '</div>' +
-        '</div>';
-    }
+    html += renderChecklistCard(item.id, 5);
 
     // Khung đánh dấu hoàn thành bài học (không khóa!)
     html += renderLMSUnlockBox(item.id, item.ten);
@@ -1408,6 +1430,7 @@
     });
     html += '</div></div>';
 
+    html += renderChecklistCard(item.id, (html.match(/class="num"/g) || []).length + 1);
     html += renderLMSUnlockBox(item.id, item.ten);
     html += mobBars.bottom;
     mainPanel.innerHTML = html;
@@ -1481,6 +1504,7 @@
         '<div class="step-card-body">' + stepsHtml + '</div>' +
       '</div>';
 
+    html += renderChecklistCard(item.id, (html.match(/class="num"/g) || []).length + 1);
     html += renderLMSUnlockBox(item.id, item.ten);
     html += mobBars.bottom;
     mainPanel.innerHTML = html;
@@ -1541,6 +1565,7 @@
       html += '</tbody></table></div></div></div>';
     }
 
+    html += renderChecklistCard(sectionId, (html.match(/class="num"/g) || []).length + 1);
     html += renderLMSUnlockBox(sectionId, "Đo Loãng Xương DEXA");
     html += mobBars.bottom;
     mainPanel.innerHTML = html;
