@@ -265,6 +265,19 @@ window.getChecklistForProtocol = function (protocolId) {
   for (i = 0; i < lists.length && !it; i++) {
     (lists[i] || []).some(function (x) { if (x && x.id === protocolId) { it = x; return true; } return false; });
   }
+  var vp = !it && window.SOTAY_PROTOCOL_VPI && window.SOTAY_PROTOCOL_VPI[protocolId];
+  if (vp) {   // Protocol BV Vĩnh Phúc VPI: dùng bảng kiểm theo loại kỹ thuật + vùng gần nhất
+    var l = String(vp.loai || "MRI"), n = String(vp.nhom || "").toLowerCase();
+    var mod = /^ct/i.test(l) ? "CT" : (/^x/i.test(l) ? "X-quang" : "MRI");
+    var guess = mod === "MRI"
+      ? (/cột sống/.test(n) ? "Cột sống" : /gối|vai|háng|khớp|chi/.test(n) ? "Chi & các khớp" : /bụng|gan|mật|tụy|thận|chậu|tiền liệt|tử cung|trực tràng/.test(n) ? "Bụng" : /vú/.test(n) ? "Vú" : "Sọ não")
+      : (mod === "X-quang" ? (/cột sống/.test(n) ? "Cột sống" : /ngực|bụng/.test(n) ? "Lồng ngực" : /sọ|mặt|răng/.test(n) ? "Sọ - Mặt" : "Chi trên") : "");
+    if (mod === "CT") {
+      var ct = /sọ|não/.test(n) ? "ct-so-nao" : /ngực|phổi/.test(n) ? "ct-long-nguc" : /bụng|chậu|gan/.test(n) ? "ct-bung-da-pha" : /cột sống/.test(n) ? "ct-cot-song" : null;
+      return ct ? (map[ct] || null) : null;
+    }
+    it = { modality: mod, nhom: guess };
+  }
   if (!it) return null;
   var tag = (it.modality || (window.SOTAY_SIEUAM && window.SOTAY_SIEUAM.indexOf(it) !== -1 ? "Siêu âm" : "")) + "|" + (it.nhom || "");
   for (i = 0; i < keys.length; i++) {

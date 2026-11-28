@@ -753,7 +753,7 @@
       head.appendChild(btn);
     });
 
-    if (mainKey && /^SOTAY_QUYTRINH#/.test(mainKey)) { planeTools(itemId, mainKey, mainPanel); beamTools(mainKey, mainPanel); }
+    if (mainKey && (/^SOTAY_QUYTRINH#/.test(mainKey) || isVpiKey(mainKey))) { planeTools(itemId, mainKey, mainPanel); beamTools(mainKey, mainPanel); }
   }
 
   /* ---------------------------- X-QUANG / CT: ẢNH HƯỚNG TIA & MẶT PHẲNG TÁI TẠO --- */
@@ -770,8 +770,9 @@
     }
     function current() { var d = V.getDoc(key) || {}; return Array.isArray(d.anhHuongTia) ? d.anhHuongTia.slice() : []; }
     var slot = gal.querySelector(".beam-admin");
-    var title = (mainPanel.querySelector(".detail-header h2") || {}).textContent || "";
-    var isXq = /^X-quang/i.test((window.VUDAT_APP.findItem(key.split("#")[1]) || {}).modality || "");
+    var kind = gal.getAttribute("data-kind") || "mri";
+    var CAPS = kind === "xq" ? BEAM_CAPS_XQ : (kind === "ct" ? BEAM_CAPS_CT : BEAM_CAPS_MRI);
+    var where = kind === "xq" ? "Hướng tia & tư thế" : (kind === "ct" ? "Mặt phẳng tái tạo" : "Định vị & đặt lát cắt");
     slot.innerHTML = '<button type="button" class="vpi-btn sm primary" data-cam>📷 Chụp ảnh</button><button type="button" class="vpi-btn sm" data-up>🖼️ Tải ảnh lên</button>' +
       '<input type="file" accept="image/*" capture="environment" hidden data-fc><input type="file" accept="image/*" multiple hidden data-fu>';
     slot.querySelector("[data-cam]").addEventListener("click", function () { slot.querySelector("[data-fc]").click(); });
@@ -780,7 +781,7 @@
       inp.addEventListener("change", function () {
         var files = Array.prototype.slice.call(inp.files || [], 0, 10); inp.value = "";
         if (!files.length) return;
-        askImages(files, isXq ? "Hướng tia & tư thế" : "Mặt phẳng tái tạo", isXq ? BEAM_CAPS_XQ : BEAM_CAPS_CT, function (added) {
+        askImages(files, where, CAPS, function (added) {
           return saveImgs(current().concat(added));
         });
       });
@@ -936,11 +937,12 @@
   }
 
   /* ------------------------------------------------- PROTOCOL BV VĨNH PHÚC VPI ---- */
-  function newProtocol(copyFrom) {
+  var LOAI_OF = { mri: "MRI", ct: "CT", xq: "X-quang" };
+  function newProtocol(copyFrom, modId) {
     if (!guard()) return;
     var id = "vpi-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 6);
     var base = copyFrom ? JSON.parse(JSON.stringify(copyFrom)) : {
-      loai: "MRI", nhom: "", ten: "", thuTu: 50, mayApDung: "GE SIGNA™ Explorer 1.5T",
+      loai: LOAI_OF[modId] || "MRI", nhom: "", ten: "", thuTu: 50, mayApDung: modId === "ct" ? "Máy CT của khoa" : (modId === "xq" ? "Máy X-quang của khoa" : "GE SIGNA™ Explorer 1.5T"),
       chiDinh: [""], chuanBi: [""], tuThe: "", chuoiXung: [{ ten: "", matPhang: "", thongSo: "", ghiChu: "" }],
       thuocCanQuang: "", luuY: [""], tieuChuanDat: [""], nguoiDuyet: "", capNhat: "", hinhAnh: []
     };
@@ -949,7 +951,7 @@
     if (copyFrom) { base.ten = (copyFrom.ten || "Protocol") + " (bản sao)"; base.hinhAnh = []; }
     openEditor("SOTAY_PROTOCOL_VPI." + id, copyFrom ? "Nhân bản protocol" : "Protocol mới — BV Vĩnh Phúc VPI", {
       initial: base,
-      note: "Nhập <b>Loại kỹ thuật</b> đúng một trong: MRI, CT, X-quang, Siêu âm, Khác (để xếp nhóm). Có thể thêm ảnh minh họa sau khi lưu.",
+      note: "<b>Loại kỹ thuật</b> quyết định protocol nằm ở cuối danh mục nào: <b>MRI</b>, <b>CT</b> hoặc <b>X-quang</b>. Sau khi lưu có thể thêm hướng đặt lát cắt và ảnh minh họa.",
       onSaved: function () { location.hash = "item:" + id; }
     });
   }
@@ -963,19 +965,21 @@
     p.then(function (r) {
       if (!r.ok) return toast(r.message, "err");
       toast("Đã xóa protocol.", "ok");
-      location.hash = "mod-vpi";
+      var l = String(doc.loai || "").toLowerCase();
+      location.hash = "mod-" + (l.indexOf("ct") === 0 ? "ct" : (l.indexOf("x") === 0 ? "xq" : "mri"));
     });
   }
 
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-vpi-add]");
-    if (b) { e.preventDefault(); newProtocol(null); }
+    if (b) { e.preventDefault(); newProtocol(null, b.getAttribute("data-vpi-add") || (window.location.hash.match(/mod-(\w+)/) || [])[1]); }
   });
 
   /* ========================================================== ẢNH TƯ THẾ / PHIM == */
   var PRESET_CAPS = ["Tư thế & hướng tia", "Phim đạt yêu cầu", "Phim đạt yêu cầu (có chú thích)", "Ảnh đặt tư thế người bệnh", "Khác..."];
   var BEAM_CAPS_XQ = ["Tư thế đặt bệnh nhân", "Hướng tia trung tâm & khu trú chùm tia", "Phim đạt yêu cầu", "Phim đạt yêu cầu (có chú thích)", "Khác..."];
   var BEAM_CAPS_CT = ["Ảnh định vị (Scout) & phạm vi quét", "Tái tạo Axial", "Tái tạo Coronal", "Tái tạo Sagittal", "MIP / MinIP", "Dựng hình 3D VRT", "Khác..."];
+  var BEAM_CAPS_MRI = ["Ảnh định vị (localizer) & đặt lát cắt", "Đặt lát cắt Axial", "Đặt lát cắt Sagittal", "Đặt lát cắt Coronal", "Ảnh kết quả chuỗi xung", "Khác..."];
   var PLANE_CAPS = ["Ảnh định vị (localizer) & đặt lát cắt", "Ảnh kết quả mặt phẳng này", "Mốc giải phẫu", "Khác..."];
 
   function onGalleryRendered(item, rightPanel) {

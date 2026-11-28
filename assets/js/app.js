@@ -10,15 +10,6 @@
   // Danh mục 8 phân hệ chính và cấu hình màu
   var MODALITIES = [
     {
-      id: "vpi",
-      name: "Protocol BV Vĩnh Phúc VPI",
-      en: "VPI In-house Protocols",
-      icon: "🏥",
-      colorClass: "theme-vpi",
-      colorHex: "#0f766e",
-      desc: "Protocol kỹ thuật riêng của Khoa CĐHA Bệnh viện Vĩnh Phúc VPI — Admin thêm, bớt, điều chỉnh linh hoạt và đồng bộ tức thì."
-    },
-    {
       id: "xq",
       name: "Quy trình X-quang",
       en: "X-Ray Protocols & Positioning",
@@ -102,7 +93,8 @@
     { id: "bung-chau", name: "Ổ bụng & Tiểu khung", icon: "🩺" },
     { id: "chi-tren", name: "Chi trên & Khớp", icon: "💪" },
     { id: "chi-duoi", name: "Chi dưới & Khớp", icon: "🦵" },
-    { id: "toan-than", name: "Toàn thân & Mạch máu", icon: "🌐" }
+    { id: "toan-than", name: "Toàn thân & Mạch máu", icon: "🌐" },
+    { id: "protocol-vpi", name: "🏥 Protocol BV Vĩnh Phúc VPI", icon: "🏥" }
   ];
 
   var appState = {
@@ -128,6 +120,7 @@
 
   /* Phân loại kỹ thuật vào Nhóm Vùng Cơ Thể */
   function getRegionCategory(item) {
+    if (item && item.type === "vpi-protocol") return { id: "protocol-vpi", name: "Protocol BV Vĩnh Phúc VPI", icon: "🏥" };
     var t = ((item.nhom || "") + " " + (item.ten || "") + " " + (item.vung || "")).toLowerCase();
     if (t.indexOf("thông số") !== -1 || t.indexOf("vật lý") !== -1 || t.indexOf("alara") !== -1 || t.indexOf("chuỗi xung") !== -1 || t.indexOf("an toàn") !== -1 || t.indexOf("nguyên lý") !== -1) {
       return { id: "thong-so", name: "Thông số & An toàn", icon: "⚡" };
@@ -300,7 +293,7 @@
 
   /* Đếm số bài trong từng phân hệ (Không tính bảng kiểm rời!) */
   function getModalityItemCount(modId) {
-    if (modId === "vpi") return getVpiProtocols().length;
+    if (modId === "mri" || modId === "ct" || modId === "xq") return getItemsForModality(modId).length;
     if (modId === "xq") {
       return (window.SOTAY_QUYTRINH || []).filter(function (x) { return x.modality === "X-quang"; }).length;
     } else if (modId === "ct") {
@@ -556,7 +549,7 @@
         '<div class="col-panel col-sidebar-left">' +
           '<div class="list-filter-bar">' +
             '<input id="lessonSearchInput" type="text" placeholder="Tìm kỹ thuật trong ' + esc(curMod.name) + '...">' +
-            (modId === "vpi" ? '<button type="button" class="vpi-btn sm primary admin-only vpi-add-btn" data-vpi-add>➕ Thêm protocol mới</button>' : '') +
+            (modId === "mri" || modId === "ct" || modId === "xq" ? '<button type="button" class="vpi-btn sm primary admin-only vpi-add-btn" data-vpi-add="' + modId + '">➕ Thêm Protocol BV Vĩnh Phúc VPI</button>' : '') +
           '</div>' +
           '<div class="lesson-list-scroll" id="lessonListContainer">' +
             renderLessonItemsHtml(items, null, appState.selectedRegion) +
@@ -643,6 +636,7 @@
           '<div class="lesson-info">' +
             '<span class="t">' + esc(it.ten) + '</span>' +
             '<span class="sub">' +
+              (it.type === "vpi-protocol" ? '<b style="color:var(--c-vpi);">🏥 Protocol VPI</b> • ' : '') +
               esc(it.nhom || it.vung || it.modality || "") +
               (hasChk ? ' • <b style="color:var(--brand);">Có Bảng kiểm</b>' : '') +
             '</span>' +
@@ -656,6 +650,12 @@
   /* Lấy danh sách bài học theo phân hệ (Không tạo bảng kiểm rời!) */
   /* Protocol BV Vĩnh Phúc VPI: đối tượng {id: protocol} → danh sách đã sắp xếp (bỏ mục Admin đã xóa) */
   var VPI_LOAI_ORDER = ["MRI", "CT", "X-quang", "Siêu âm", "Khác"];
+  function vpiModOf(p) {
+    var l = String((p && p.loai) || "").toLowerCase();
+    if (l.indexOf("ct") === 0 || l.indexOf("cắt lớp") !== -1) return "ct";
+    if (l.indexOf("x-quang") !== -1 || l.indexOf("xq") === 0 || l.indexOf("x quang") !== -1) return "xq";
+    return "mri";
+  }
   function getVpiProtocols() {
     var src = window.SOTAY_PROTOCOL_VPI || {};
     return Object.keys(src).map(function (k) {
@@ -670,7 +670,11 @@
   }
 
   function getItemsForModality(modId) {
-    if (modId === "vpi") return getVpiProtocols();
+    // Protocol BV Vĩnh Phúc VPI nằm CUỐI danh mục của phân hệ tương ứng (MRI / CT / X-quang)
+    var vpiOf = function (loai) { return getVpiProtocols().filter(function (p) { return vpiModOf(p) === loai; }); };
+    if (modId === "mri") return (window.SOTAY_QUYTRINH || []).filter(function (x) { return x.modality === "MRI"; }).concat(vpiOf("mri"));
+    if (modId === "ct") return (window.SOTAY_QUYTRINH || []).filter(function (x) { return x.modality === "CT"; }).concat(vpiOf("ct"));
+    if (modId === "xq") return (window.SOTAY_QUYTRINH || []).filter(function (x) { return x.modality === "X-quang"; }).concat(vpiOf("xq"));
     if (modId === "xq") {
       return (window.SOTAY_QUYTRINH || []).filter(function (x) { return x.modality === "X-quang"; });
     } else if (modId === "ct") {
@@ -785,7 +789,7 @@
     else if (item.type === "dlx-section") modId = "dlx";
     else if (item.type === "cq-section") modId = "cq";
     else if (item.type === "emg-section") modId = "emg";
-    else if (item.type === "vpi-protocol") modId = "vpi";
+    else if (item.type === "vpi-protocol") modId = vpiModOf(item);
 
     var mainPanel = document.getElementById("detailMainPanel");
     if (!mainPanel || appState.currentModId !== modId) {
@@ -869,25 +873,57 @@
   }
   function safeImg(u) { return window.VPI_UI ? window.VPI_UI.safeImgUrl(u) : u; }
 
-  /* X-quang / CT — khối "Hướng tia & mặt phẳng khảo sát (tái tạo)": nội dung + ảnh minh họa (Admin chụp/tải lên) */
-  function renderBeamBlock(item, secs, imgs, isXray) {
+  /* Các thẻ mặt phẳng (nội dung + ảnh ngay bên dưới) — dùng cho bài kỹ thuật và Protocol BV Vĩnh Phúc VPI */
+  function renderPlanesInner(planes, planesShared, isAdminView, isMRI) {
+    var h = (planesShared ? '<p class="s4-src">📐 Nguồn: MRI Master (<a href="https://mrimaster.com/planning/" target="_blank" rel="noopener">mrimaster.com ↗</a>) & GE Healthcare VPI' + (isAdminView ? ' — <i>dữ liệu dùng chung; Admin sửa/thêm ảnh sẽ tạo bản riêng cho bài này.</i>' : '') + '</p>' : '') +
+      '<div class="plane-list" data-planes-shared="' + (planesShared ? "1" : "0") + '">';
+    planes.forEach(function (p, idx) {
+      var imgs = Array.isArray(p.hinhAnh) ? p.hinhAnh : [];
+      h +=
+        '<article class="plane-card" data-plane="' + idx + '">' +
+          '<header class="plane-head"><span class="plane-no">' + (idx + 1) + '</span><b>Mặt phẳng ' + esc(p.matPhang || "") + '</b><span class="plane-admin"></span></header>' +
+          '<dl class="plane-rules">' +
+            (p.nguyenTac ? '<div><dt>Nguyên tắc</dt><dd>' + esc(p.nguyenTac) + '</dd></div>' : '') +
+            (p.phamVi ? '<div><dt>Phạm vi</dt><dd>' + esc(p.phamVi) + '</dd></div>' : '') +
+            (p.soDoGiaiPhau ? '<div><dt>📍 Mốc giải phẫu</dt><dd>' + esc(p.soDoGiaiPhau) + '</dd></div>' : '') +
+            (p.chongXaoAnh ? '<div class="warn"><dt>Chống xảo ảnh</dt><dd>' + esc(p.chongXaoAnh) + '</dd></div>' : '') +
+            (p.ghiChu ? '<div><dt>Ghi chú</dt><dd>' + esc(p.ghiChu) + '</dd></div>' : '') +
+          '</dl>' +
+          '<div class="plane-imgs">' +
+            imgs.map(function (im, j) {
+              var src = safeImg(im.src || im.url || "");
+              var cap = im.caption || im.chuThich || ("Ảnh minh họa " + (j + 1));
+              return src ? '<figure class="plane-img" data-idx="' + j + '" data-src="' + esc(src) + '" data-cap="' + esc(cap) + '"><img src="' + esc(src) + '" alt="' + esc(cap) + '" loading="lazy"><figcaption>' + esc(cap) + '</figcaption></figure>' : '';
+            }).join("") +
+            (imgs.length ? '' : '<div class="plane-noimg admin-only">Chưa có ảnh minh họa cho mặt phẳng này — bấm 📷 / 🖼️ để thêm.</div>') +
+          '</div>' +
+        '</article>';
+    });
+    if (!planes.length && isMRI) h += '<div class="plane-noimg admin-only">Chưa có hướng đặt lát cắt theo mặt phẳng. Bấm <b>➕ Thêm mặt phẳng</b> để bổ sung (mỗi mặt phẳng có nút 📷 / 🖼️ thêm ảnh).</div>';
+    return h + '</div><div class="plane-add-slot admin-only"></div>';
+  }
+
+  /* Khối ảnh minh họa chung của mục 4.2 (Admin chụp / tải lên):
+     X-quang: hướng tia & tư thế · CT: mặt phẳng tái tạo · MRI: định vị & đặt lát cắt */
+  function renderBeamBlock(item, secs, imgs, kind) {
+    var title = kind === "xq" ? "Ảnh hướng tia, tư thế & phim minh họa" : (kind === "ct" ? "Ảnh mặt phẳng khảo sát & tái tạo (MPR / MIP / 3D)" : "Ảnh định vị (localizer) & đặt lát cắt");
+    var hint = kind === "xq" ? "ảnh hướng tia, tư thế đặt bệnh nhân." : (kind === "ct" ? "ảnh tái tạo các mặt phẳng." : "ảnh định vị và đặt lát cắt.");
     var h = '<div class="beam-block">';
-    secs.forEach(function (sec) { h += renderContentSection(sec, "s4-sec"); });
+    (secs || []).forEach(function (sec) { h += renderContentSection(sec, "s4-sec"); });
     h +=
-      '<div class="beam-gallery">' +
-        '<div class="beam-head"><b>🖼️ ' + (isXray ? 'Ảnh hướng tia, tư thế & phim minh họa' : 'Ảnh mặt phẳng khảo sát & tái tạo (MPR / MIP / 3D)') + '</b><span class="beam-admin"></span></div>' +
+      '<div class="beam-gallery' + (imgs.length ? '' : ' admin-only') + '" data-kind="' + kind + '">' +
+        '<div class="beam-head"><b>🖼️ ' + title + '</b><span class="beam-admin"></span></div>' +
         '<div class="plane-imgs beam-imgs">' +
           imgs.map(function (im, j) {
             var src = safeImg(im.src || im.url || "");
             var cap = im.caption || im.chuThich || ("Ảnh minh họa " + (j + 1));
             return src ? '<figure class="plane-img" data-bidx="' + j + '" data-src="' + esc(src) + '" data-cap="' + esc(cap) + '"><img src="' + esc(src) + '" alt="' + esc(cap) + '" loading="lazy"><figcaption>' + esc(cap) + '</figcaption></figure>' : '';
           }).join("") +
-          (imgs.length ? '' : '<div class="plane-noimg admin-only">Chưa có ảnh — bấm 📷 Chụp ảnh / 🖼️ Tải ảnh lên để thêm ' + (isXray ? 'ảnh hướng tia, tư thế đặt bệnh nhân.' : 'ảnh tái tạo các mặt phẳng.') + '</div>') +
+          (imgs.length ? '' : '<div class="plane-noimg">Chưa có ảnh — bấm 📷 Chụp ảnh / 🖼️ Tải ảnh lên để thêm ' + hint + '</div>') +
         '</div>' +
       '</div>';
     return h + '</div>';
   }
-
   /* Bảng kiểm thực hành (dùng chung cho X-quang, CT, MRI, Siêu âm, Đo loãng xương) */
   function renderChecklistCard(itemId, num) {
     var checklist = window.getChecklistForProtocol ? window.getChecklistForProtocol(itemId) : null;
@@ -935,9 +971,9 @@
 
   /* Kế hoạch đặt cắt chung (MRI Master) phù hợp với bài — dùng khi bài chưa có hướng đặt cắt riêng */
   function findMriMasterPlan(item) {
-    if (!item || item.modality !== "MRI" || !window.SOTAY_MRIMASTER || !window.SOTAY_MRIMASTER.quyTrinhLapKeHoach) return null;
+    if (!item || !(item.modality === "MRI" || (item.type === "vpi-protocol" && vpiModOf(item) === "mri")) || !window.SOTAY_MRIMASTER || !window.SOTAY_MRIMASTER.quyTrinhLapKeHoach) return null;
       return window.SOTAY_MRIMASTER.quyTrinhLapKeHoach.filter(function (p) {
-        var t = item.ten.toLowerCase();
+        var t = String(item.ten || "").toLowerCase();
         var nhom = (item.nhom || "").toLowerCase();
         return (p.vung && nhom.indexOf(p.vung.toLowerCase()) !== -1) ||
                (t.indexOf("sọ não") !== -1 && p.id === "mri-plan-so-nao") ||
@@ -1210,7 +1246,7 @@
     var allSteps = (item.noiDung || []).filter(function (sec) { return !isIndicationSection(sec); });
     var beamSecs = beamRe ? allSteps.filter(function (sec) { return beamRe.test(sec.tieuDe || ""); }) : [];
     var stepSecs = allSteps.filter(function (sec) { return beamSecs.indexOf(sec) === -1; });
-    var beamImgs = (!isMRI && Array.isArray(item.anhHuongTia)) ? item.anhHuongTia : [];
+    var beamImgs = Array.isArray(item.anhHuongTia) ? item.anhHuongTia : [];
     var planes = Array.isArray(item.huongDatCat) ? item.huongDatCat : ((mriMasterPlan && mriMasterPlan.huongDatCat) || []);
     var planesShared = !Array.isArray(item.huongDatCat) && planes.length > 0;
     var qualityText = (typeof item.tieuChuan === "string" && item.tieuChuan.trim()) ? item.tieuChuan : (modPrinciple ? modPrinciple.tieuChuanChatLuong : "");
@@ -1250,37 +1286,9 @@
       html +=
         '<section class="s4-block" id="s4b_' + esc(item.id) + '">' +
           '<h4 class="s4-title"><span>' + subNo.s4b + '</span> ' + esc(isMRI ? "Hướng đặt lát cắt theo từng mặt phẳng" : (isCT ? "Hướng cắt & mặt phẳng tái tạo" : "Hướng tia & mặt phẳng khảo sát")) + '</h4>' +
-          (!isMRI ? renderBeamBlock(item, beamSecs, beamImgs, isXray) : '') +
-          (planesShared ? '<p class="s4-src">📐 Nguồn: MRI Master (<a href="https://mrimaster.com/planning/" target="_blank" rel="noopener">mrimaster.com ↗</a>) & GE Healthcare VPI' + (isAdminView ? ' — <i>dữ liệu dùng chung; Admin sửa/thêm ảnh sẽ tạo bản riêng cho bài này.</i>' : '') + '</p>' : '') +
-          '<div class="plane-list" data-planes-shared="' + (planesShared ? "1" : "0") + '">';
-      planes.forEach(function (h, idx) {
-        var imgs = Array.isArray(h.hinhAnh) ? h.hinhAnh : [];
-        html +=
-          '<article class="plane-card" data-plane="' + idx + '">' +
-            '<header class="plane-head">' +
-              '<span class="plane-no">' + (idx + 1) + '</span>' +
-              '<b>Mặt phẳng ' + esc(h.matPhang || "") + '</b>' +
-              '<span class="plane-admin"></span>' +
-            '</header>' +
-            '<dl class="plane-rules">' +
-              (h.nguyenTac ? '<div><dt>Nguyên tắc</dt><dd>' + esc(h.nguyenTac) + '</dd></div>' : '') +
-              (h.phamVi ? '<div><dt>Phạm vi</dt><dd>' + esc(h.phamVi) + '</dd></div>' : '') +
-              (h.soDoGiaiPhau ? '<div><dt>📍 Mốc giải phẫu</dt><dd>' + esc(h.soDoGiaiPhau) + '</dd></div>' : '') +
-              (h.chongXaoAnh ? '<div class="warn"><dt>Chống xảo ảnh</dt><dd>' + esc(h.chongXaoAnh) + '</dd></div>' : '') +
-              (h.ghiChu ? '<div><dt>Ghi chú</dt><dd>' + esc(h.ghiChu) + '</dd></div>' : '') +
-            '</dl>' +
-            '<div class="plane-imgs">' +
-              imgs.map(function (im, j) {
-                var src = safeImg(im.src || im.url || "");
-                var cap = im.caption || im.chuThich || ("Ảnh minh họa " + (j + 1));
-                return src ? '<figure class="plane-img" data-idx="' + j + '" data-src="' + esc(src) + '" data-cap="' + esc(cap) + '"><img src="' + esc(src) + '" alt="' + esc(cap) + '" loading="lazy"><figcaption>' + esc(cap) + '</figcaption></figure>' : '';
-              }).join("") +
-              (imgs.length ? '' : '<div class="plane-noimg admin-only">Chưa có ảnh minh họa cho mặt phẳng này — bấm 📷 / 🖼️ để thêm.</div>') +
-            '</div>' +
-          '</article>';
-      });
-      if (!planes.length && isMRI) html += '<div class="plane-noimg admin-only">Bài này chưa có hướng đặt lát cắt. Bấm <b>➕ Thêm mặt phẳng</b> để bổ sung.</div>';
-      html += '</div><div class="plane-add-slot admin-only"></div></section>';
+          renderBeamBlock(item, beamSecs, beamImgs, isXray ? "xq" : (isCT ? "ct" : "mri")) +
+          renderPlanesInner(planes, planesShared, isAdminView, isMRI);
+      html += '</section>';
     }
 
     // ---- 4.3 Tiêu chuẩn chất lượng hình ảnh & xảo ảnh
@@ -1339,6 +1347,16 @@
         seq.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td><b>' + esc(r.ten) + '</b></td><td>' + esc(r.matPhang) + '</td><td>' + esc(r.thongSo) + '</td><td>' + esc(r.ghiChu) + '</td></tr>'; }).join("") +
         '</tbody></table></div>']);
     }
+    // Hướng đặt lát cắt theo từng mặt phẳng + ảnh minh họa (Admin chụp / tải ảnh lên)
+    var kind = vpiModOf(item), isAdm = !!(window.VPI && window.VPI.isAdmin && window.VPI.isAdmin());
+    var mp0 = findMriMasterPlan(item);
+    var vPlanes = Array.isArray(item.huongDatCat) ? item.huongDatCat : ((mp0 && mp0.huongDatCat) || []);
+    var vImgs = Array.isArray(item.anhHuongTia) ? item.anhHuongTia : [];
+    if (vPlanes.length || vImgs.length || isAdm) {
+      blocks.push([kind === "mri" ? "Hướng đặt lát cắt theo từng mặt phẳng" : (kind === "ct" ? "Hướng cắt & mặt phẳng tái tạo" : "Hướng tia & mặt phẳng khảo sát"),
+        '<div class="s4-block" id="s4b_' + esc(item.id) + '">' + renderBeamBlock(item, [], vImgs, kind) +
+        renderPlanesInner(vPlanes, !Array.isArray(item.huongDatCat) && vPlanes.length > 0, isAdm, kind === "mri") + '</div>']);
+    }
     if (item.thuocCanQuang) blocks.push(["Thuốc cản quang / đối quang từ", '<p class="vpi-p">' + esc(item.thuocCanQuang) + '</p>']);
     if (ly) blocks.push(["Lưu ý an toàn & kỹ thuật", ly]);
     if (td) blocks.push(["Tiêu chuẩn hình ảnh đạt", td]);
@@ -1370,8 +1388,10 @@
           '<div class="step-card-body">' + b[1] + '</div>' +
         '</div>';
     });
+    html += renderChecklistCard(item.id, blocks.length + 1);
     html += mobBars.bottom;
     mainPanel.innerHTML = html;
+    bindDetailExtras(mainPanel);
     if (rightPanel) renderImagesSidebar(item.hinhAnh || [], rightPanel, "Ảnh minh họa protocol", item);
   }
 
